@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Sage Green Light Palette -->
+    <color name="sjt_light_bg_app">#F2F5F3</color>
+    <color name="sjt_light_bg_surface">#FFFFFF</color>
+    <color name="sjt_light_brand_primary">#2E4D3E</color>
+
+    <!-- Sage Green Dark Palette -->
+    <color name="sjt_dark_bg_app">#0E1411</color>
+    <color name="sjt_dark_bg_surface">#16201B</color>
+    <color name="sjt_dark_brand_primary">#52997A</color>
+</resources>
