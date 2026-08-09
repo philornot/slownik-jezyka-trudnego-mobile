@@ -2,7 +2,6 @@ package pl.slownikjezykatrudnego.app.ui.lesson
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,11 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.RemoveCircle
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -78,7 +77,7 @@ fun HybridQuizCard(
         SjtCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f, fill = false)
+                .weight(1f) // Ensure card takes available space
         ) {
             // Header
             Row(
@@ -127,6 +126,7 @@ fun HybridQuizCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .weight(1f) // Take available space
                     .verticalScroll(scrollState)
                     .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
@@ -155,62 +155,7 @@ fun HybridQuizCard(
                     }
                 }
 
-                // ETAP 1: Active Recall Quiz Options
-                if (!isAnswered) {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text(
-                            text = "SPRAWDŹ PAMIĘĆ: WYBIERZ WŁAŚCIWE ZNACZENIE",
-                            color = colors.textPrimary,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                            letterSpacing = 0.5.sp
-                        )
-
-                        card.options.forEachIndexed { index, option ->
-                            val letter = ('A' + index).toString()
-
-                            Surface(
-                                onClick = { selectedOption = option },
-                                shape = RoundedCornerShape(12.dp),
-                                color = colors.bgSurfaceElevated,
-                                border = BorderStroke(1.dp, colors.borderDefault),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(12.dp),
-                                    verticalAlignment = Alignment.Top,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                                ) {
-                                    Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = colors.bgSurface,
-                                        border = BorderStroke(1.dp, colors.borderDefault),
-                                        modifier = Modifier.size(26.dp)
-                                    ) {
-                                        Box(contentAlignment = Alignment.Center) {
-                                            Text(
-                                                text = letter,
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.ExtraBold,
-                                                color = colors.textPrimary
-                                            )
-                                        }
-                                    }
-
-                                    Text(
-                                        text = option,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = colors.textPrimary,
-                                        lineHeight = 20.sp,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                } else {
+                if (isAnswered) {
                     // ETAP 2: Context Revelation & Details
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         // Feedback Banner
@@ -328,7 +273,10 @@ fun HybridQuizCard(
                                     .fillMaxWidth()
                                     .clickable {
                                         try {
-                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(card.word.sjpUrl))
+                                            val intent = Intent(
+                                                Intent.ACTION_VIEW,
+                                                Uri.parse(card.word.sjpUrl)
+                                            )
                                             context.startActivity(intent)
                                         } catch (e: Exception) {
                                             e.printStackTrace()
@@ -350,6 +298,68 @@ fun HybridQuizCard(
                                     contentDescription = "Otwórz SJP PWN",
                                     tint = colors.textAmberBrand,
                                     modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ETAP 1: Active Recall Quiz Options (Moved to bottom of card for thumb access)
+            if (!isAnswered) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(
+                        text = "SPRAWDŹ PAMIĘĆ: WYBIERZ WŁAŚCIWE ZNACZENIE",
+                        color = colors.textPrimary,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                        letterSpacing = 0.5.sp
+                    )
+
+                    card.options.forEachIndexed { index, option ->
+                        val letter = ('A' + index).toString()
+
+                        Surface(
+                            onClick = { selectedOption = option },
+                            shape = RoundedCornerShape(12.dp),
+                            color = colors.bgSurfaceElevated,
+                            border = BorderStroke(1.dp, colors.borderDefault),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.Top,
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = colors.bgSurface,
+                                    border = BorderStroke(1.dp, colors.borderDefault),
+                                    modifier = Modifier.size(26.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text(
+                                            text = letter,
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = colors.textPrimary
+                                        )
+                                    }
+                                }
+
+                                Text(
+                                    text = option,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = colors.textPrimary,
+                                    lineHeight = 20.sp,
+                                    modifier = Modifier.weight(1f)
                                 )
                             }
                         }
@@ -390,7 +400,7 @@ fun HybridQuizCard(
                             onClick = { onGrade(ReviewGrade.AGAIN) },
                             modifier = Modifier
                                 .weight(1f)
-                                .heightIn(min = 48.dp),
+                                .height(64.dp), // Increased height
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade0Bg,
                             border = BorderStroke(1.dp, colors.grade0Border)
@@ -404,12 +414,12 @@ fun HybridQuizCard(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = null,
                                     tint = colors.grade0Text,
-                                    modifier = Modifier.size(15.dp)
+                                    modifier = Modifier.size(22.dp) // Increased icon size
                                 )
                                 Text(
                                     text = "Bardzo słabo",
                                     color = colors.grade0Text,
-                                    fontSize = 11.sp,
+                                    fontSize = 12.sp, // Increased font size
                                     fontWeight = FontWeight.ExtraBold,
                                     textAlign = TextAlign.Center
                                 )
@@ -421,7 +431,7 @@ fun HybridQuizCard(
                             onClick = { onGrade(ReviewGrade.HARD) },
                             modifier = Modifier
                                 .weight(1f)
-                                .heightIn(min = 48.dp),
+                                .height(64.dp), // Increased height
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade3Bg,
                             border = BorderStroke(1.dp, colors.grade3Border)
@@ -435,12 +445,12 @@ fun HybridQuizCard(
                                     imageVector = Icons.Default.RemoveCircle,
                                     contentDescription = null,
                                     tint = colors.grade3Text,
-                                    modifier = Modifier.size(15.dp)
+                                    modifier = Modifier.size(22.dp) // Increased icon size
                                 )
                                 Text(
                                     text = "Słabo",
                                     color = colors.grade3Text,
-                                    fontSize = 11.sp,
+                                    fontSize = 12.sp, // Increased font size
                                     fontWeight = FontWeight.ExtraBold,
                                     textAlign = TextAlign.Center
                                 )
@@ -452,7 +462,7 @@ fun HybridQuizCard(
                             onClick = { onGrade(ReviewGrade.GOOD) },
                             modifier = Modifier
                                 .weight(1f)
-                                .heightIn(min = 48.dp),
+                                .height(64.dp), // Increased height
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade4Bg,
                             border = BorderStroke(1.dp, colors.grade4Border)
@@ -466,12 +476,12 @@ fun HybridQuizCard(
                                     imageVector = Icons.Default.CheckCircle,
                                     contentDescription = null,
                                     tint = colors.grade4Text,
-                                    modifier = Modifier.size(15.dp)
+                                    modifier = Modifier.size(22.dp) // Increased icon size
                                 )
                                 Text(
                                     text = "Dobrze",
                                     color = colors.grade4Text,
-                                    fontSize = 11.sp,
+                                    fontSize = 12.sp, // Increased font size
                                     fontWeight = FontWeight.ExtraBold,
                                     textAlign = TextAlign.Center
                                 )
@@ -483,7 +493,7 @@ fun HybridQuizCard(
                             onClick = { onGrade(ReviewGrade.EASY) },
                             modifier = Modifier
                                 .weight(1f)
-                                .heightIn(min = 48.dp),
+                                .height(64.dp), // Increased height
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade5Bg,
                             border = BorderStroke(1.dp, colors.grade5Border)
@@ -497,12 +507,12 @@ fun HybridQuizCard(
                                     imageVector = Icons.Default.Star,
                                     contentDescription = null,
                                     tint = colors.grade5Text,
-                                    modifier = Modifier.size(15.dp)
+                                    modifier = Modifier.size(22.dp) // Increased icon size
                                 )
                                 Text(
                                     text = "Bardzo dobrze",
                                     color = colors.grade5Text,
-                                    fontSize = 11.sp,
+                                    fontSize = 12.sp, // Increased font size
                                     fontWeight = FontWeight.ExtraBold,
                                     textAlign = TextAlign.Center
                                 )
