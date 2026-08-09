@@ -1,13 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace = "pl.slownikjezykatrudnego.app"
-    compileSdk = 34
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "pl.slownikjezykatrudnego.app"
@@ -35,9 +34,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
-    }
+
     buildFeatures {
         compose = true
     }
