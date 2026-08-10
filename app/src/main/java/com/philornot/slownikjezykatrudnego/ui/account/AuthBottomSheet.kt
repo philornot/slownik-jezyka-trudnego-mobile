@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.philornot.slownikjezykatrudnego.R
+import com.philornot.slownikjezykatrudnego.ui.components.GoogleSignInButton
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTouchButton
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 
@@ -147,8 +148,8 @@ fun AuthBottomSheet(
                 lineHeight = 18.sp
             )
 
-            // Google Sign-In Button
-            Surface(
+            // Google Sign-In Button (official Google Identity branding)
+            GoogleSignInButton(
                 onClick = {
                     isGoogleLoading = true
                     errorMessage = null
@@ -157,44 +158,10 @@ fun AuthBottomSheet(
                         isGoogleLoading = false
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                color = colors.bgSurfaceElevated,
-                border = BorderStroke(1.dp, colors.borderDefault),
-                enabled = !isLoading && !isGoogleLoading
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    if (isGoogleLoading) {
-                        Text(
-                            "Łączenie z Google…",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = colors.textPrimary
-                        )
-                    } else {
-                        // Google "G" logo text representation
-                        Text(
-                            text = "G",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.brandPrimary,
-                            modifier = Modifier.padding(end = 10.dp)
-                        )
-                        Text(
-                            text = "Kontynuuj z Google",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = colors.textPrimary
-                        )
-                    }
-                }
-            }
+                isLoading = isGoogleLoading,
+                enabled = !isLoading,
+                text = "Kontynuuj z Google"
+            )
 
             // Divider
             Row(

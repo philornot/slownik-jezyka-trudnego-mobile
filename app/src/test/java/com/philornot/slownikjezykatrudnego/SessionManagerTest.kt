@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego
+package com.philornot.slownikjezykatrudnego
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -49,6 +49,21 @@ class SessionManagerTest {
         assertEquals(5, sessionData.cards.size)
         assertTrue(sessionData.cards.all { it.isNew })
         assertTrue(sessionData.cards.all { it.options.size == 4 })
+    }
+
+    @Test
+    fun testDailySession_withDefaultSettings_createsThreeCards() {
+        val defaultSettings = UserSettings()
+        assertEquals(3, defaultSettings.dailyNewWordsLimit)
+
+        val sessionData = SessionManager.createDailySession(
+            progressMap = emptyMap(),
+            settings = defaultSettings,
+            allWords = DictionaryWordsData.WORDS
+        )
+
+        assertEquals(3, sessionData.cards.size)
+        assertTrue(sessionData.cards.all { it.isNew })
     }
 
     @Test

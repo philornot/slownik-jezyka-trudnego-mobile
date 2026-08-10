@@ -96,6 +96,9 @@ class SjtViewModel(
     private val _isAuthOpen = MutableStateFlow(false)
     val isAuthOpen: StateFlow<Boolean> = _isAuthOpen.asStateFlow()
 
+    private val _showNotificationPrompt = MutableStateFlow(false)
+    val showNotificationPrompt: StateFlow<Boolean> = _showNotificationPrompt.asStateFlow()
+
     init {
         startSession()
         // Observe auth state changes — load profile on login, clear on logout.
@@ -435,9 +438,25 @@ class SjtViewModel(
         } else {
             _sessionCompleted.value = true
             _completionMessage.value = SessionManager.getDailyCompletionMessage()
+            if (!repository.hasPromptedForNotifications() && !settings.value.notificationsEnabled) {
+                _showNotificationPrompt.value = true
+            }
         }
 
         persistActiveSessionState()
+    }
+
+    /** Enables daily reminders and dismisses the notification prompt. */
+    fun enableNotifications() {
+        saveSettings(settings.value.copy(notificationsEnabled = true))
+        repository.setPromptedForNotifications(true)
+        _showNotificationPrompt.value = false
+    }
+
+    /** Dismisses notification prompt without enabling notifications. */
+    fun dismissNotificationPrompt() {
+        repository.setPromptedForNotifications(true)
+        _showNotificationPrompt.value = false
     }
 
     /**

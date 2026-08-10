@@ -3,6 +3,7 @@ package com.philornot.slownikjezykatrudnego.ui
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,7 @@ import com.philornot.slownikjezykatrudnego.ui.components.SjtBottomNavBar
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTab
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTopBar
 import com.philornot.slownikjezykatrudnego.ui.lesson.LessonScreen
+import com.philornot.slownikjezykatrudnego.ui.lesson.NotificationPromptDialog
 import com.philornot.slownikjezykatrudnego.ui.settings.SettingsBottomSheet
 import com.philornot.slownikjezykatrudnego.ui.stats.StatsScreen
 import com.philornot.slownikjezykatrudnego.ui.theme.LocalThemeTransitionState
@@ -72,6 +74,7 @@ fun SjtApp(
     val isSettingsOpen by viewModel.isSettingsOpen.collectAsState()
     val isAccountOpen by viewModel.isAccountOpen.collectAsState()
     val isAuthOpen by viewModel.isAuthOpen.collectAsState()
+    val showNotificationPrompt by viewModel.showNotificationPrompt.collectAsState()
 
     val streakDays = remember(progressMap) {
         SuperMemoEngine.calculateStreak(progressMap)
@@ -116,6 +119,7 @@ fun SjtApp(
                 isSettingsOpen = isSettingsOpen,
                 isAccountOpen = isAccountOpen,
                 isAuthOpen = isAuthOpen,
+                showNotificationPrompt = showNotificationPrompt,
                 onOpenPrivacy = ::openPrivacyInBrowser,
                 onToggleTheme = { offset ->
                     revealOrigin = offset?.let { RevealOrigin(it.x, it.y) }
@@ -167,6 +171,7 @@ private fun SjtAppScaffold(
     isSettingsOpen: Boolean,
     isAccountOpen: Boolean,
     isAuthOpen: Boolean,
+    showNotificationPrompt: Boolean,
     onOpenPrivacy: () -> Unit,
     onToggleTheme: ((Offset?) -> Unit)?
 ) {
@@ -279,16 +284,19 @@ private fun SjtAppScaffold(
                 onSignInWithEmail = { email, password, onError ->
                     viewModel.signInWithEmail(email, password, {
                         viewModel.closeAuth()
+                        Toast.makeText(activity, "Zalogowano pomyślnie", Toast.LENGTH_SHORT).show()
                     }, onError)
                 },
                 onRegisterWithEmail = { email, password, onError ->
                     viewModel.registerWithEmail(email, password, {
                         viewModel.closeAuth()
+                        Toast.makeText(activity, "Zalogowano pomyślnie", Toast.LENGTH_SHORT).show()
                     }, onError)
                 },
                 onSignInWithGoogle = { onError ->
                     viewModel.signInWithGoogle(activity, googleWebClientId, {
                         viewModel.closeAuth()
+                        Toast.makeText(activity, "Zalogowano pomyślnie", Toast.LENGTH_SHORT).show()
                     }, onError)
                 },
                 onOpenPrivacy = {
@@ -296,6 +304,13 @@ private fun SjtAppScaffold(
                     onOpenPrivacy()
                 },
                 onDismiss = { viewModel.closeAuth() }
+            )
+        }
+
+        if (showNotificationPrompt) {
+            NotificationPromptDialog(
+                onEnable = { viewModel.enableNotifications() },
+                onDismiss = { viewModel.dismissNotificationPrompt() }
             )
         }
     }

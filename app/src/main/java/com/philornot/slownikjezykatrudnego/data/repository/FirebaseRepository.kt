@@ -372,7 +372,7 @@ class FirebaseRepository(
                     .firstOrNull { it.name.equals(textSizeStr, ignoreCase = true) }
                     ?: com.philornot.slownikjezykatrudnego.data.model.TextSizeLevel.SMALL
                 return@withContext UserSettings(
-                    dailyNewWordsLimit = (raw["dailyNewWordsLimit"] as? Number)?.toInt() ?: 5,
+                    dailyNewWordsLimit = (raw["dailyNewWordsLimit"] as? Number)?.toInt() ?: 3,
                     highContrast = raw["highContrast"] as? Boolean ?: false,
                     reducedMotion = raw["reducedMotion"] as? Boolean ?: false,
                     textSize = textSize

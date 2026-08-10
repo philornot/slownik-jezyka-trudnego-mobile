@@ -138,6 +138,20 @@ class PreferencesRepository(context: Context) {
     }
 
     /**
+     * Checks if user has already been prompted to enable notifications after completing a lesson.
+     */
+    fun hasPromptedForNotifications(): Boolean {
+        return prefs.getBoolean(KEY_PROMPTED_NOTIFICATIONS, false)
+    }
+
+    /**
+     * Records that user has been prompted to enable notifications.
+     */
+    fun setPromptedForNotifications(prompted: Boolean = true) {
+        prefs.edit().putBoolean(KEY_PROMPTED_NOTIFICATIONS, prompted).apply()
+    }
+
+    /**
      * Retrieves or generates a persistent device UUID.
      */
     fun getDeviceId(): String {
@@ -155,5 +169,6 @@ class PreferencesRepository(context: Context) {
         private const val KEY_USER_SETTINGS = "sjt_user_settings"
         private const val KEY_SESSION_STATE = "sjt_session_state"
         private const val KEY_DEVICE_ID = "sjt_device_id"
+        private const val KEY_PROMPTED_NOTIFICATIONS = "sjt_prompted_notifications"
     }
 }

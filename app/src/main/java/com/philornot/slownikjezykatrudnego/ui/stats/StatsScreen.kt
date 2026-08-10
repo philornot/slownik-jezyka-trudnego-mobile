@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.ui.stats
+package com.philornot.slownikjezykatrudnego.ui.stats
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -383,7 +383,7 @@ fun StatsScreen(
                         )
                     }
 
-                    hardestWords.forEach { (word, prog) ->
+                    hardestWords.forEach { (word, _) ->
                         Surface(
                             onClick = { selectedWordForDetail = word },
                             shape = RoundedCornerShape(10.dp),
@@ -392,7 +392,7 @@ fun StatsScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(
-                                modifier = Modifier.padding(10.dp),
+                                modifier = Modifier.padding(12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -407,20 +407,6 @@ fun StatsScreen(
                                         fontSize = 12.sp,
                                         color = colors.textSecondary,
                                         maxLines = 1
-                                    )
-                                }
-
-                                Surface(
-                                    shape = RoundedCornerShape(9999.dp),
-                                    color = colors.badgeRoseBg,
-                                    border = BorderStroke(1.dp, colors.badgeRoseBorder)
-                                ) {
-                                    Text(
-                                        text = "EF: ${prog.easeFactor}",
-                                        color = colors.badgeRoseText,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                                     )
                                 }
                             }

@@ -179,80 +179,42 @@ private fun UnauthenticatedContent(
 ) {
     val colors = SjtTheme.colors
 
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // Offline status card
-        Surface(
-            shape = RoundedCornerShape(12.dp),
-            color = colors.badgeAmberBg.copy(alpha = 0.6f),
-            border = BorderStroke(1.dp, colors.badgeAmberBorder),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier.padding(14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Smartphone,
-                    contentDescription = null,
-                    tint = colors.badgeAmberText,
-                    modifier = Modifier.size(22.dp)
-                )
-                Column {
-                    Text(
-                        text = "Tryb lokalny (offline)",
-                        fontSize = 13.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.badgeAmberText
-                    )
-                    Text(
-                        text = "Postęp jest zapisywany wyłącznie na tym urządzeniu.",
-                        fontSize = 11.5.sp,
-                        color = colors.textPrimary,
-                        lineHeight = 15.sp
-                    )
-                }
-            }
-        }
-
-        // Sync benefits card
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Surface(
             shape = RoundedCornerShape(12.dp),
             color = colors.bgSurfaceElevated,
-            border = BorderStroke(1.dp, colors.borderMuted),
+            border = BorderStroke(1.dp, colors.borderDefault),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.padding(14.dp),
+                modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "ZALETY KONTA",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = colors.textMuted,
-                    letterSpacing = 0.8.sp
+                    text = "Konto użytkownika",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.textSerifTitle
                 )
-                listOf(
-                    "☁️  Synchronizacja postępów między urządzeniami",
-                    "🔒  Bezpieczna kopia zapasowa w chmurze",
-                    "📱  Kontynuuj naukę na dowolnym urządzeniu"
-                ).forEach { benefit ->
-                    Text(text = benefit, fontSize = 13.sp, color = colors.textPrimary, lineHeight = 18.sp)
-                }
+                Text(
+                    text = "Zaloguj się lub utwórz konto, aby synchronizować postępy w nauce między urządzeniami i bezpiecznie przechowywać kopię zapasową w chmurze.",
+                    fontSize = 13.sp,
+                    color = colors.textSecondary,
+                    lineHeight = 18.sp
+                )
             }
         }
-
-        Text(
-            text = "ID urządzenia: ${currentDeviceId.take(8)}…",
-            fontSize = 11.sp,
-            color = colors.textMuted
-        )
 
         SjtTouchButton(
             text = "Zaloguj się / Zarejestruj",
             onClick = onOpenAuth,
             modifier = Modifier.fillMaxWidth()
+        )
+
+        Text(
+            text = "ID urządzenia: ${currentDeviceId.take(8)}…",
+            fontSize = 11.sp,
+            color = colors.textMuted
         )
     }
 }
