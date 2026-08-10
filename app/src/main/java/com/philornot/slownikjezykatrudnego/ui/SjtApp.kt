@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +18,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import com.philornot.slownikjezykatrudnego.R
 import com.philornot.slownikjezykatrudnego.domain.SuperMemoEngine
@@ -30,10 +33,13 @@ import com.philornot.slownikjezykatrudnego.ui.lesson.LessonScreen
 import com.philornot.slownikjezykatrudnego.ui.settings.SettingsBottomSheet
 import com.philornot.slownikjezykatrudnego.ui.stats.StatsScreen
 import com.philornot.slownikjezykatrudnego.ui.theme.CircularRevealThemeWrapper
+import com.philornot.slownikjezykatrudnego.ui.theme.LocalThemeTransitionState
 import com.philornot.slownikjezykatrudnego.ui.theme.RevealOrigin
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 import com.philornot.slownikjezykatrudnego.ui.theme.SlownikJezykaTrudnegoTheme
+import com.philornot.slownikjezykatrudnego.ui.theme.THEME_TRANSITION_TAG
 import com.philornot.slownikjezykatrudnego.ui.theme.animateThemeReveal
+import com.philornot.slownikjezykatrudnego.ui.theme.captureViewBitmap
 import com.philornot.slownikjezykatrudnego.ui.theme.rememberThemeTransitionState
 import kotlinx.coroutines.launch
 
@@ -79,6 +85,7 @@ fun SjtApp(
     val themeTransitionState = rememberThemeTransitionState()
     val coroutineScope = rememberCoroutineScope()
     var revealOrigin by remember { mutableStateOf<RevealOrigin?>(null) }
+    val view = LocalView.current
 
     /** Opens the privacy policy in the system browser. */
     fun openPrivacyInBrowser() {
@@ -90,13 +97,15 @@ fun SjtApp(
         }
     }
 
-    // We need to render both old and new theme content for the circular reveal.
-    // The transition state drives which version is visible.
-    CircularRevealThemeWrapper(
-        state = themeTransitionState,
-        skipAnimation = settings.reducedMotion,
-        newContent = {
-            // New theme content (revealed by expanding circle)
+    CompositionLocalProvider(
+        LocalThemeTransitionState provides themeTransitionState
+    ) {
+        // ─── Circular Reveal Theme Transition Wrapper ───
+        CircularRevealThemeWrapper(
+            state = themeTransitionState,
+            skipAnimation = settings.reducedMotion,
+            modifier = Modifier.fillMaxSize()
+        ) {
             SlownikJezykaTrudnegoTheme(settings = settings) {
                 SjtAppScaffold(
                     viewModel = viewModel,
@@ -121,6 +130,15 @@ fun SjtApp(
                     onOpenPrivacy = ::openPrivacyInBrowser,
                     onToggleTheme = { offset ->
                         revealOrigin = offset?.let { RevealOrigin(it.x, it.y) }
+                        android.util.Log.d(
+                            THEME_TRANSITION_TAG,
+                            "[EVENT] onToggleTheme triggered from UI. Coordinates: $revealOrigin"
+                        )
+
+                        // Capture view snapshot before applying the new theme
+                        val snapshot = captureViewBitmap(view)?.asImageBitmap()
+                        themeTransitionState.oldBitmap = snapshot
+
                         coroutineScope.launch {
                             animateThemeReveal(
                                 state = themeTransitionState,
@@ -134,36 +152,8 @@ fun SjtApp(
                     }
                 )
             }
-        },
-        oldContent = {
-            // Old theme content — shown underneath while circle expands
-            SlownikJezykaTrudnegoTheme(settings = settings) {
-                SjtAppScaffold(
-                    viewModel = viewModel,
-                    activity = activity,
-                    settings = settings,
-                    activeTab = activeTab,
-                    progressMap = progressMap,
-                    sessionCompleted = sessionCompleted,
-                    sessionPhase = sessionPhase,
-                    newWordsToLearn = newWordsToLearn,
-                    sessionCards = sessionCards,
-                    currentCardIndex = currentCardIndex,
-                    cardsReviewedCount = cardsReviewedCount,
-                    completionMessage = completionMessage,
-                    authState = authState,
-                    userProfile = userProfile,
-                    isSyncing = isSyncing,
-                    streakDays = streakDays,
-                    isSettingsOpen = isSettingsOpen,
-                    isAccountOpen = isAccountOpen,
-                    isAuthOpen = isAuthOpen,
-                    onOpenPrivacy = ::openPrivacyInBrowser,
-                    onToggleTheme = null // Clicks disabled during transition
-                )
-            }
         }
-    )
+    }
 }
 
 /**

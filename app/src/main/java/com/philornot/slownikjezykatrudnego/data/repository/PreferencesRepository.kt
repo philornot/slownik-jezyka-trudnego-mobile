@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.data.repository
+package com.philornot.slownikjezykatrudnego.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -86,13 +86,15 @@ class PreferencesRepository(context: Context) {
     /**
      * Persists user settings to local storage.
      */
-    suspend fun saveSettings(settings: UserSettings) = withContext(Dispatchers.IO) {
-        try {
-            val encoded = json.encodeToString(settings)
-            prefs.edit().putString(KEY_USER_SETTINGS, encoded).apply()
-            _settingsFlow.value = settings
-        } catch (e: Exception) {
-            e.printStackTrace()
+    suspend fun saveSettings(settings: UserSettings) {
+        _settingsFlow.value = settings
+        withContext(Dispatchers.IO) {
+            try {
+                val encoded = json.encodeToString(settings)
+                prefs.edit().putString(KEY_USER_SETTINGS, encoded).apply()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

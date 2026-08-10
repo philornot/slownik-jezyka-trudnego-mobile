@@ -67,6 +67,13 @@ import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
  *
  * Theme toggle now uses circular reveal animation (same as web version).
  */
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalView
+import com.philornot.slownikjezykatrudnego.ui.theme.CircularRevealThemeWrapper
+import com.philornot.slownikjezykatrudnego.ui.theme.LocalThemeTransitionState
+import com.philornot.slownikjezykatrudnego.ui.theme.captureViewBitmap
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsBottomSheet(
@@ -80,6 +87,8 @@ fun SettingsBottomSheet(
     val colors = SjtTheme.colors
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
+    val themeTransitionState = LocalThemeTransitionState.current
+    val sheetView = LocalView.current
 
     var localLimit by remember { mutableIntStateOf(settings.dailyNewWordsLimit) }
     var localHighContrast by remember { mutableStateOf(settings.highContrast) }
@@ -168,35 +177,36 @@ fun SettingsBottomSheet(
             ) {}
         }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp)
-                .padding(bottom = 24.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Title Bar
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        val sheetContent: @Composable () -> Unit = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp)
+                    .padding(bottom = 24.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Column {
-                    Text(
-                        text = "Ustawienia",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = colors.textSerifTitle
-                    )
-                    Text(
-                        text = "Zmiany widoczne od razu · Zapisz, żeby zachować",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = colors.textMuted
-                    )
-                }
+                // Title Bar
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Ustawienia",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = colors.textSerifTitle
+                        )
+                        Text(
+                            text = "Zmiany widoczne od razu · Zapisz, żeby zachować",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = colors.textMuted
+                        )
+                    }
 
-                IconButton(onClick = {
+                    IconButton(onClick = {
                     applyAndSave()
                     onDismiss()
                 }) {
@@ -367,9 +377,23 @@ fun SettingsBottomSheet(
                     )
                 }
 
-                // Theme Toggle Button (circular reveal — like web version)
+                // Theme Toggle Card (circular reveal — like web version)
                 val isDark = settings.isDarkTheme ?: false
                 Surface(
+                    onClick = {
+                        if (onToggleTheme != null) {
+                            val origin = if (themeButtonCenter != Offset.Zero) themeButtonCenter else null
+                            android.util.Log.d(
+                                "ThemeTransition",
+                                "[UI] Theme setting clicked in SettingsBottomSheet. Origin: $origin"
+                            )
+                            val snapshot = captureViewBitmap(sheetView)?.asImageBitmap()
+                            if (themeTransitionState != null && snapshot != null) {
+                                themeTransitionState.oldBitmap = snapshot
+                            }
+                            onToggleTheme(origin)
+                        }
+                    },
                     shape = RoundedCornerShape(12.dp),
                     color = colors.bgSurfaceElevated,
                     border = BorderStroke(1.dp, colors.borderDefault),
@@ -384,7 +408,8 @@ fun SettingsBottomSheet(
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.weight(1f)
                         ) {
                             Icon(
                                 imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
@@ -412,13 +437,22 @@ fun SettingsBottomSheet(
                         Surface(
                             onClick = {
                                 if (onToggleTheme != null) {
-                                    onToggleTheme(themeButtonCenter)
+                                    val origin = if (themeButtonCenter != Offset.Zero) themeButtonCenter else null
+                                    android.util.Log.d(
+                                        "ThemeTransition",
+                                        "[UI] Theme icon button clicked in SettingsBottomSheet. Origin: $origin"
+                                    )
+                                    val snapshot = captureViewBitmap(sheetView)?.asImageBitmap()
+                                    if (themeTransitionState != null && snapshot != null) {
+                                        themeTransitionState.oldBitmap = snapshot
+                                    }
+                                    onToggleTheme(origin)
                                 }
                             },
                             modifier = Modifier
                                 .size(44.dp)
                                 .onGloballyPositioned { coords ->
-                                    val pos = coords.positionInWindow()
+                                    val pos = coords.positionInRoot()
                                     val size = coords.size
                                     themeButtonCenter = Offset(
                                         pos.x + size.width / 2f,
@@ -789,6 +823,19 @@ fun SettingsBottomSheet(
                     modifier = Modifier.clickable { onOpenPrivacy() }
                 )
             }
+        }
+    }
+
+        if (themeTransitionState != null) {
+            CircularRevealThemeWrapper(
+                state = themeTransitionState,
+                skipAnimation = settings.reducedMotion,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                sheetContent()
+            }
+        } else {
+            sheetContent()
         }
     }
 }

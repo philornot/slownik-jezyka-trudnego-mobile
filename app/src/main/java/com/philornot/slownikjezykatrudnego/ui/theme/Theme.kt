@@ -118,16 +118,6 @@ fun SlownikJezykaTrudnegoTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            // Sync AppCompatDelegate so the system/OS does NOT fight Compose over dark mode.
-            // This is the fix for the Pixel flickering bug — without this, Android may try
-            // to force-dark a "Light" theme while Compose is rendering a dark one.
-            val targetMode = when (settings.isDarkTheme) {
-                true -> AppCompatDelegate.MODE_NIGHT_YES
-                false -> AppCompatDelegate.MODE_NIGHT_NO
-                null -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            }
-            AppCompatDelegate.setDefaultNightMode(targetMode)
-
             // Sync status/navigation bar appearance.
             val window = (view.context as? Activity)?.window
             if (window != null) {
