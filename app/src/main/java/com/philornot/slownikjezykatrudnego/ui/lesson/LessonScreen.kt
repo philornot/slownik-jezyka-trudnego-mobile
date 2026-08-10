@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.ui.lesson
+package com.philornot.slownikjezykatrudnego.ui.lesson
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -97,7 +97,8 @@ fun LessonScreen(
 
                     HybridQuizCard(
                         card = currentCard,
-                        onGrade = onGradeCard
+                        onGrade = onGradeCard,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }

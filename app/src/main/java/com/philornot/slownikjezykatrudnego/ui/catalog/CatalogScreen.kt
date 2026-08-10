@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.ui.catalog
+package com.philornot.slownikjezykatrudnego.ui.catalog
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
@@ -344,8 +344,7 @@ fun CatalogScreen(
                 }
 
                 items(filteredLocked, key = { it.id }) { word ->
-                    SjtInteractiveCard(
-                        onClick = { selectedWordForDetail = word },
+                    SjtCard(
                         modifier = Modifier.fillMaxWidth(),
                         backgroundColor = colors.bgSurfaceElevated.copy(alpha = 0.5f)
                     ) {
@@ -360,12 +359,12 @@ fun CatalogScreen(
                                 Text(
                                     text = word.word,
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = colors.textPrimary
+                                    color = colors.textMuted
                                 )
                                 Text(
                                     text = word.category,
                                     fontSize = 11.5.sp,
-                                    color = colors.textMuted
+                                    color = colors.textMuted.copy(alpha = 0.7f)
                                 )
                             }
 

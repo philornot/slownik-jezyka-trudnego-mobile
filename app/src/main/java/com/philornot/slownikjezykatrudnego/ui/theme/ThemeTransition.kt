@@ -2,7 +2,6 @@ package com.philornot.slownikjezykatrudnego.ui.theme
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,10 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
-import kotlinx.coroutines.launch
 import kotlin.math.hypot
 import kotlin.math.max
 
@@ -51,7 +48,7 @@ class ThemeTransitionState {
     var progress by mutableFloatStateOf(1f)
         internal set
 
-    /** Origin point (in px) from which the circle expands. Null = crossfade fallback. */
+    /** Origin point (in px) from which the circle expands. Null = no origin set yet. */
     var origin by mutableStateOf<RevealOrigin?>(null)
         internal set
 
@@ -68,11 +65,11 @@ class ThemeTransitionState {
  * expanding outward to cover the entire screen. When [skipAnimation] is true (reducedMotion),
  * the new content is shown instantly without any transition.
  *
- * @param state       The [ThemeTransitionState] controlling this transition.
+ * @param state         The [ThemeTransitionState] controlling this transition.
  * @param skipAnimation When true, transitions are instant (respects reducedMotion setting).
- * @param newContent  Composable rendering the NEW theme state (will be revealed by the circle).
- * @param oldContent  Composable rendering the OLD theme state (visible beneath the reveal).
- * @param modifier    Modifier applied to the container Box.
+ * @param newContent    Composable rendering the NEW theme state (will be revealed by the circle).
+ * @param oldContent    Composable rendering the OLD theme state (visible beneath the reveal).
+ * @param modifier      Modifier applied to the container Box.
  */
 @Composable
 fun CircularRevealThemeWrapper(
@@ -89,7 +86,7 @@ fun CircularRevealThemeWrapper(
         // Layer 1: Old theme content (always visible underneath)
         oldContent()
 
-        // Layer 2: New theme content — clipped to an expanding/full circle
+        // Layer 2: New theme content — clipped to an expanding circle
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -99,7 +96,7 @@ fun CircularRevealThemeWrapper(
                         drawContent()
                     } else if (origin != null) {
                         // Circular reveal from the toggle button position
-                        val o = origin
+                        val o = origin!!
                         val maxRadius = hypot(
                             max(o.x, size.width - o.x).toDouble(),
                             max(o.y, size.height - o.y).toDouble()
@@ -118,7 +115,7 @@ fun CircularRevealThemeWrapper(
                             this@drawWithContent.drawContent()
                         }
                     } else {
-                        // Crossfade fallback (no origin available)
+                        // No origin yet — show normally (snap)
                         drawContent()
                     }
                 }
@@ -130,23 +127,26 @@ fun CircularRevealThemeWrapper(
 
 /**
  * Launches a circular reveal animation using the provided [ThemeTransitionState].
- * Should be called inside a [LaunchedEffect] or a coroutine scope when the theme is toggled.
+ * Should be called inside a coroutine scope when the theme is toggled.
  *
- * @param state       The transition state to animate.
- * @param origin      Optional pixel offset of the toggle button (for directional reveal).
+ * @param state         The transition state to animate.
+ * @param origin        Optional pixel offset of the toggle button (for directional reveal).
  * @param skipAnimation If true, completes the transition instantly.
- * @param animSpec    Animation spec controlling duration and easing. Defaults to 650ms cubic.
- * @param onStart     Called when animation starts — switch to new theme HERE to enable the reveal.
+ * @param animSpec      Animation spec controlling duration and easing. Defaults to 600ms ease-out cubic.
+ * @param onStart       Called when animation starts — switch to new theme HERE to enable the reveal.
  */
 suspend fun animateThemeReveal(
     state: ThemeTransitionState,
     origin: RevealOrigin?,
     skipAnimation: Boolean,
-    animSpec: AnimationSpec<Float> = tween(durationMillis = 650, easing = { t ->
-        // cubic-bezier(0.65, 0, 0.35, 1) — matches web easing
-        val p = t - 1f
-        p * p * p + 1f
-    }),
+    animSpec: AnimationSpec<Float> = tween(
+        durationMillis = 600,
+        easing = { t ->
+            // ease-out cubic: decelerates into the final position
+            val p = t - 1f
+            p * p * p + 1f
+        }
+    ),
     onStart: () -> Unit
 ) {
     if (state.isAnimating) return
@@ -167,6 +167,6 @@ suspend fun animateThemeReveal(
         state.progress = value
     }
 
-    state.isAnimating = false
     state.progress = 1f
+    state.isAnimating = false
 }

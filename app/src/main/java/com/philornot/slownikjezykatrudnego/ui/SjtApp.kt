@@ -1,6 +1,8 @@
 package com.philornot.slownikjezykatrudnego.ui
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,11 +17,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.res.stringResource
+import com.philornot.slownikjezykatrudnego.R
 import com.philornot.slownikjezykatrudnego.domain.SuperMemoEngine
 import com.philornot.slownikjezykatrudnego.ui.account.AccountBottomSheet
 import com.philornot.slownikjezykatrudnego.ui.account.AuthBottomSheet
 import com.philornot.slownikjezykatrudnego.ui.catalog.CatalogScreen
-import com.philornot.slownikjezykatrudnego.ui.common.PrivacyBottomSheet
 import com.philornot.slownikjezykatrudnego.ui.components.SjtBottomNavBar
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTab
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTopBar
@@ -27,8 +30,6 @@ import com.philornot.slownikjezykatrudnego.ui.lesson.LessonScreen
 import com.philornot.slownikjezykatrudnego.ui.settings.SettingsBottomSheet
 import com.philornot.slownikjezykatrudnego.ui.stats.StatsScreen
 import com.philornot.slownikjezykatrudnego.ui.theme.CircularRevealThemeWrapper
-import androidx.compose.ui.res.stringResource
-import com.philornot.slownikjezykatrudnego.R
 import com.philornot.slownikjezykatrudnego.ui.theme.RevealOrigin
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 import com.philornot.slownikjezykatrudnego.ui.theme.SlownikJezykaTrudnegoTheme
@@ -36,7 +37,10 @@ import com.philornot.slownikjezykatrudnego.ui.theme.animateThemeReveal
 import com.philornot.slownikjezykatrudnego.ui.theme.rememberThemeTransitionState
 import kotlinx.coroutines.launch
 
-// Web Client ID from Firebase Console (OAuth 2.0 → Web Application Client ID)
+/** URL polityki prywatności — otwierany w przeglądarce. */
+private const val PRIVACY_POLICY_URL =
+    "https://www.slownik-jezyka-trudnego.pl/polityka-prywatnosci"
+
 /**
  * Root Composable wrapping navigation Scaffold, top bar, bottom bar, screens, and modal sheets.
  * Includes circular reveal animation for theme transitions (matching the web version).
@@ -65,7 +69,6 @@ fun SjtApp(
 
     val isSettingsOpen by viewModel.isSettingsOpen.collectAsState()
     val isAccountOpen by viewModel.isAccountOpen.collectAsState()
-    val isPrivacyOpen by viewModel.isPrivacyOpen.collectAsState()
     val isAuthOpen by viewModel.isAuthOpen.collectAsState()
 
     val streakDays = remember(progressMap) {
@@ -75,8 +78,17 @@ fun SjtApp(
     // ─── Circular Reveal Theme Transition State ───
     val themeTransitionState = rememberThemeTransitionState()
     val coroutineScope = rememberCoroutineScope()
-    var pendingThemeToggle by remember { mutableStateOf(false) }
     var revealOrigin by remember { mutableStateOf<RevealOrigin?>(null) }
+
+    /** Opens the privacy policy in the system browser. */
+    fun openPrivacyInBrowser() {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_POLICY_URL))
+            activity.startActivity(intent)
+        } catch (e: Exception) {
+            android.util.Log.w("SjtApp", "Cannot open privacy policy URL", e)
+        }
+    }
 
     // We need to render both old and new theme content for the circular reveal.
     // The transition state drives which version is visible.
@@ -105,8 +117,8 @@ fun SjtApp(
                     streakDays = streakDays,
                     isSettingsOpen = isSettingsOpen,
                     isAccountOpen = isAccountOpen,
-                    isPrivacyOpen = isPrivacyOpen,
                     isAuthOpen = isAuthOpen,
+                    onOpenPrivacy = ::openPrivacyInBrowser,
                     onToggleTheme = { offset ->
                         revealOrigin = offset?.let { RevealOrigin(it.x, it.y) }
                         coroutineScope.launch {
@@ -145,8 +157,8 @@ fun SjtApp(
                     streakDays = streakDays,
                     isSettingsOpen = isSettingsOpen,
                     isAccountOpen = isAccountOpen,
-                    isPrivacyOpen = isPrivacyOpen,
                     isAuthOpen = isAuthOpen,
+                    onOpenPrivacy = ::openPrivacyInBrowser,
                     onToggleTheme = null // Clicks disabled during transition
                 )
             }
@@ -158,6 +170,7 @@ fun SjtApp(
  * Internal scaffold composable used for both old and new theme layers in the circular reveal.
  *
  * @param onToggleTheme Callback for theme toggle with optional offset; null = disabled.
+ * @param onOpenPrivacy Callback to open the privacy policy URL in the browser.
  */
 @Composable
 private fun SjtAppScaffold(
@@ -179,8 +192,8 @@ private fun SjtAppScaffold(
     streakDays: Int,
     isSettingsOpen: Boolean,
     isAccountOpen: Boolean,
-    isPrivacyOpen: Boolean,
     isAuthOpen: Boolean,
+    onOpenPrivacy: () -> Unit,
     onToggleTheme: ((Offset?) -> Unit)?
 ) {
     val colors = SjtTheme.colors
@@ -195,7 +208,6 @@ private fun SjtAppScaffold(
             SjtTopBar(
                 streakDays = streakDays,
                 isDarkTheme = colors.isDark,
-                onToggleTheme = onToggleTheme,
                 onOpenSettings = { viewModel.openSettings() },
                 onOpenAccount = { viewModel.openAccount() }
             )
@@ -254,8 +266,9 @@ private fun SjtAppScaffold(
                 onResetProgress = { viewModel.resetProgress() },
                 onOpenPrivacy = {
                     viewModel.closeSettings()
-                    viewModel.openPrivacy()
+                    onOpenPrivacy()
                 },
+                onToggleTheme = onToggleTheme,
                 onDismiss = { viewModel.closeSettings() }
             )
         }
@@ -306,15 +319,9 @@ private fun SjtAppScaffold(
                 },
                 onOpenPrivacy = {
                     viewModel.closeAuth()
-                    viewModel.openPrivacy()
+                    onOpenPrivacy()
                 },
                 onDismiss = { viewModel.closeAuth() }
-            )
-        }
-
-        if (isPrivacyOpen) {
-            PrivacyBottomSheet(
-                onDismiss = { viewModel.closePrivacy() }
             )
         }
     }

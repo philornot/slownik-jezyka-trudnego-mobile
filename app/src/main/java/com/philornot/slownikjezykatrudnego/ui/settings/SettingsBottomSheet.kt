@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.ui.settings
+package com.philornot.slownikjezykatrudnego.ui.settings
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -15,12 +15,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,6 +37,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +48,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,6 +64,8 @@ import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
  * Settings Bottom Sheet for configuring daily limits, theme,
  * accessibility, and resetting progress. Strictly aligned with the WEB
  * version styling and functionality.
+ *
+ * Theme toggle now uses circular reveal animation (same as web version).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,6 +74,7 @@ fun SettingsBottomSheet(
     onSaveSettings: (UserSettings) -> Unit,
     onResetProgress: () -> Unit,
     onOpenPrivacy: () -> Unit,
+    onToggleTheme: ((Offset?) -> Unit)?,
     onDismiss: () -> Unit
 ) {
     val colors = SjtTheme.colors
@@ -74,12 +85,17 @@ fun SettingsBottomSheet(
     var localHighContrast by remember { mutableStateOf(settings.highContrast) }
     var localReducedMotion by remember { mutableStateOf(settings.reducedMotion) }
     var localTextSize by remember { mutableStateOf(settings.textSize) }
-    var isDarkTheme by remember { mutableStateOf(settings.isDarkTheme ?: false) }
     var notificationsEnabled by remember { mutableStateOf(settings.notificationsEnabled) }
 
     // Reset progress confirmation timer
     var isResetConfirmOpen by remember { mutableStateOf(false) }
     var resetCountdown by remember { mutableIntStateOf(5) }
+
+    // Credit dialog for Dawid Siekielski
+    var showCreditDialog by remember { mutableStateOf(false) }
+
+    // Position of the theme toggle button for circular reveal origin
+    var themeButtonCenter by remember { mutableStateOf(Offset.Zero) }
 
     LaunchedEffect(isResetConfirmOpen) {
         if (isResetConfirmOpen) {
@@ -98,9 +114,39 @@ fun SettingsBottomSheet(
                 highContrast = localHighContrast,
                 reducedMotion = localReducedMotion,
                 textSize = localTextSize,
-                isDarkTheme = isDarkTheme,
                 notificationsEnabled = notificationsEnabled
             )
+        )
+    }
+
+    // Credit dialog
+    if (showCreditDialog) {
+        AlertDialog(
+            onDismissRequest = { showCreditDialog = false },
+            containerColor = colors.bgSurface,
+            title = {
+                Text(
+                    text = ":>",
+                    fontWeight = FontWeight.ExtraBold,
+                    color = colors.textSerifTitle
+                )
+            },
+            text = {
+                Text(
+                    text = "Autor logo strony: Dawid Siekielski",
+                    color = colors.textPrimary,
+                    fontSize = 14.sp
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showCreditDialog = false }) {
+                    Text(
+                        text = "OK",
+                        color = colors.brandPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         )
     }
 
@@ -298,7 +344,105 @@ fun SettingsBottomSheet(
                 }
             }
 
-            // Section 2: Accessibility
+            // Section 2: Appearance (Theme + Accessibility)
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                HorizontalDivider(color = colors.borderDefault)
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Palette,
+                        contentDescription = null,
+                        tint = colors.textAmberBrand,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Text(
+                        text = "WYGLĄD",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = colors.textAmberBrand,
+                        letterSpacing = 0.5.sp
+                    )
+                }
+
+                // Theme Toggle Button (circular reveal — like web version)
+                val isDark = settings.isDarkTheme ?: false
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = colors.bgSurfaceElevated,
+                    border = BorderStroke(1.dp, colors.borderDefault),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                contentDescription = null,
+                                tint = colors.brandPrimary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Column {
+                                Text(
+                                    text = if (isDark) "Jasny motyw" else "Ciemny motyw",
+                                    fontSize = 13.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textPrimary
+                                )
+                                Text(
+                                    text = if (isDark) "Przełącz na jasne barwy dzienne" else "Głębokie, stonowane szałwiowe barwy nocne",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = colors.textMuted
+                                )
+                            }
+                        }
+
+                        // Theme toggle button — captures position for circular reveal
+                        Surface(
+                            onClick = {
+                                if (onToggleTheme != null) {
+                                    onToggleTheme(themeButtonCenter)
+                                }
+                            },
+                            modifier = Modifier
+                                .size(44.dp)
+                                .onGloballyPositioned { coords ->
+                                    val pos = coords.positionInWindow()
+                                    val size = coords.size
+                                    themeButtonCenter = Offset(
+                                        pos.x + size.width / 2f,
+                                        pos.y + size.height / 2f
+                                    )
+                                },
+                            shape = RoundedCornerShape(10.dp),
+                            color = colors.brandPrimary,
+                            enabled = onToggleTheme != null
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                    contentDescription = "Przełącz motyw",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Section 3: Accessibility
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 HorizontalDivider(color = colors.borderDefault)
 
@@ -331,41 +475,6 @@ fun SettingsBottomSheet(
                         modifier = Modifier.padding(14.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-
-                        // Dark Theme Toggle
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "Ciemny motyw",
-                                    fontSize = 13.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.textPrimary
-                                )
-                                Text(
-                                    text = "Głębokie, stonowane szałwiowe barwy nocne.",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = colors.textMuted
-                                )
-                            }
-                            Switch(
-                                checked = isDarkTheme,
-                                onCheckedChange = {
-                                    isDarkTheme = it
-                                    applyAndSave()
-                                },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = Color.White,
-                                    checkedTrackColor = colors.brandPrimary
-                                )
-                            )
-                        }
-
-                        HorizontalDivider(color = colors.borderDefault)
 
                         // High Contrast Toggle
                         Row(
@@ -518,7 +627,7 @@ fun SettingsBottomSheet(
                 }
             }
 
-            // Section 3: Reset Progress
+            // Section 4: Reset Progress
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 HorizontalDivider(color = colors.borderDefault)
 
@@ -655,17 +764,20 @@ fun SettingsBottomSheet(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Text(
-                        text = "v0.12.1",
+                        text = "v0.13.0",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = colors.textMuted.copy(alpha = 0.6f)
                     )
                     Text(text = "•", color = colors.textMuted.copy(alpha = 0.3f))
+                    // Serduszko — credit dla Dawida Siekielskiego
                     Icon(
                         imageVector = Icons.Default.Favorite,
-                        contentDescription = "Autor loga",
+                        contentDescription = "Autor logo",
                         tint = Color(0xFFE11D48).copy(alpha = 0.7f),
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier
+                            .size(14.dp)
+                            .clickable { showCreditDialog = true }
                     )
                 }
 

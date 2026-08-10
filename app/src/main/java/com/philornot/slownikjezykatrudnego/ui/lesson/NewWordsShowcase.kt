@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.ui.lesson
+package com.philornot.slownikjezykatrudnego.ui.lesson
 
 import android.content.Intent
 import android.net.Uri
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -88,14 +89,14 @@ fun NewWordsShowcase(
 
     Column(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(horizontal = 14.dp, vertical = 8.dp)
     ) {
         // Main Showcase Card
         SjtCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f, fill = false)
+                .weight(1f)
         ) {
             // Card Header
             Row(
