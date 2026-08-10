@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Night variant for the OS when dark mode is enabled system-wide.
+        Prevents mismatch between Compose and system UI.
+    -->
+    <style name="Theme.SlownikJezykaTrudnego" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@color/sjt_dark_bg_app</item>
+        <item name="android:navigationBarColor">@color/sjt_dark_bg_surface</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>
