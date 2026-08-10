@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -43,24 +44,37 @@ class FirebaseRepository(
     private val preferencesRepository: PreferencesRepository
 ) {
 
-    private val auth: FirebaseAuth = Firebase.auth
-    private val db = Firebase.firestore
+    private val auth: FirebaseAuth? = try {
+        Firebase.auth
+    } catch (e: Exception) {
+        android.util.Log.e("FirebaseRepository", "Firebase Auth not available", e)
+        null
+    }
+
+    private val db = try {
+        Firebase.firestore
+    } catch (e: Exception) {
+        android.util.Log.e("FirebaseRepository", "Firestore not available", e)
+        null
+    }
 
     // ─────────────────────── Auth State ───────────────────────
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
-    /** The currently authenticated Firebase user (null if not logged in). */
-    val currentUser: FirebaseUser? get() = auth.currentUser
+    /** The currently authenticated Firebase user (null if not logged in or Firebase not available). */
+    val currentUser: FirebaseUser? get() = auth?.currentUser
 
     init {
         // Listen to Firebase Auth state changes and update our state flow.
-        auth.addAuthStateListener { firebaseAuth ->
+        auth?.addAuthStateListener { firebaseAuth ->
             _authState.value = when (val user = firebaseAuth.currentUser) {
                 null -> AuthState.Unauthenticated
                 else -> AuthState.Authenticated(user)
             }
+        } ?: run {
+            _authState.value = AuthState.Unauthenticated
         }
     }
 
@@ -75,6 +89,7 @@ class FirebaseRepository(
      * @throws Exception on Firebase Auth error.
      */
     suspend fun signInWithEmail(email: String, password: String): FirebaseUser {
+        val auth = auth ?: throw Exception("Usługa Firebase nie jest dostępna.")
         val result = auth.signInWithEmailAndPassword(email, password).await()
         return result.user ?: throw Exception("Logowanie nie powiodło się.")
     }
@@ -88,6 +103,7 @@ class FirebaseRepository(
      * @throws Exception on Firebase Auth error.
      */
     suspend fun registerWithEmail(email: String, password: String): FirebaseUser {
+        val auth = auth ?: throw Exception("Usługa Firebase nie jest dostępna.")
         val result = auth.createUserWithEmailAndPassword(email, password).await()
         return result.user ?: throw Exception("Rejestracja nie powiodła się.")
     }
@@ -103,6 +119,13 @@ class FirebaseRepository(
      * @throws Exception on any other error.
      */
     suspend fun signInWithGoogle(activityContext: Context, webClientId: String): FirebaseUser {
+        android.util.Log.d("SjtAuth", "Rozpoczynanie logowania Google. WebClientId: $webClientId")
+        
+        val auth = auth ?: run {
+            android.util.Log.e("SjtAuth", "FirebaseAuth jest null!")
+            throw Exception("Usługa Firebase nie jest dostępna.")
+        }
+        
         val credentialManager = CredentialManager.create(activityContext)
 
         val googleIdOption = GetGoogleIdOption.Builder()
@@ -115,31 +138,49 @@ class FirebaseRepository(
             .addCredentialOption(googleIdOption)
             .build()
 
-        val credentialResponse = credentialManager.getCredential(
-            request = request,
-            context = activityContext
-        )
-
-        val credential = credentialResponse.credential
-        if (credential is CustomCredential &&
-            credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-        ) {
-            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-            val firebaseCredential = GoogleAuthProvider.getCredential(
-                googleIdTokenCredential.idToken, null
+        try {
+            android.util.Log.d("SjtAuth", "Wywołanie credentialManager.getCredential...")
+            val credentialResponse = credentialManager.getCredential(
+                request = request,
+                context = activityContext
             )
-            val result = auth.signInWithCredential(firebaseCredential).await()
-            return result.user ?: throw Exception("Google Sign-In nie powiódł się.")
-        }
 
-        throw Exception("Nieoczekiwany typ danych uwierzytelniających.")
+            val credential = credentialResponse.credential
+            android.util.Log.d("SjtAuth", "Otrzymano credential typu: ${credential.type}")
+
+            if (credential is CustomCredential &&
+                credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+            ) {
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                android.util.Log.d("SjtAuth", "Token ID odebrany pomyślnie.")
+                
+                val firebaseCredential = GoogleAuthProvider.getCredential(
+                    googleIdTokenCredential.idToken, null
+                )
+                
+                android.util.Log.d("SjtAuth", "Logowanie do Firebase za pomocą credentiali...")
+                val result = auth.signInWithCredential(firebaseCredential).await()
+                
+                android.util.Log.d("SjtAuth", "Logowanie Firebase zakończone sukcesem: ${result.user?.uid}")
+                return result.user ?: throw Exception("Google Sign-In nie powiódł się.")
+            }
+
+            android.util.Log.e("SjtAuth", "Nieoczekiwany typ credential: ${credential.type}")
+            throw Exception("Nieoczekiwany typ danych uwierzytelniających.")
+        } catch (e: GetCredentialException) {
+            android.util.Log.e("SjtAuth", "Błąd Credential Manager: ${e.message}", e)
+            throw Exception("Błąd autoryzacji Google: ${e.message}")
+        } catch (e: Exception) {
+            android.util.Log.e("SjtAuth", "Nieoczekiwany błąd podczas logowania Google", e)
+            throw e
+        }
     }
 
     /**
      * Signs the current user out of Firebase Auth.
      */
     fun signOut() {
-        auth.signOut()
+        auth?.signOut()
     }
 
     /**
@@ -148,6 +189,7 @@ class FirebaseRepository(
      * @param email Email address to send the reset link to.
      */
     suspend fun sendPasswordResetEmail(email: String) {
+        val auth = auth ?: throw Exception("Usługa Firebase nie jest dostępna.")
         auth.sendPasswordResetEmail(email).await()
     }
 
@@ -185,6 +227,7 @@ class FirebaseRepository(
         userId: String,
         progressMap: Map<String, UserWordProgress>
     ) = withContext(Dispatchers.IO) {
+        val db = db ?: return@withContext
         try {
             val serializable = progressMap.mapValues { (_, p) ->
                 mapOf(
@@ -221,6 +264,7 @@ class FirebaseRepository(
      */
     suspend fun loadProgressFromCloud(userId: String): Map<String, UserWordProgress>? =
         withContext(Dispatchers.IO) {
+            val db = db ?: return@withContext null
             try {
                 val snap = db.collection("users").document(userId).get().await()
                 if (snap.exists()) {
@@ -290,6 +334,7 @@ class FirebaseRepository(
      */
     suspend fun saveSettingsToCloud(userId: String, settings: UserSettings) =
         withContext(Dispatchers.IO) {
+            val db = db ?: return@withContext
             try {
                 db.collection("users").document(userId)
                     .set(
@@ -316,6 +361,7 @@ class FirebaseRepository(
      * @return UserSettings or null if not found.
      */
     suspend fun loadSettingsFromCloud(userId: String): UserSettings? = withContext(Dispatchers.IO) {
+        val db = db ?: return@withContext null
         try {
             val snap = db.collection("users").document(userId).get().await()
             if (snap.exists()) {
@@ -352,6 +398,7 @@ class FirebaseRepository(
         userId: String,
         userEmail: String? = null
     ): DeviceSession? = withContext(Dispatchers.IO) {
+        val db = db ?: return@withContext null
         try {
             val deviceId = preferencesRepository.getDeviceId()
             val deviceName = getDeviceInfo()
@@ -403,6 +450,7 @@ class FirebaseRepository(
      * @return [UserProfile] or null if not found.
      */
     suspend fun loadUserProfile(userId: String): UserProfile? = withContext(Dispatchers.IO) {
+        val db = db ?: return@withContext null
         try {
             val snap = db.collection("users").document(userId).get().await()
             if (snap.exists()) {
@@ -441,6 +489,8 @@ class FirebaseRepository(
      * @param newUsername New display username.
      */
     suspend fun saveUsername(userId: String, newUsername: String) = withContext(Dispatchers.IO) {
+        val db = db ?: return@withContext
+        val auth = auth ?: return@withContext
         val trimmed = newUsername.trim()
         db.collection("users").document(userId)
             .set(
@@ -465,6 +515,7 @@ class FirebaseRepository(
      * @param userId Firebase UID.
      */
     suspend fun logoutAllDevices(userId: String) = withContext(Dispatchers.IO) {
+        val db = db ?: return@withContext
         val now = java.time.Instant.now().toString()
         db.collection("users").document(userId)
             .set(
@@ -483,8 +534,8 @@ class FirebaseRepository(
      * @param userId Firebase UID.
      */
     suspend fun deleteUserAccount(userId: String) = withContext(Dispatchers.IO) {
-        db.collection("users").document(userId).delete().await()
-        auth.currentUser?.delete()?.await()
+        db?.collection("users")?.document(userId)?.delete()?.await()
+        auth?.currentUser?.delete()?.await()
     }
 
     /**
@@ -493,6 +544,7 @@ class FirebaseRepository(
      * @param userId Firebase UID.
      */
     suspend fun clearProgressInCloud(userId: String) = withContext(Dispatchers.IO) {
+        val db = db ?: return@withContext
         try {
             db.collection("users").document(userId)
                 .set(

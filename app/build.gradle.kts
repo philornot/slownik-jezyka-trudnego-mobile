@@ -2,18 +2,20 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.kotlin.compose)
+    // Google Services plugin for Firebase
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
-    namespace = "pl.slownikjezykatrudnego.app"
+    namespace = "com.philornot.slownikjezykatrudnego"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "pl.slownikjezykatrudnego.app"
+        applicationId = "com.philornot.slownikjezykatrudnego"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
-        versionName = "0.12.1"
+        versionName = "0.13.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -55,6 +57,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
 
     // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -71,6 +74,16 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
+
+    // Firebase (versions managed by BOM)
+    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    // Google Sign-In via Credential Manager (Android 14+) + Play Services fallback
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     // Test dependencies
     testImplementation(libs.junit)

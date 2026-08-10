@@ -17,3 +17,4 @@ app/build/
 .kotlin/
 /.idea/
 /.artifacts/
+app/google-services.json

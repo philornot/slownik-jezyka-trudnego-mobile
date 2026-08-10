@@ -27,6 +27,8 @@ import com.philornot.slownikjezykatrudnego.ui.lesson.LessonScreen
 import com.philornot.slownikjezykatrudnego.ui.settings.SettingsBottomSheet
 import com.philornot.slownikjezykatrudnego.ui.stats.StatsScreen
 import com.philornot.slownikjezykatrudnego.ui.theme.CircularRevealThemeWrapper
+import androidx.compose.ui.res.stringResource
+import com.philornot.slownikjezykatrudnego.R
 import com.philornot.slownikjezykatrudnego.ui.theme.RevealOrigin
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 import com.philornot.slownikjezykatrudnego.ui.theme.SlownikJezykaTrudnegoTheme
@@ -35,10 +37,6 @@ import com.philornot.slownikjezykatrudnego.ui.theme.rememberThemeTransitionState
 import kotlinx.coroutines.launch
 
 // Web Client ID from Firebase Console (OAuth 2.0 → Web Application Client ID)
-// TODO: Replace with your actual Web Client ID from Firebase Console
-private const val GOOGLE_WEB_CLIENT_ID =
-    "YOUR_WEB_CLIENT_ID_FROM_FIREBASE_CONSOLE.apps.googleusercontent.com"
-
 /**
  * Root Composable wrapping navigation Scaffold, top bar, bottom bar, screens, and modal sheets.
  * Includes circular reveal animation for theme transitions (matching the web version).
@@ -186,6 +184,7 @@ private fun SjtAppScaffold(
     onToggleTheme: ((Offset?) -> Unit)?
 ) {
     val colors = SjtTheme.colors
+    val googleWebClientId = stringResource(id = R.string.default_web_client_id)
 
     Scaffold(
         modifier = Modifier
@@ -301,7 +300,7 @@ private fun SjtAppScaffold(
                     }, onError)
                 },
                 onSignInWithGoogle = { onError ->
-                    viewModel.signInWithGoogle(activity, GOOGLE_WEB_CLIENT_ID, {
+                    viewModel.signInWithGoogle(activity, googleWebClientId, {
                         viewModel.closeAuth()
                     }, onError)
                 },
