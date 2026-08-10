@@ -1,14 +1,11 @@
 package com.philornot.slownikjezykatrudnego.ui.theme
 
-import android.graphics.Bitmap
 import android.util.Log
-import android.view.View
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,13 +14,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.layer.GraphicsLayer
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.hypot
 import kotlin.math.max
@@ -58,7 +58,7 @@ fun rememberThemeTransitionState(): ThemeTransitionState {
 
 /**
  * State holder for the circular theme reveal animation.
- * Tracks the animation progress, origin, whether a transition is currently running,
+ * Tracks the animation progress, origin, active GraphicsLayer reference,
  * and the snapshot bitmap of the previous theme.
  */
 class ThemeTransitionState {
@@ -76,37 +76,16 @@ class ThemeTransitionState {
 
     /** Snapshot image of the old theme before switching, drawn with expanding circular cutout. */
     var oldBitmap by mutableStateOf<ImageBitmap?>(null)
-}
 
-/**
- * Captures a pixel-perfect bitmap screenshot of the given [View].
- *
- * @param view The root view to snapshot.
- * @return [Bitmap] containing the current view content, or null if size is invalid.
- */
-fun captureViewBitmap(view: View): Bitmap? {
-    if (view.width <= 0 || view.height <= 0) {
-        Log.w(THEME_TRANSITION_TAG, "[CAPTURE_FAILED] View has non-positive dimensions: ${view.width}x${view.height}")
-        return null
-    }
-    return try {
-        Log.d(THEME_TRANSITION_TAG, "[STEP 0/5: CAPTURE] Capturing view snapshot (${view.width}x${view.height}px)...")
-        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
-        val canvas = android.graphics.Canvas(bitmap)
-        view.draw(canvas)
-        Log.d(THEME_TRANSITION_TAG, "[STEP 0/5: CAPTURE] View snapshot captured successfully (${bitmap.byteCount / 1024} KB).")
-        bitmap
-    } catch (e: Exception) {
-        Log.e(THEME_TRANSITION_TAG, "[ERROR] Failed to capture view snapshot", e)
-        null
-    }
+    /** Reference to the active GraphicsLayer for capturing the composable snapshot. */
+    var graphicsLayer: GraphicsLayer? = null
 }
 
 /**
  * Wraps application content with a smooth circular reveal overlay when the theme is toggled.
  *
  * How it works:
- * 1. The live application content renders normally with the active Theme (New Theme).
+ * 1. The live application content renders normally with the active Theme (New Theme) and records into [graphicsLayer].
  * 2. While [state.isAnimating] is true, an overlay draws the snapshot of the Old Theme
  *    ([state.oldBitmap]) with an expanding circular cutout centered at [state.origin].
  * 3. As [state.progress] animates from 0f to 1f, the circular hole grows, revealing the New Theme.
@@ -128,6 +107,8 @@ fun CircularRevealThemeWrapper(
     val progress = state.progress
     val origin = state.origin
     val oldBitmap = state.oldBitmap
+    val graphicsLayer = rememberGraphicsLayer()
+    state.graphicsLayer = graphicsLayer
 
     LaunchedEffect(isAnimating) {
         if (isAnimating) {
@@ -144,8 +125,17 @@ fun CircularRevealThemeWrapper(
     }
 
     Box(modifier = modifier) {
-        // Base Layer: Live app with the active theme
-        content()
+        // Base Layer: Live app with the active theme, recorded into GraphicsLayer
+        Box(
+            modifier = Modifier.drawWithContent {
+                graphicsLayer.record {
+                    this@drawWithContent.drawContent()
+                }
+                drawLayer(graphicsLayer)
+            }
+        ) {
+            content()
+        }
 
         // Overlay Layer: Snapshot of old theme with expanding circular hole revealing new theme
         if (isAnimating && oldBitmap != null) {
@@ -187,7 +177,7 @@ fun CircularRevealThemeWrapper(
  * @param state         The transition state to animate.
  * @param origin        Optional pixel offset of the toggle button (for directional reveal).
  * @param skipAnimation If true, completes the transition instantly without animation.
- * @param animSpec      Animation spec controlling duration and easing. Defaults to 550ms ease-out cubic.
+ * @param animSpec      Animation spec controlling duration and easing. Defaults to 650ms cubic ease-out.
  * @param onStart       Called when animation starts — switches the theme in ViewModel.
  */
 suspend fun animateThemeReveal(
@@ -195,7 +185,7 @@ suspend fun animateThemeReveal(
     origin: RevealOrigin?,
     skipAnimation: Boolean,
     animSpec: AnimationSpec<Float> = tween(
-        durationMillis = 550,
+        durationMillis = 650,
         easing = { t ->
             val p = t - 1f
             p * p * p + 1f
@@ -242,7 +232,6 @@ suspend fun animateThemeReveal(
         "[STEP 3/5: STATE_CHANGE] Calling onStart() callback to switch theme in ViewModel..."
     )
     onStart()
-    // Wait for the new theme frame to be composed under the frozen overlay snapshot
     kotlinx.coroutines.delay(32)
     Log.d(
         THEME_TRANSITION_TAG,
@@ -252,16 +241,7 @@ suspend fun animateThemeReveal(
     var lastLoggedStep = -1
     val anim = Animatable(0f)
     try {
-        anim.animateTo(
-            targetValue = 1f,
-            animationSpec = tween(
-                durationMillis = 650,
-                easing = { t ->
-                    val p = t - 1f
-                    p * p * p + 1f
-                }
-            )
-        ) {
+        anim.animateTo(targetValue = 1f, animationSpec = animSpec) {
             state.progress = value
             val step = (value * 5).toInt() // Checkpoints at 0%, 20%, 40%, 60%, 80%, 100%
             if (step > lastLoggedStep) {

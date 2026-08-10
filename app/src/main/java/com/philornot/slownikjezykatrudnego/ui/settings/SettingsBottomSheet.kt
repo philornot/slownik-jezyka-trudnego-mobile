@@ -67,12 +67,12 @@ import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
  *
  * Theme toggle now uses circular reveal animation (same as web version).
  */
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.platform.LocalView
 import com.philornot.slownikjezykatrudnego.ui.theme.CircularRevealThemeWrapper
 import com.philornot.slownikjezykatrudnego.ui.theme.LocalThemeTransitionState
-import com.philornot.slownikjezykatrudnego.ui.theme.captureViewBitmap
+
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,7 +88,7 @@ fun SettingsBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
     val themeTransitionState = LocalThemeTransitionState.current
-    val sheetView = LocalView.current
+    val coroutineScope = rememberCoroutineScope()
 
     var localLimit by remember { mutableIntStateOf(settings.dailyNewWordsLimit) }
     var localHighContrast by remember { mutableStateOf(settings.highContrast) }
@@ -382,16 +382,27 @@ fun SettingsBottomSheet(
                 Surface(
                     onClick = {
                         if (onToggleTheme != null) {
-                            val origin = if (themeButtonCenter != Offset.Zero) themeButtonCenter else null
-                            android.util.Log.d(
-                                "ThemeTransition",
-                                "[UI] Theme setting clicked in SettingsBottomSheet. Origin: $origin"
-                            )
-                            val snapshot = captureViewBitmap(sheetView)?.asImageBitmap()
-                            if (themeTransitionState != null && snapshot != null) {
-                                themeTransitionState.oldBitmap = snapshot
+                            coroutineScope.launch {
+                                val origin = if (themeButtonCenter != Offset.Zero) themeButtonCenter else null
+                                android.util.Log.d(
+                                    "ThemeTransition",
+                                    "[UI] Theme setting clicked in SettingsBottomSheet. Origin: $origin"
+                                )
+                                val snapshot = try {
+                                    themeTransitionState?.graphicsLayer?.toImageBitmap()
+                                } catch (e: Exception) {
+                                    android.util.Log.e("ThemeTransition", "Failed to capture graphicsLayer snapshot", e)
+                                    null
+                                }
+                                if (snapshot != null) {
+                                    android.util.Log.d(
+                                        "ThemeTransition",
+                                        "[STEP 0/5: CAPTURE] Composable graphicsLayer snapshot captured (${snapshot.width}x${snapshot.height}px)."
+                                    )
+                                }
+                                themeTransitionState?.oldBitmap = snapshot
+                                onToggleTheme(origin)
                             }
-                            onToggleTheme(origin)
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
@@ -437,16 +448,27 @@ fun SettingsBottomSheet(
                         Surface(
                             onClick = {
                                 if (onToggleTheme != null) {
-                                    val origin = if (themeButtonCenter != Offset.Zero) themeButtonCenter else null
-                                    android.util.Log.d(
-                                        "ThemeTransition",
-                                        "[UI] Theme icon button clicked in SettingsBottomSheet. Origin: $origin"
-                                    )
-                                    val snapshot = captureViewBitmap(sheetView)?.asImageBitmap()
-                                    if (themeTransitionState != null && snapshot != null) {
-                                        themeTransitionState.oldBitmap = snapshot
+                                    coroutineScope.launch {
+                                        val origin = if (themeButtonCenter != Offset.Zero) themeButtonCenter else null
+                                        android.util.Log.d(
+                                            "ThemeTransition",
+                                            "[UI] Theme icon button clicked in SettingsBottomSheet. Origin: $origin"
+                                        )
+                                        val snapshot = try {
+                                            themeTransitionState?.graphicsLayer?.toImageBitmap()
+                                        } catch (e: Exception) {
+                                            android.util.Log.e("ThemeTransition", "Failed to capture graphicsLayer snapshot", e)
+                                            null
+                                        }
+                                        if (snapshot != null) {
+                                            android.util.Log.d(
+                                                "ThemeTransition",
+                                                "[STEP 0/5: CAPTURE] Composable graphicsLayer snapshot captured (${snapshot.width}x${snapshot.height}px)."
+                                            )
+                                        }
+                                        themeTransitionState?.oldBitmap = snapshot
+                                        onToggleTheme(origin)
                                     }
-                                    onToggleTheme(origin)
                                 }
                             },
                             modifier = Modifier
