@@ -1,5 +1,13 @@
 package com.philornot.slownikjezykatrudnego.ui.settings
 
+/**
+ * Settings Bottom Sheet for configuring daily limits, theme,
+ * accessibility, and resetting progress. Strictly aligned with the WEB
+ * version styling and functionality.
+ *
+ * Theme toggle now uses circular reveal animation (same as web version).
+ */
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,33 +53,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
+import com.philornot.slownikjezykatrudnego.BuildConfig
 import com.philornot.slownikjezykatrudnego.data.model.TextSizeLevel
 import com.philornot.slownikjezykatrudnego.data.model.UserSettings
-import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
-
-/**
- * Settings Bottom Sheet for configuring daily limits, theme,
- * accessibility, and resetting progress. Strictly aligned with the WEB
- * version styling and functionality.
- *
- * Theme toggle now uses circular reveal animation (same as web version).
- */
-import androidx.compose.ui.layout.positionInRoot
 import com.philornot.slownikjezykatrudnego.ui.theme.CircularRevealThemeWrapper
 import com.philornot.slownikjezykatrudnego.ui.theme.LocalThemeTransitionState
-
-import androidx.compose.runtime.rememberCoroutineScope
+import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -820,7 +819,7 @@ fun SettingsBottomSheet(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Text(
-                        text = "v0.13.0",
+                        text = "v${BuildConfig.VERSION_NAME}",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = colors.textMuted.copy(alpha = 0.6f)

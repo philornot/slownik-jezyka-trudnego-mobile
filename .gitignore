@@ -18,3 +18,4 @@ app/build/
 /.idea/
 /.artifacts/
 app/google-services.json
+/.agents/

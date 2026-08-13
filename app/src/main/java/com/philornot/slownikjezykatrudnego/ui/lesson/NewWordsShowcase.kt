@@ -115,7 +115,7 @@ fun NewWordsShowcase(
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
-                        text = "PREZENTACJA (${currentIndex + 1}/${words.size})",
+                        text = "NOWE (${currentIndex + 1}/${words.size})",
                         color = colors.textPrimary,
                         fontSize = 11.5.sp,
                         fontWeight = FontWeight.ExtraBold,
