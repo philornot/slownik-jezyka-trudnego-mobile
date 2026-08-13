@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+
+      // Odczyt: tylko wlasciciel dokumentu
+      allow read: if request.auth != null
+                  && request.auth.uid == userId;
+
+      // Tworzenie i aktualizacja: wlasciciel + walidacja pol
+      allow create, update: if request.auth != null
+                            && request.auth.uid == userId
+                            && validUserDocument();
+
+      // Usuwanie: tylko wlasciciel (deleteUserAccount)
+      allow delete: if request.auth != null
+                    && request.auth.uid == userId;
+    }
+
+    // Wszystko inne jest domyslnie zablokowane
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function validUserDocument() {
+      let data = request.resource.data;
+      return data.keys().hasOnly([
+        'progressMap', 'settings', 'devices',
+        'email', 'username', 'displayName',
+        'sessionRevokedAt', 'updatedAt'
+      ]);
+    }
+  }
+}

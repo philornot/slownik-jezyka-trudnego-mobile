@@ -1,0 +1,14 @@
+{
+  "name": "firestore-rules-tests",
+  "version": "1.0.0",
+  "description": "Testy regul bezpieczenstwa Firestore dla Slownik Jezyka Trudnego",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.0",
+    "vitest": "^1.6.0"
+  }
+}

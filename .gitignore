@@ -19,3 +19,5 @@ app/build/
 /.artifacts/
 app/google-services.json
 /.agents/
+firestore-rules-tests/node_modules/
+*.log
