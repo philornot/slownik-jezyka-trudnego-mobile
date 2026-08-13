@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Słownik Języka Trudnego</string>
     <string name="app_version">0.12.1</string>
+
+    <!-- Daily session completion messages. One pair per CompletionMessageType entry. -->
+    <string name="completion_great_job_title">Świetna robota!</string>
+    <string name="completion_great_job_description">Dzisiejsza porcja wyrafinowanego słownictwa została w pełni zrealizowana.</string>
+
+    <string name="completion_session_done_title">Sesja ukończona!</string>
+    <string name="completion_session_done_description">Twoja pamięć została wzmocniona dzięki regularnemu treningowi.</string>
+
+    <string name="completion_erudition_title">Erudycja rośnie!</string>
+    <string name="completion_erudition_description">Kolejny krok ku bogatszemu, precyzyjniejszemu wysławianiu się za Tobą.</string>
 </resources>

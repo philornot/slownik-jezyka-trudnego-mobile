@@ -15,23 +15,26 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.philornot.slownikjezykatrudnego.R
 import com.philornot.slownikjezykatrudnego.domain.SessionManager
 import com.philornot.slownikjezykatrudnego.ui.components.SjtCard
 import com.philornot.slownikjezykatrudnego.ui.components.SjtSecondaryButton
@@ -45,13 +48,17 @@ import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 fun SessionSummaryScreen(
     cardsReviewedCount: Int,
     streakDays: Int,
-    completionMessage: SessionManager.CompletionMessage,
+    completionMessage: SessionManager.CompletionMessageType,
     onNavigateCatalog: () -> Unit,
     onNavigateStats: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val colors = SjtTheme.colors
     val scrollState = rememberScrollState()
+
+    val (titleRes, descriptionRes) = remember(completionMessage) {
+        completionMessage.toStringRes()
+    }
 
     Column(
         modifier = modifier
@@ -94,14 +101,14 @@ fun SessionSummaryScreen(
                 // Title & Description
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = completionMessage.title,
+                        text = stringResource(titleRes),
                         style = MaterialTheme.typography.headlineLarge,
                         color = colors.textSerifTitle,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = completionMessage.description,
+                        text = stringResource(descriptionRes),
                         fontSize = 13.5.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = colors.textMuted,
@@ -239,4 +246,28 @@ fun SessionSummaryScreen(
             }
         }
     }
+}
+
+/**
+ * Resolves a [SessionManager.CompletionMessageType] to its title and
+ * description string resources.
+ *
+ * Keeping this mapping in the UI layer (rather than in `SessionManager`)
+ * is deliberate: the domain layer only decides *which* message variant was
+ * picked, not what text represents it.
+ *
+ * @return A pair of `(titleResId, descriptionResId)` to pass into
+ *    [stringResource].
+ * @receiver The completion message variant selected by
+ *    [SessionManager.getDailyCompletionMessage].
+ */
+private fun SessionManager.CompletionMessageType.toStringRes(): Pair<Int, Int> = when (this) {
+    SessionManager.CompletionMessageType.GREAT_JOB ->
+        R.string.completion_great_job_title to R.string.completion_great_job_description
+
+    SessionManager.CompletionMessageType.SESSION_DONE ->
+        R.string.completion_session_done_title to R.string.completion_session_done_description
+
+    SessionManager.CompletionMessageType.ERUDITION_GROWING ->
+        R.string.completion_erudition_title to R.string.completion_erudition_description
 }

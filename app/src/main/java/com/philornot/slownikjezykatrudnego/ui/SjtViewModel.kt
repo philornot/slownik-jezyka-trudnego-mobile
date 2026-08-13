@@ -80,7 +80,8 @@ class SjtViewModel(
     val cardsReviewedInSession: StateFlow<Int> = _cardsReviewedInSession.asStateFlow()
 
     private val _completionMessage = MutableStateFlow(SessionManager.getDailyCompletionMessage())
-    val completionMessage: StateFlow<SessionManager.CompletionMessage> = _completionMessage.asStateFlow()
+    val completionMessage: StateFlow<SessionManager.CompletionMessageType> =
+        _completionMessage.asStateFlow()
 
     // ─────────────────────── Modals ───────────────────────
 
@@ -526,19 +527,19 @@ class SjtViewModel(
         val message = e.message ?: ""
         return when {
             "INVALID_LOGIN_CREDENTIALS" in message ||
-            "invalid-credential" in message -> "Nieprawidłowy email lub hasło."
+                    "invalid-credential" in message -> "Nieprawidłowy email lub hasło."
             "EMAIL_EXISTS" in message ||
-            "email-already-in-use" in message -> "Ten adres e-mail jest już używany."
+                    "email-already-in-use" in message -> "Ten adres e-mail jest już używany."
             "WEAK_PASSWORD" in message ||
-            "weak-password" in message -> "Hasło musi mieć co najmniej 6 znaków."
+                    "weak-password" in message -> "Hasło musi mieć co najmniej 6 znaków."
             "INVALID_EMAIL" in message ||
-            "invalid-email" in message -> "Nieprawidłowy format adresu e-mail."
+                    "invalid-email" in message -> "Nieprawidłowy format adresu e-mail."
             "USER_NOT_FOUND" in message ||
-            "user-not-found" in message -> "Nie znaleziono konta z tym adresem e-mail."
+                    "user-not-found" in message -> "Nie znaleziono konta z tym adresem e-mail."
             "TOO_MANY_ATTEMPTS_TRY_LATER" in message ||
-            "too-many-requests" in message -> "Zbyt wiele prób. Spróbuj ponownie za chwilę."
+                    "too-many-requests" in message -> "Zbyt wiele prób. Spróbuj ponownie za chwilę."
             "NETWORK_ERROR" in message ||
-            "network-request-failed" in message -> "Brak połączenia z internetem."
+                    "network-request-failed" in message -> "Brak połączenia z internetem."
             else -> "Wystąpił błąd. Spróbuj ponownie."
         }
     }

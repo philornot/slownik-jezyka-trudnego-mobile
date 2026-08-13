@@ -36,12 +36,12 @@ fun LessonScreen(
     currentCardIndex: Int,
     cardsReviewedCount: Int,
     streakDays: Int,
-    completionMessage: SessionManager.CompletionMessage,
+    completionMessage: SessionManager.CompletionMessageType,
     onFinishShowcase: () -> Unit,
     onGradeCard: (ReviewGrade) -> Unit,
     onNavigateCatalog: () -> Unit,
     onNavigateStats: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val colors = SjtTheme.colors
 

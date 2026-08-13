@@ -163,7 +163,7 @@ private fun SjtAppScaffold(
     sessionCards: List<com.philornot.slownikjezykatrudnego.data.model.SessionCard>,
     currentCardIndex: Int,
     cardsReviewedCount: Int,
-    completionMessage: com.philornot.slownikjezykatrudnego.domain.SessionManager.CompletionMessage,
+    completionMessage: com.philornot.slownikjezykatrudnego.domain.SessionManager.CompletionMessageType,
     authState: com.philornot.slownikjezykatrudnego.data.model.AuthState,
     userProfile: com.philornot.slownikjezykatrudnego.data.model.UserProfile?,
     isSyncing: Boolean,
@@ -173,7 +173,7 @@ private fun SjtAppScaffold(
     isAuthOpen: Boolean,
     showNotificationPrompt: Boolean,
     onOpenPrivacy: () -> Unit,
-    onToggleTheme: ((Offset?) -> Unit)?
+    onToggleTheme: ((Offset?) -> Unit)?,
 ) {
     val colors = SjtTheme.colors
     val googleWebClientId = stringResource(id = R.string.default_web_client_id)

@@ -1,13 +1,13 @@
 package com.philornot.slownikjezykatrudnego
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Test
 import com.philornot.slownikjezykatrudnego.data.datasource.DictionaryWordsData
 import com.philornot.slownikjezykatrudnego.data.model.ReviewHistoryItem
 import com.philornot.slownikjezykatrudnego.data.model.UserSettings
 import com.philornot.slownikjezykatrudnego.data.model.UserWordProgress
 import com.philornot.slownikjezykatrudnego.domain.SessionManager
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
 
 /**
  * Unit tests verifying daily session creation and adaptive throttling.
@@ -75,5 +75,12 @@ class SessionManagerTest {
         val val2 = rng2.nextFloat()
 
         assertEquals(val1, val2, 0.00001f)
+    }
+
+    @Test
+    fun testGetDailyCompletionMessage_returnsOneOfTheDefinedVariants() {
+        val result = SessionManager.getDailyCompletionMessage()
+
+        assertTrue(result in SessionManager.CompletionMessageType.entries)
     }
 }

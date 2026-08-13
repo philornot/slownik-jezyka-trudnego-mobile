@@ -13,13 +13,23 @@ object SessionManager {
     data class DailySessionData(
         val cards: List<SessionCard>,
         val dueCount: Int,
-        val newCount: Int
+        val newCount: Int,
     )
 
-    data class CompletionMessage(
-        val title: String,
-        val description: String
-    )
+    /**
+     * Identifies which congratulatory message variant to show after a
+     * completed session.
+     *
+     * This enum intentionally carries no text. Mapping a variant to its
+     * title/description is a UI concern and belongs in `strings.xml`, not in
+     * the domain layer — that keeps this class testable independently of the
+     * copy shown on screen.
+     */
+    enum class CompletionMessageType {
+        GREAT_JOB,
+        SESSION_DONE,
+        ERUDITION_GROWING
+    }
 
     /**
      * Mulberry32 seeded pseudo-random number generator for deterministic daily card ordering.
@@ -206,23 +216,14 @@ object SessionManager {
     }
 
     /**
-     * Congratulatory daily session completion messages.
+     * Picks a random congratulatory message variant for the daily session
+     * summary screen.
+     *
+     * @return A randomly selected [CompletionMessageType]. The caller (UI
+     *    layer) is responsible for resolving it to localized title/description
+     *    strings.
      */
-    fun getDailyCompletionMessage(): CompletionMessage {
-        val messages = listOf(
-            CompletionMessage(
-                title = "Świetna robota!",
-                description = "Dzisiejsza porcja wyrafinowanego słownictwa została w pełni zrealizowana."
-            ),
-            CompletionMessage(
-                title = "Sesja ukończona!",
-                description = "Twoja pamięć została wzmocniona dzięki regularnemu treningowi."
-            ),
-            CompletionMessage(
-                title = "Erudycja rośnie!",
-                description = "Kolejny krok ku bogatszemu, precyzyjniejszemu wysławianiu się za Tobą."
-            )
-        )
-        return messages.random()
+    fun getDailyCompletionMessage(): CompletionMessageType {
+        return CompletionMessageType.entries.random()
     }
 }
