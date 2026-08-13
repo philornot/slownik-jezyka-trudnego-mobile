@@ -2,7 +2,6 @@ package com.philornot.slownikjezykatrudnego.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.stringResource
+import androidx.core.net.toUri
 import com.philornot.slownikjezykatrudnego.R
 import com.philornot.slownikjezykatrudnego.domain.SuperMemoEngine
 import com.philornot.slownikjezykatrudnego.ui.account.AccountBottomSheet
@@ -55,7 +55,7 @@ private const val PRIVACY_POLICY_URL =
 @Composable
 fun SjtApp(
     viewModel: SjtViewModel,
-    activity: Activity
+    activity: Activity,
 ) {
     val settings by viewModel.settings.collectAsState()
     val activeTab by viewModel.activeTab.collectAsState()
@@ -88,7 +88,7 @@ fun SjtApp(
     /** Opens the privacy policy in the system browser. */
     fun openPrivacyInBrowser() {
         try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_POLICY_URL))
+            val intent = Intent(Intent.ACTION_VIEW, PRIVACY_POLICY_URL.toUri())
             activity.startActivity(intent)
         } catch (e: Exception) {
             android.util.Log.w("SjtApp", "Cannot open privacy policy URL", e)
