@@ -7,11 +7,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -170,15 +171,20 @@ fun WordDetailBottomSheet(
 
                     word.examples.forEach { example ->
                         Surface(
-                            shape = RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp),
+                            shape = RoundedCornerShape(10.dp),
                             color = colors.blockquoteBg,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Row(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(IntrinsicSize.Min),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Box(
                                     modifier = Modifier
                                         .width(4.dp)
-                                        .heightIn(min = 36.dp)
+                                        .fillMaxHeight()
                                         .background(colors.brandPrimary)
                                 )
                                 Text(
@@ -187,7 +193,9 @@ fun WordDetailBottomSheet(
                                     fontWeight = FontWeight.SemiBold,
                                     color = colors.textPrimary,
                                     lineHeight = 20.sp,
-                                    modifier = Modifier.padding(10.dp)
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(10.dp)
                                 )
                             }
                         }

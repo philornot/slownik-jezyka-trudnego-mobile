@@ -2,18 +2,16 @@ package com.philornot.slownikjezykatrudnego.ui.lesson
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,8 +25,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -317,23 +314,21 @@ fun NewWordsShowcase(
 
                         currentWord.examples.forEach { example ->
                             Surface(
-                                shape = RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp),
+                                shape = RoundedCornerShape(10.dp),
                                 color = colors.blockquoteBg,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .border(
-                                        width = 0.dp,
-                                        color = Color.Transparent
-                                    )
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 Row(
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(IntrinsicSize.Min),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    // Left thick brand bar
+                                    // Left thick brand bar spanning full height
                                     Box(
                                         modifier = Modifier
                                             .width(4.dp)
-                                            .heightIn(min = 40.dp)
+                                            .fillMaxHeight()
                                             .background(colors.brandPrimary)
                                     )
                                     Text(
@@ -342,7 +337,9 @@ fun NewWordsShowcase(
                                         fontWeight = FontWeight.SemiBold,
                                         color = colors.textPrimary,
                                         lineHeight = 20.sp,
-                                        modifier = Modifier.padding(10.dp)
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(10.dp)
                                     )
                                 }
                             }
@@ -357,7 +354,8 @@ fun NewWordsShowcase(
                             .fillMaxWidth()
                             .clickable {
                                 try {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(currentWord.sjpUrl))
+                                    val intent =
+                                        Intent(Intent.ACTION_VIEW, Uri.parse(currentWord.sjpUrl))
                                     context.startActivity(intent)
                                 } catch (e: Exception) {
                                     e.printStackTrace()
