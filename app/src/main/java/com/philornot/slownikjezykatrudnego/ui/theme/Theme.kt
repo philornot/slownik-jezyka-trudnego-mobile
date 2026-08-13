@@ -1,8 +1,6 @@
 package com.philornot.slownikjezykatrudnego.ui.theme
 
 import android.app.Activity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -13,10 +11,8 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.philornot.slownikjezykatrudnego.data.model.TextSizeLevel
 import com.philornot.slownikjezykatrudnego.data.model.UserSettings
 
 val LocalSjtColors = staticCompositionLocalOf { SageLightColors }
@@ -53,7 +49,7 @@ object SjtTheme {
  * - Dark/light mode with proper AppCompatDelegate sync (fixes Pixel flicker bug)
  * - High contrast mode
  * - reducedMotion via LocalMotionDurationScale
- * - System status/navigation bar colors
+ * - System status/navigation bar colours
  *
  * @param settings User configuration preferences.
  * @param content Composable content to render within the theme.
@@ -118,11 +114,10 @@ fun SlownikJezykaTrudnegoTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            // Sync status/navigation bar appearance.
+            // enableEdgeToEdge() in MainActivity already sets transparent bars.
+            // Here we only sync the icon/text appearance (light vs dark).
             val window = (view.context as? Activity)?.window
             if (window != null) {
-                window.statusBarColor = colors.bgApp.toArgb()
-                window.navigationBarColor = colors.bgSurface.toArgb()
                 WindowCompat.getInsetsController(window, view).apply {
                     isAppearanceLightStatusBars = !isDark
                     isAppearanceLightNavigationBars = !isDark
