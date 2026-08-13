@@ -25,6 +25,6 @@ class SjtApplication : Application() {
             android.util.Log.e("SjtApplication", "Firebase initialization failed. Continuing without cloud features.", e)
         }
         preferencesRepository = PreferencesRepository(this)
-        firebaseRepository = FirebaseRepository(this, preferencesRepository)
+        firebaseRepository = FirebaseRepository(preferencesRepository)
     }
 }

@@ -5,16 +5,16 @@ import android.os.Build
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 import com.philornot.slownikjezykatrudnego.data.model.AuthState
 import com.philornot.slownikjezykatrudnego.data.model.DeviceSession
 import com.philornot.slownikjezykatrudnego.data.model.ReviewHistoryItem
@@ -31,16 +31,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Repository encapsulating all Firebase Authentication and Firestore operations.
- * Mirrors the web version's `storage.ts` functionality for a consistent cross-platform experience.
+ * Repository encapsulating all Firebase Authentication and Firestore
+ * operations. Mirrors the web version's `storage.ts` functionality for a
+ * consistent cross-platform experience.
  *
- * @property context Application context (for Credential Manager).
- * @property preferencesRepository Local persistence repository for device ID and settings.
+ * @property preferencesRepository Local persistence repository for device
+ *    ID and settings.
  */
 class FirebaseRepository(
-    private val context: Context,
     private val preferencesRepository: PreferencesRepository
 ) {
 
@@ -113,9 +114,10 @@ class FirebaseRepository(
      * Falls back gracefully on older API levels.
      *
      * @param activityContext Activity context required by Credential Manager.
-     * @param webClientId     OAuth 2.0 Web Client ID from Firebase Console.
+     * @param webClientId OAuth 2.0 Web Client ID from Firebase Console.
      * @return The authenticated [FirebaseUser] on success.
-     * @throws GetCredentialCancellationException if the user cancelled the dialog.
+     * @throws GetCredentialCancellationException if the user cancelled the
+     *    dialogue.
      * @throws Exception on any other error.
      */
     suspend fun signInWithGoogle(activityContext: Context, webClientId: String): FirebaseUser {
@@ -212,7 +214,7 @@ class FirebaseRepository(
     ) {
         syncJob?.cancel()
         syncJob = scope.launch {
-            delay(2500)
+            delay(2500.milliseconds)
             syncProgressToCloud(userId, progressMap)
         }
     }
@@ -421,7 +423,7 @@ class FirebaseRepository(
             val updatedDevices = existingDevices.toMutableMap()
             updatedDevices[deviceId] = deviceData
 
-            val payload = mutableMapOf<String, Any>(
+            val payload = mutableMapOf(
                 "devices" to updatedDevices,
                 "updatedAt" to now
             )

@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.philornot.slownikjezykatrudnego"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "0.12.1"
 
@@ -77,9 +77,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     // Firebase (versions managed by BOM)
-    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
 
     // Google Sign-In via Credential Manager (Android 14+) + Play Services fallback
     implementation(libs.androidx.credentials)
@@ -90,7 +90,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
