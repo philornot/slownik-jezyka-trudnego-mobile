@@ -176,16 +176,23 @@ object DictionaryWordsData {
             distractors = listOf("Zimna obojętność i brak jakichkolwiek uczuć.", "Głęboka depresja i milczenie.", "Precyzyjna analiza matematyczna danych.")
         ),
         DictionaryWord(
-            id = "serendipnosc",
-            word = "Serendipność",
-            phonetic = "[se-ren-dip-ność]",
-            shortDefinition = "Dar dokonywania szczęśliwych odkryć przez przypadek.",
-            fullDefinition = "Zdolność lub właściwość polegająca na przypadkowym odnajdywaniu wartościowych, pięknych lub cennych rzeczy, podczas gdy szukało się czegoś zupełnie innego.",
-            etymology = "Z angielskiego: serendipity (od dawnej nazwy Sri Lanki - Serendib).",
-            examples = listOf("Odkrycie penicyliny było klasycznym przykładem serendipności w nauce.", "Dzięki serendipności trafił w antykwariacie na pierwsze wydanie ukochanej książki."),
+            id = "serendypnosc",
+            word = "Serendypność",
+            phonetic = "[se-ren-dyp-ność]",
+            shortDefinition = "Szczęśliwe odkrycie czegoś wartościowego przez przypadek.",
+            fullDefinition = "Zdolność do przypadkowego odkrywania czegoś wartościowego, interesującego lub użytecznego podczas poszukiwania czegoś innego, a także umiejętność dostrzeżenia znaczenia takiego nieoczekiwanego odkrycia.",
+            etymology = "Z angielskiego: serendipity, od dawnej perskiej nazwy Sri Lanki – Serendip.",
+            examples = listOf(
+                "Odkrycie penicyliny jest często podawane jako przykład serendypności w nauce.",
+                "Dzięki serendypności, szukając innej książki, trafił w antykwariacie na cenne pierwsze wydanie."
+            ),
             category = "Czas i Zjawiska",
-            sjpUrl = "https://sjp.pwn.pl/szukaj/serendipno%C5%9B%C4%87.html",
-            distractors = listOf("Ciężka praca fizyczna wykonywana według planu.", "Poczucie winy wynikające z popełnionego błędu.", "Szybkie uleganie pokusom i braki w silnej woli.")
+            sjpUrl = "https://sjp.pwn.pl/szukaj/serendypno%C5%9B%C4%87.html",
+            distractors = listOf(
+                "Dokładne planowanie każdego etapu pracy.",
+                "Poczucie winy wynikające z popełnionego błędu.",
+                "Szybkie uleganie pokusom i brak silnej woli."
+            )
         ),
         DictionaryWord(
             id = "atawizm",
