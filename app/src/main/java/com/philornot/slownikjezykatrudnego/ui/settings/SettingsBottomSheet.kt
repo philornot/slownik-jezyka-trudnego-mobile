@@ -8,6 +8,7 @@ package com.philornot.slownikjezykatrudnego.ui.settings
  * Theme toggle now uses circular reveal animation (same as web version).
  */
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -62,9 +63,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.philornot.slownikjezykatrudnego.BuildConfig
+import com.philornot.slownikjezykatrudnego.data.model.NotificationTimeSlot
 import com.philornot.slownikjezykatrudnego.data.model.TextSizeLevel
 import com.philornot.slownikjezykatrudnego.data.model.UserSettings
 import com.philornot.slownikjezykatrudnego.ui.theme.CircularRevealThemeWrapper
@@ -94,6 +97,7 @@ fun SettingsBottomSheet(
     var localReducedMotion by remember { mutableStateOf(settings.reducedMotion) }
     var localTextSize by remember { mutableStateOf(settings.textSize) }
     var notificationsEnabled by remember { mutableStateOf(settings.notificationsEnabled) }
+    var notificationTimeSlot by remember { mutableStateOf(settings.notificationTimeSlot) }
 
     // Reset progress confirmation timer
     var isResetConfirmOpen by remember { mutableStateOf(false) }
@@ -122,7 +126,8 @@ fun SettingsBottomSheet(
                 highContrast = localHighContrast,
                 reducedMotion = localReducedMotion,
                 textSize = localTextSize,
-                notificationsEnabled = notificationsEnabled
+                notificationsEnabled = notificationsEnabled,
+                notificationTimeSlot = notificationTimeSlot
             )
         )
     }
@@ -206,236 +211,132 @@ fun SettingsBottomSheet(
                     }
 
                     IconButton(onClick = {
-                    applyAndSave()
-                    onDismiss()
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Zamknij",
-                        tint = colors.textMuted
-                    )
-                }
-            }
-
-            // Section 1: Learning Parameters
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AutoStories,
-                        contentDescription = null,
-                        tint = colors.textAmberBrand,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Text(
-                        text = "PARAMETRY NAUKI",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = colors.textAmberBrand,
-                        letterSpacing = 0.5.sp
-                    )
-                }
-
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = colors.bgSurfaceElevated,
-                    border = BorderStroke(1.dp, colors.borderDefault),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Nowe słowa na dzienną sesję",
-                                fontSize = 13.5.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textPrimary
-                            )
-                            Text(
-                                text = "$localLimit",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = colors.textAmberBrand
-                            )
-                        }
-
-                        Slider(
-                            value = localLimit.toFloat(),
-                            onValueChange = {
-                                localLimit = it.toInt()
-                                applyAndSave()
-                            },
-                            valueRange = 1f..20f,
-                            steps = 19,
-                            colors = SliderDefaults.colors(
-                                thumbColor = colors.brandPrimary,
-                                activeTrackColor = colors.brandPrimary,
-                                inactiveTrackColor = colors.progressTrack
-                            )
+                        applyAndSave()
+                        onDismiss()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Zamknij",
+                            tint = colors.textMuted
                         )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "1 słowo",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = colors.textMuted
-                            )
-                            Text(
-                                text = "10 słów",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = colors.textMuted
-                            )
-                            Text(
-                                text = "20 słów",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = colors.textMuted
-                            )
-                        }
                     }
                 }
 
-                // Notifications Toggle
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                // Section 1: Learning Parameters
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Notifications,
+                            imageVector = Icons.Default.AutoStories,
                             contentDescription = null,
-                            tint = colors.brandPrimary,
-                            modifier = Modifier.size(18.dp)
+                            tint = colors.textAmberBrand,
+                            modifier = Modifier.size(16.dp)
                         )
-                        Column {
-                            Text(
-                                text = "Powiadomienia o powtórkach",
-                                fontSize = 13.5.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textPrimary
+                        Text(
+                            text = "PARAMETRY NAUKI",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = colors.textAmberBrand,
+                            letterSpacing = 0.5.sp
+                        )
+                    }
+
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = colors.bgSurfaceElevated,
+                        border = BorderStroke(1.dp, colors.borderDefault),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Nowe słowa na dzienną sesję",
+                                    fontSize = 13.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textPrimary
+                                )
+                                Text(
+                                    text = "$localLimit",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = colors.textAmberBrand
+                                )
+                            }
+
+                            Slider(
+                                value = localLimit.toFloat(),
+                                onValueChange = {
+                                    localLimit = it.toInt()
+                                    applyAndSave()
+                                },
+                                valueRange = 1f..20f,
+                                steps = 19,
+                                colors = SliderDefaults.colors(
+                                    thumbColor = colors.brandPrimary,
+                                    activeTrackColor = colors.brandPrimary,
+                                    inactiveTrackColor = colors.progressTrack
+                                )
                             )
-                            Text(
-                                text = "Codzienne przypomnienie w aplikacji",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = colors.textMuted
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "1 słowo",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = colors.textMuted
+                                )
+                                Text(
+                                    text = "10 słów",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = colors.textMuted
+                                )
+                                Text(
+                                    text = "20 słów",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = colors.textMuted
+                                )
+                            }
                         }
                     }
 
-                    Switch(
-                        checked = notificationsEnabled,
-                        onCheckedChange = {
-                            notificationsEnabled = it
-                            applyAndSave()
-                        },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.White,
-                            checkedTrackColor = colors.brandPrimary
-                        )
-                    )
-                }
-            }
-
-            // Section 2: Appearance (Theme + Accessibility)
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                HorizontalDivider(color = colors.borderDefault)
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Palette,
-                        contentDescription = null,
-                        tint = colors.textAmberBrand,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Text(
-                        text = "WYGLĄD",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = colors.textAmberBrand,
-                        letterSpacing = 0.5.sp
-                    )
-                }
-
-                // Theme Toggle Card (circular reveal — like web version)
-                val isDark = settings.isDarkTheme ?: false
-                Surface(
-                    onClick = {
-                        if (onToggleTheme != null) {
-                            coroutineScope.launch {
-                                val origin = if (themeButtonCenter != Offset.Zero) themeButtonCenter else null
-                                android.util.Log.d(
-                                    "ThemeTransition",
-                                    "[UI] Theme setting clicked in SettingsBottomSheet. Origin: $origin"
-                                )
-                                val snapshot = try {
-                                    themeTransitionState?.graphicsLayer?.toImageBitmap()
-                                } catch (e: Exception) {
-                                    android.util.Log.e("ThemeTransition", "Failed to capture graphicsLayer snapshot", e)
-                                    null
-                                }
-                                if (snapshot != null) {
-                                    android.util.Log.d(
-                                        "ThemeTransition",
-                                        "[STEP 0/5: CAPTURE] Composable graphicsLayer snapshot captured (${snapshot.width}x${snapshot.height}px)."
-                                    )
-                                }
-                                themeTransitionState?.oldBitmap = snapshot
-                                onToggleTheme(origin)
-                            }
-                        }
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    color = colors.bgSurfaceElevated,
-                    border = BorderStroke(1.dp, colors.borderDefault),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                    // Notifications Toggle
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 14.dp, vertical = 12.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.weight(1f)
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             Icon(
-                                imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                imageVector = Icons.Default.Notifications,
                                 contentDescription = null,
                                 tint = colors.brandPrimary,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                             Column {
                                 Text(
-                                    text = if (isDark) "Jasny motyw" else "Ciemny motyw",
+                                    text = "Powiadomienia o powtórkach",
                                     fontSize = 13.5.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary
                                 )
                                 Text(
-                                    text = if (isDark) "Przełącz na jasne barwy dzienne" else "Głębokie, stonowane szałwiowe barwy nocne",
+                                    text = "Codzienne przypomnienie w aplikacji",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = colors.textMuted
@@ -443,360 +344,530 @@ fun SettingsBottomSheet(
                             }
                         }
 
-                        // Theme toggle button — captures position for circular reveal
-                        Surface(
-                            onClick = {
-                                if (onToggleTheme != null) {
-                                    coroutineScope.launch {
-                                        val origin = if (themeButtonCenter != Offset.Zero) themeButtonCenter else null
-                                        android.util.Log.d(
-                                            "ThemeTransition",
-                                            "[UI] Theme icon button clicked in SettingsBottomSheet. Origin: $origin"
-                                        )
-                                        val snapshot = try {
-                                            themeTransitionState?.graphicsLayer?.toImageBitmap()
-                                        } catch (e: Exception) {
-                                            android.util.Log.e("ThemeTransition", "Failed to capture graphicsLayer snapshot", e)
-                                            null
-                                        }
-                                        if (snapshot != null) {
-                                            android.util.Log.d(
-                                                "ThemeTransition",
-                                                "[STEP 0/5: CAPTURE] Composable graphicsLayer snapshot captured (${snapshot.width}x${snapshot.height}px)."
-                                            )
-                                        }
-                                        themeTransitionState?.oldBitmap = snapshot
-                                        onToggleTheme(origin)
-                                    }
-                                }
+                        Switch(
+                            checked = notificationsEnabled,
+                            onCheckedChange = {
+                                notificationsEnabled = it
+                                applyAndSave()
                             },
-                            modifier = Modifier
-                                .size(44.dp)
-                                .onGloballyPositioned { coords ->
-                                    val pos = coords.positionInRoot()
-                                    val size = coords.size
-                                    themeButtonCenter = Offset(
-                                        pos.x + size.width / 2f,
-                                        pos.y + size.height / 2f
-                                    )
-                                },
-                            shape = RoundedCornerShape(10.dp),
-                            color = colors.brandPrimary,
-                            enabled = onToggleTheme != null
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
-                                    contentDescription = "Przełącz motyw",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Section 3: Accessibility
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                HorizontalDivider(color = colors.borderDefault)
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Visibility,
-                        contentDescription = null,
-                        tint = colors.textAmberBrand,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Text(
-                        text = "DOSTĘPNOŚĆ",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = colors.textAmberBrand,
-                        letterSpacing = 0.5.sp
-                    )
-                }
-
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = colors.bgSurfaceElevated,
-                    border = BorderStroke(1.dp, colors.borderDefault),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-
-                        // High Contrast Toggle
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "Wysoki kontrast",
-                                    fontSize = 13.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.textPrimary
-                                )
-                                Text(
-                                    text = "Wyrazistsze kolory, grubsze obramowania",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = colors.textMuted
-                                )
-                            }
-                            Switch(
-                                checked = localHighContrast,
-                                onCheckedChange = {
-                                    localHighContrast = it
-                                    applyAndSave()
-                                },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = Color.White,
-                                    checkedTrackColor = colors.brandPrimary
-                                )
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = colors.brandPrimary
                             )
-                        }
+                        )
+                    }
 
-                        HorizontalDivider(color = colors.borderDefault)
-
-                        // Text Size
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.TextFormat,
-                                    contentDescription = null,
-                                    tint = colors.brandPrimary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Text(
-                                    text = "Wielkość tekstu",
-                                    fontSize = 13.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.textPrimary
-                                )
-                            }
-
+                    // Time-of-day slot picker — only relevant while notifications are enabled.
+                    AnimatedVisibility(visible = notificationsEnabled) {
+                        Column(
+                            modifier = Modifier.padding(top = 2.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = "Pora przypomnienia",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = colors.textMuted
+                            )
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                TextSizeLevel.entries.forEach { level ->
-                                    val isSelected = localTextSize == level
-                                    val label = when (level) {
-                                        TextSizeLevel.SMALL -> "Mały"
-                                        TextSizeLevel.MEDIUM -> "Średni"
-                                        TextSizeLevel.LARGE -> "Duży"
-                                    }
-                                    val subLabel = when (level) {
-                                        TextSizeLevel.SMALL -> "Domyślny"
-                                        TextSizeLevel.MEDIUM -> "Powiększony"
-                                        TextSizeLevel.LARGE -> "Maksymalny"
-                                    }
-
+                                NotificationTimeSlot.entries.forEach { slot ->
+                                    val selected = notificationTimeSlot == slot
                                     Surface(
                                         onClick = {
-                                            localTextSize = level
+                                            notificationTimeSlot = slot
                                             applyAndSave()
                                         },
                                         modifier = Modifier.weight(1f),
                                         shape = RoundedCornerShape(10.dp),
-                                        color = if (isSelected) colors.brandPrimary else colors.bgSurface,
-                                        border = BorderStroke(
-                                            2.dp,
-                                            if (isSelected) colors.brandPrimary else colors.borderDefault
+                                        color = if (selected) colors.brandPrimary else colors.bgSurfaceElevated,
+                                        contentColor = if (selected) colors.btnPrimaryText else colors.textPrimary,
+                                        border = if (selected) null else BorderStroke(
+                                            1.dp,
+                                            colors.borderDefault
                                         )
                                     ) {
-                                        Column(
+                                        Box(
                                             modifier = Modifier.padding(vertical = 10.dp),
-                                            horizontalAlignment = Alignment.CenterHorizontally
+                                            contentAlignment = Alignment.Center
                                         ) {
                                             Text(
-                                                text = label,
-                                                fontSize = when (level) {
-                                                    TextSizeLevel.SMALL -> 12.sp
-                                                    TextSizeLevel.MEDIUM -> 14.sp
-                                                    TextSizeLevel.LARGE -> 16.sp
-                                                },
-                                                fontWeight = FontWeight.ExtraBold,
-                                                color = if (isSelected) Color.White else colors.textMuted
-                                            )
-                                            Text(
-                                                text = subLabel,
-                                                fontSize = 9.sp,
+                                                text = slot.label,
+                                                fontSize = 12.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = if (isSelected) Color.White.copy(alpha = 0.75f) else colors.textMuted.copy(
-                                                    alpha = 0.75f
-                                                )
+                                                textAlign = TextAlign.Center
                                             )
                                         }
                                     }
                                 }
                             }
-                        }
-
-                        HorizontalDivider(color = colors.borderDefault)
-
-                        // Reduced Motion Toggle
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "Redukcja animacji",
-                                    fontSize = 13.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.textPrimary
-                                )
-                                Text(
-                                    text = "Wyłączenie animacji i przejść",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = colors.textMuted
-                                )
-                            }
-                            Switch(
-                                checked = localReducedMotion,
-                                onCheckedChange = {
-                                    localReducedMotion = it
-                                    applyAndSave()
-                                },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = Color.White,
-                                    checkedTrackColor = colors.brandPrimary
-                                )
+                            Text(
+                                text = "Dostaniesz jedno powiadomienie dziennie, o losowej porze w tym przedziale.",
+                                fontSize = 10.5.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = colors.textMuted
                             )
                         }
                     }
                 }
-            }
 
-            // Section 4: Reset Progress
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                HorizontalDivider(color = colors.borderDefault)
+                // Section 2: Appearance (Theme + Accessibility)
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    HorizontalDivider(color = colors.borderDefault)
 
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = colors.badgeRoseBg.copy(alpha = 0.4f),
-                    border = BorderStroke(1.dp, colors.badgeRoseBorder),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        if (!isResetConfirmOpen) {
-                            Surface(
-                                onClick = { isResetConfirmOpen = true },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(10.dp),
-                                color = colors.badgeRoseBg,
-                                border = BorderStroke(1.dp, colors.badgeRoseBorder)
+                        Icon(
+                            imageVector = Icons.Default.Palette,
+                            contentDescription = null,
+                            tint = colors.textAmberBrand,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = "WYGLĄD",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = colors.textAmberBrand,
+                            letterSpacing = 0.5.sp
+                        )
+                    }
+
+                    // Theme Toggle Card (circular reveal — like web version)
+                    val isDark = settings.isDarkTheme ?: false
+                    Surface(
+                        onClick = {
+                            if (onToggleTheme != null) {
+                                coroutineScope.launch {
+                                    val origin =
+                                        if (themeButtonCenter != Offset.Zero) themeButtonCenter else null
+                                    android.util.Log.d(
+                                        "ThemeTransition",
+                                        "[UI] Theme setting clicked in SettingsBottomSheet. Origin: $origin"
+                                    )
+                                    val snapshot = try {
+                                        themeTransitionState?.graphicsLayer?.toImageBitmap()
+                                    } catch (e: Exception) {
+                                        android.util.Log.e(
+                                            "ThemeTransition",
+                                            "Failed to capture graphicsLayer snapshot",
+                                            e
+                                        )
+                                        null
+                                    }
+                                    if (snapshot != null) {
+                                        android.util.Log.d(
+                                            "ThemeTransition",
+                                            "[STEP 0/5: CAPTURE] Composable graphicsLayer snapshot captured (${snapshot.width}x${snapshot.height}px)."
+                                        )
+                                    }
+                                    themeTransitionState?.oldBitmap = snapshot
+                                    onToggleTheme(origin)
+                                }
+                            }
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        color = colors.bgSurfaceElevated,
+                        border = BorderStroke(1.dp, colors.borderDefault),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.weight(1f)
                             ) {
-                                Row(
-                                    modifier = Modifier.padding(vertical = 10.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        Icons.Default.RestartAlt,
-                                        contentDescription = null,
-                                        tint = colors.badgeRoseText,
-                                        modifier = Modifier.size(16.dp)
+                                Icon(
+                                    imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                    contentDescription = null,
+                                    tint = colors.brandPrimary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Column {
+                                    Text(
+                                        text = if (isDark) "Jasny motyw" else "Ciemny motyw",
+                                        fontSize = 13.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary
                                     )
                                     Text(
-                                        text = "Resetuj cały postęp nauki",
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        color = colors.badgeRoseText,
-                                        modifier = Modifier.padding(start = 8.dp)
+                                        text = if (isDark) "Przełącz na jasne barwy dzienne" else "Głębokie, stonowane szałwiowe barwy nocne",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = colors.textMuted
                                     )
                                 }
                             }
-                        } else {
-                            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+
+                            // Theme toggle button — captures position for circular reveal
+                            Surface(
+                                onClick = {
+                                    if (onToggleTheme != null) {
+                                        coroutineScope.launch {
+                                            val origin =
+                                                if (themeButtonCenter != Offset.Zero) themeButtonCenter else null
+                                            android.util.Log.d(
+                                                "ThemeTransition",
+                                                "[UI] Theme icon button clicked in SettingsBottomSheet. Origin: $origin"
+                                            )
+                                            val snapshot = try {
+                                                themeTransitionState?.graphicsLayer?.toImageBitmap()
+                                            } catch (e: Exception) {
+                                                android.util.Log.e(
+                                                    "ThemeTransition",
+                                                    "Failed to capture graphicsLayer snapshot",
+                                                    e
+                                                )
+                                                null
+                                            }
+                                            if (snapshot != null) {
+                                                android.util.Log.d(
+                                                    "ThemeTransition",
+                                                    "[STEP 0/5: CAPTURE] Composable graphicsLayer snapshot captured (${snapshot.width}x${snapshot.height}px)."
+                                                )
+                                            }
+                                            themeTransitionState?.oldBitmap = snapshot
+                                            onToggleTheme(origin)
+                                        }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .onGloballyPositioned { coords ->
+                                        val pos = coords.positionInRoot()
+                                        val size = coords.size
+                                        themeButtonCenter = Offset(
+                                            pos.x + size.width / 2f,
+                                            pos.y + size.height / 2f
+                                        )
+                                    },
+                                shape = RoundedCornerShape(10.dp),
+                                color = colors.brandPrimary,
+                                enabled = onToggleTheme != null
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
                                     Icon(
-                                        Icons.Default.Warning,
-                                        contentDescription = null,
-                                        tint = colors.grade0Text,
+                                        imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                        contentDescription = "Przełącz motyw",
+                                        tint = Color.White,
                                         modifier = Modifier.size(20.dp)
                                     )
-                                    Column {
-                                        Text(
-                                            text = "Czy na pewno chcesz zresetować całą historię?",
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            color = colors.badgeRoseText
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Section 3: Accessibility
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    HorizontalDivider(color = colors.borderDefault)
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Visibility,
+                            contentDescription = null,
+                            tint = colors.textAmberBrand,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = "DOSTĘPNOŚĆ",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = colors.textAmberBrand,
+                            letterSpacing = 0.5.sp
+                        )
+                    }
+
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = colors.bgSurfaceElevated,
+                        border = BorderStroke(1.dp, colors.borderDefault),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+
+                            // High Contrast Toggle
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Wysoki kontrast",
+                                        fontSize = 13.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary
+                                    )
+                                    Text(
+                                        text = "Wyrazistsze kolory, grubsze obramowania",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = colors.textMuted
+                                    )
+                                }
+                                Switch(
+                                    checked = localHighContrast,
+                                    onCheckedChange = {
+                                        localHighContrast = it
+                                        applyAndSave()
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedThumbColor = Color.White,
+                                        checkedTrackColor = colors.brandPrimary
+                                    )
+                                )
+                            }
+
+                            HorizontalDivider(color = colors.borderDefault)
+
+                            // Text Size
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.TextFormat,
+                                        contentDescription = null,
+                                        tint = colors.brandPrimary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text(
+                                        text = "Wielkość tekstu",
+                                        fontSize = 13.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary
+                                    )
+                                }
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    TextSizeLevel.entries.forEach { level ->
+                                        val isSelected = localTextSize == level
+                                        val label = when (level) {
+                                            TextSizeLevel.SMALL -> "Mały"
+                                            TextSizeLevel.MEDIUM -> "Średni"
+                                            TextSizeLevel.LARGE -> "Duży"
+                                        }
+                                        val subLabel = when (level) {
+                                            TextSizeLevel.SMALL -> "Domyślny"
+                                            TextSizeLevel.MEDIUM -> "Powiększony"
+                                            TextSizeLevel.LARGE -> "Maksymalny"
+                                        }
+
+                                        Surface(
+                                            onClick = {
+                                                localTextSize = level
+                                                applyAndSave()
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                            shape = RoundedCornerShape(10.dp),
+                                            color = if (isSelected) colors.brandPrimary else colors.bgSurface,
+                                            border = BorderStroke(
+                                                2.dp,
+                                                if (isSelected) colors.brandPrimary else colors.borderDefault
+                                            )
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.padding(vertical = 10.dp),
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+                                                Text(
+                                                    text = label,
+                                                    fontSize = when (level) {
+                                                        TextSizeLevel.SMALL -> 12.sp
+                                                        TextSizeLevel.MEDIUM -> 14.sp
+                                                        TextSizeLevel.LARGE -> 16.sp
+                                                    },
+                                                    fontWeight = FontWeight.ExtraBold,
+                                                    color = if (isSelected) Color.White else colors.textMuted
+                                                )
+                                                Text(
+                                                    text = subLabel,
+                                                    fontSize = 9.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = if (isSelected) Color.White.copy(alpha = 0.75f) else colors.textMuted.copy(
+                                                        alpha = 0.75f
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            HorizontalDivider(color = colors.borderDefault)
+
+                            // Reduced Motion Toggle
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Redukcja animacji",
+                                        fontSize = 13.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary
+                                    )
+                                    Text(
+                                        text = "Wyłączenie animacji i przejść",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = colors.textMuted
+                                    )
+                                }
+                                Switch(
+                                    checked = localReducedMotion,
+                                    onCheckedChange = {
+                                        localReducedMotion = it
+                                        applyAndSave()
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedThumbColor = Color.White,
+                                        checkedTrackColor = colors.brandPrimary
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Section 4: Reset Progress
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    HorizontalDivider(color = colors.borderDefault)
+
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = colors.badgeRoseBg.copy(alpha = 0.4f),
+                        border = BorderStroke(1.dp, colors.badgeRoseBorder),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            if (!isResetConfirmOpen) {
+                                Surface(
+                                    onClick = { isResetConfirmOpen = true },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = colors.badgeRoseBg,
+                                    border = BorderStroke(1.dp, colors.badgeRoseBorder)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(vertical = 10.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Icon(
+                                            Icons.Default.RestartAlt,
+                                            contentDescription = null,
+                                            tint = colors.badgeRoseText,
+                                            modifier = Modifier.size(16.dp)
                                         )
                                         Text(
-                                            text = "Ta operacja usunie wszystkie powtórki i rozpocznie naukę od zera. Nie można jej cofnąć.",
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = colors.badgeRoseText
+                                            text = "Resetuj cały postęp nauki",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = colors.badgeRoseText,
+                                            modifier = Modifier.padding(start = 8.dp)
                                         )
                                     }
                                 }
-
-                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    Surface(
-                                        onClick = {
-                                            if (resetCountdown == 0) {
-                                                onResetProgress()
-                                                isResetConfirmOpen = false
-                                                onDismiss()
-                                            }
-                                        },
-                                        enabled = resetCountdown == 0,
-                                        modifier = Modifier.weight(1f),
-                                        shape = RoundedCornerShape(10.dp),
-                                        color = if (resetCountdown == 0) colors.grade0Text else colors.badgeRoseBg,
-                                        contentColor = if (resetCountdown == 0) Color.White else colors.badgeRoseText,
-                                        border = if (resetCountdown != 0) BorderStroke(
-                                            1.dp,
-                                            colors.badgeRoseBorder
-                                        ) else null
-                                    ) {
-                                        Box(
-                                            modifier = Modifier.padding(vertical = 12.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
+                            } else {
+                                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Icon(
+                                            Icons.Default.Warning,
+                                            contentDescription = null,
+                                            tint = colors.grade0Text,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Column {
                                             Text(
-                                                text = if (resetCountdown > 0) "Odczekaj $resetCountdown s..." else "Potwierdzam resetowanie",
+                                                text = "Czy na pewno chcesz zresetować całą historię?",
                                                 fontSize = 12.sp,
-                                                fontWeight = FontWeight.Bold
+                                                fontWeight = FontWeight.ExtraBold,
+                                                color = colors.badgeRoseText
+                                            )
+                                            Text(
+                                                text = "Ta operacja usunie wszystkie powtórki i rozpocznie naukę od zera. Nie można jej cofnąć.",
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = colors.badgeRoseText
                                             )
                                         }
                                     }
 
-                                    Surface(
-                                        onClick = { isResetConfirmOpen = false },
-                                        modifier = Modifier.weight(0.5f),
-                                        shape = RoundedCornerShape(10.dp),
-                                        color = colors.bgSurfaceElevated,
-                                        contentColor = colors.textPrimary,
-                                        border = BorderStroke(1.dp, colors.borderDefault)
-                                    ) {
-                                        Box(
-                                            modifier = Modifier.padding(vertical = 12.dp),
-                                            contentAlignment = Alignment.Center
+                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Surface(
+                                            onClick = {
+                                                if (resetCountdown == 0) {
+                                                    onResetProgress()
+                                                    isResetConfirmOpen = false
+                                                    onDismiss()
+                                                }
+                                            },
+                                            enabled = resetCountdown == 0,
+                                            modifier = Modifier.weight(1f),
+                                            shape = RoundedCornerShape(10.dp),
+                                            color = if (resetCountdown == 0) colors.grade0Text else colors.badgeRoseBg,
+                                            contentColor = if (resetCountdown == 0) Color.White else colors.badgeRoseText,
+                                            border = if (resetCountdown != 0) BorderStroke(
+                                                1.dp,
+                                                colors.badgeRoseBorder
+                                            ) else null
                                         ) {
-                                            Text(
-                                                "Anuluj",
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.Bold
-                                            )
+                                            Box(
+                                                modifier = Modifier.padding(vertical = 12.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = if (resetCountdown > 0) "Odczekaj $resetCountdown s..." else "Potwierdzam resetowanie",
+                                                    fontSize = 12.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+
+                                        Surface(
+                                            onClick = { isResetConfirmOpen = false },
+                                            modifier = Modifier.weight(0.5f),
+                                            shape = RoundedCornerShape(10.dp),
+                                            color = colors.bgSurfaceElevated,
+                                            contentColor = colors.textPrimary,
+                                            border = BorderStroke(1.dp, colors.borderDefault)
+                                        ) {
+                                            Box(
+                                                modifier = Modifier.padding(vertical = 12.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    "Anuluj",
+                                                    fontSize = 12.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -804,48 +875,47 @@ fun SettingsBottomSheet(
                         }
                     }
                 }
-            }
 
-            // Footer
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+                // Footer
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, bottom = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = "v${BuildConfig.VERSION_NAME}",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.textMuted.copy(alpha = 0.6f)
+                        )
+                        Text(text = "•", color = colors.textMuted.copy(alpha = 0.3f))
+                        // Serduszko — credit dla Dawida Siekielskiego
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "Autor logo",
+                            tint = Color(0xFFE11D48).copy(alpha = 0.7f),
+                            modifier = Modifier
+                                .size(14.dp)
+                                .clickable { showCreditDialog = true }
+                        )
+                    }
+
                     Text(
-                        text = "v${BuildConfig.VERSION_NAME}",
+                        text = "Polityka prywatności",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colors.textMuted.copy(alpha = 0.6f)
-                    )
-                    Text(text = "•", color = colors.textMuted.copy(alpha = 0.3f))
-                    // Serduszko — credit dla Dawida Siekielskiego
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = "Autor logo",
-                        tint = Color(0xFFE11D48).copy(alpha = 0.7f),
-                        modifier = Modifier
-                            .size(14.dp)
-                            .clickable { showCreditDialog = true }
+                        color = colors.brandPrimary,
+                        modifier = Modifier.clickable { onOpenPrivacy() }
                     )
                 }
-
-                Text(
-                    text = "Polityka prywatności",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colors.brandPrimary,
-                    modifier = Modifier.clickable { onOpenPrivacy() }
-                )
             }
         }
-    }
 
         if (themeTransitionState != null) {
             CircularRevealThemeWrapper(

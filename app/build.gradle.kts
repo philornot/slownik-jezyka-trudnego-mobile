@@ -22,8 +22,8 @@ android {
         applicationId = "com.philornot.slownikjezykatrudnego"
         minSdk = 26
         targetSdk = 37
-        versionCode = 5
-        versionName = "1.0.3"
+        versionCode = 6
+        versionName = "1.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -87,6 +87,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
+
+    // WorkManager for scheduling daily reminder notifications
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))

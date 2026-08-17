@@ -4,10 +4,12 @@ import android.app.Application
 import com.google.firebase.FirebaseApp
 import com.philornot.slownikjezykatrudnego.data.repository.FirebaseRepository
 import com.philornot.slownikjezykatrudnego.data.repository.PreferencesRepository
+import com.philornot.slownikjezykatrudnego.notifications.NotificationHelper
+import com.philornot.slownikjezykatrudnego.notifications.NotificationScheduler
 
 /**
- * Application entry point providing singleton dependencies.
- * Initializes Firebase and creates the repository layer.
+ * Application entry point providing singleton dependencies. Initializes
+ * Firebase and creates the repository layer.
  */
 class SjtApplication : Application() {
 
@@ -26,5 +28,11 @@ class SjtApplication : Application() {
         }
         preferencesRepository = PreferencesRepository(this)
         firebaseRepository = FirebaseRepository(preferencesRepository)
+
+        // Re-arm the daily reminder chain on every process start. This is what makes the
+        // reminder survive app updates / WorkManager DB resets, not just device reboots
+        // (device reboots alone are already handled by WorkManager's own persistence).
+        NotificationHelper.ensureChannel(this)
+        NotificationScheduler.scheduleDailyReminder(this, preferencesRepository.loadSettings())
     }
 }

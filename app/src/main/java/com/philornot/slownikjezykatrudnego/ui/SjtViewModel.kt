@@ -18,6 +18,7 @@ import com.philornot.slownikjezykatrudnego.data.repository.FirebaseRepository
 import com.philornot.slownikjezykatrudnego.data.repository.PreferencesRepository
 import com.philornot.slownikjezykatrudnego.domain.SessionManager
 import com.philornot.slownikjezykatrudnego.domain.SuperMemoEngine
+import com.philornot.slownikjezykatrudnego.notifications.NotificationScheduler
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTab
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,10 +31,15 @@ import kotlinx.coroutines.launch
  *
  * @property repository Local persistence repository (SharedPreferences).
  * @property firebaseRepository Firebase Auth and Firestore repository.
+ * @property appContext Application context, used only to (re)schedule the
+ *    WorkManager-backed daily reminder notification when settings change.
+ *    Deliberately typed as the application context (not an Activity
+ *    context) to avoid leaking a UI context from the ViewModel.
  */
 class SjtViewModel(
     private val repository: PreferencesRepository,
-    private val firebaseRepository: FirebaseRepository
+    private val firebaseRepository: FirebaseRepository,
+    private val appContext: Context,
 ) : ViewModel() {
 
     val allWords: List<DictionaryWord> = DictionaryWordsData.WORDS
@@ -467,6 +473,7 @@ class SjtViewModel(
      */
     fun saveSettings(newSettings: UserSettings) {
         val oldLimit = settings.value.dailyNewWordsLimit
+        val oldSettings = settings.value
         viewModelScope.launch {
             repository.saveSettings(newSettings)
             val uid = firebaseRepository.currentUser?.uid
@@ -476,6 +483,11 @@ class SjtViewModel(
         }
         if (newSettings.dailyNewWordsLimit != oldLimit) {
             startSession(forceNew = true)
+        }
+        if (newSettings.notificationsEnabled != oldSettings.notificationsEnabled ||
+            newSettings.notificationTimeSlot != oldSettings.notificationTimeSlot
+        ) {
+            NotificationScheduler.scheduleDailyReminder(appContext, newSettings)
         }
     }
 

@@ -27,7 +27,8 @@ class MainActivity : AppCompatActivity() {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return SjtViewModel(
                         app.preferencesRepository,
-                        app.firebaseRepository
+                        app.firebaseRepository,
+                        app.applicationContext
                     ) as T
                 }
             }
