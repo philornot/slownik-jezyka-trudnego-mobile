@@ -106,7 +106,7 @@ object DictionaryWordsData {
         DictionaryWord(
             id = "kwerenda",
             word = "Kwerenda",
-            phonetic = "[kve-ren-da]",
+            phonetic = "[kwe-ren-da]",
             shortDefinition = "Poszukiwanie informacji lub dokumentów w archiwach i bazach.",
             fullDefinition = "Szczegółowe poszukiwanie danych, materiałów źródłowych lub dokumentów przeprowadzane w archiwach, bibliotekach lub bazach danych w celach naukowych lub urzędowych.",
             etymology = "Z łaciny: querenda - rzeczy, których należy szukać (quaerere - szukać).",
@@ -413,7 +413,7 @@ object DictionaryWordsData {
         DictionaryWord(
             id = "insynuacja",
             word = "Insynuacja",
-            phonetic = "[in-sy-nua-cja]",
+            phonetic = "[in-sy-nu-a-cja]",
             shortDefinition = "Kłamliwe, złośliwe posądzenie rzucone nie wprost.",
             fullDefinition = "Złośliwe, nieuzasadnione posądzenie lub kłamliwy domysł sugerowany nie wprost.",
             etymology = "Z łaciny: insinuatio.",
@@ -438,7 +438,7 @@ object DictionaryWordsData {
             id = "jowialny",
             word = "Jowialny",
             phonetic = "[jo-wial-ny]",
-            shortDefinition = "Pogodny, wesolutki, serdeczny i rozśmieszający.",
+            shortDefinition = "Pogodny, wesoły, serdeczny i dobroduszny.",
             fullDefinition = "Cechujący się pogodą ducha, dobrym humorem, życzliwością i wyrozumiałością.",
             etymology = "Z łaciny: Iovialis.",
             examples = listOf("Wujek był jowialnym starszym panem, który sypał żartami.", "Przywitał go z jowialnym uśmiechem."),
@@ -678,7 +678,7 @@ object DictionaryWordsData {
             id = "snobizm",
             word = "Snobizm",
             phonetic = "[sno-bizm]",
-            shortDefinition = "Bezmyślne naśladowanie wyższych sfer dla szpanu.",
+            shortDefinition = "Bezmyślne naśladowanie gustów wyższych sfer dla prestiżu.",
             fullDefinition = "Postawa polegająca na bezkrytycznym naśladowaniu gustów i obyczajów ludzi uznawanych za elity.",
             etymology = "Z angielskiego: snob.",
             examples = listOf("Kupowanie dzieł sztuki dla snobizmu jest powszechne.", "Jego snobizm objawiał się w używaniu obcych słów."),
@@ -1097,7 +1097,7 @@ object DictionaryWordsData {
         DictionaryWord(
             id = "katharsis",
             word = "Katharsis",
-            phonetic = "[ka-tar-sis]",
+            phonetic = "[ka-thar-sis]",
             shortDefinition = "Duchowe oczyszczenie przez przeżycie sztuki lub silnych emocji.",
             fullDefinition = "Uczucie duchowego ulżenia i oczyszczenia z tłumionych emocji, które wywołuje wielka sztuka lub intensywne przeżycie.",
             etymology = "Z greki: katharsis - oczyszczenie.",
@@ -1105,6 +1105,25 @@ object DictionaryWordsData {
             category = "Sztuka i Literatura",
             sjpUrl = "https://sjp.pwn.pl/szukaj/katharsis.html",
             distractors = listOf("Głębokie poczucie winy bez możliwości ulgi.", "Zatrucie pokarmowe wywołane zjedzeniem zepsutej żywności.", "Rozpad budowli z cegły na skutek działania mrozu.")
+        ),
+        DictionaryWord(
+            id = "hipochondria",
+            word = "Hipochondria",
+            phonetic = "[hi-po-chon-dria]",
+            shortDefinition = "Chorobliwy, uporczywy lęk przed byciem poważnie chorym.",
+            fullDefinition = "Uporczywe przekonanie o istnieniu poważnej choroby somatycznej mimo braku medycznego uzasadnienia, połączone z nadmiernym skupieniem uwagi na sygnałach płynących z ciała.",
+            etymology = "Z greki: hypochondrion - podżebrze, brzuch (hypo- - pod + chondros - chrząstka).",
+            examples = listOf(
+                "Jego hipochondria sprawiała, że każdy ból głowy interpretował jako objaw poważnej choroby.",
+                "Lekarz cierpliwie tłumaczył pacjentce, że wyniki są prawidłowe, lecz hipochondria nie pozwalała jej w to uwierzyć."
+            ),
+            category = "Psychologia i Emocje",
+            sjpUrl = "https://sjp.pwn.pl/szukaj/hipochondria.html",
+            distractors = listOf(
+                "Rzeczywista, potwierdzona badaniami choroba przewlekła.",
+                "Nadmierna dbałość o higienę otoczenia.",
+                "Lęk przed przebywaniem w zamkniętych pomieszczeniach."
+            )
         )
     )
 }
