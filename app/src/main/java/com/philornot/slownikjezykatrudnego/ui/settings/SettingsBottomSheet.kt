@@ -89,6 +89,7 @@ import com.philornot.slownikjezykatrudnego.ui.theme.LocalThemeTransitionState
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -190,7 +191,7 @@ fun SettingsBottomSheet(
         if (isResetConfirmOpen) {
             resetCountdown = 5
             while (resetCountdown > 0) {
-                delay(1000)
+                delay(1000.milliseconds)
                 resetCountdown--
             }
         }
