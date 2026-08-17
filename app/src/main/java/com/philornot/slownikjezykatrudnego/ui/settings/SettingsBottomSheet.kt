@@ -8,6 +8,14 @@ package com.philornot.slownikjezykatrudnego.ui.settings
  * Theme toggle now uses circular reveal animation (same as web version).
  */
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -49,6 +57,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -62,10 +71,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.philornot.slownikjezykatrudnego.BuildConfig
 import com.philornot.slownikjezykatrudnego.data.model.NotificationTimeSlot
 import com.philornot.slownikjezykatrudnego.data.model.TextSizeLevel
@@ -91,6 +105,7 @@ fun SettingsBottomSheet(
     val scrollState = rememberScrollState()
     val themeTransitionState = LocalThemeTransitionState.current
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     var localLimit by remember { mutableIntStateOf(settings.dailyNewWordsLimit) }
     var localHighContrast by remember { mutableStateOf(settings.highContrast) }
@@ -98,6 +113,68 @@ fun SettingsBottomSheet(
     var localTextSize by remember { mutableStateOf(settings.textSize) }
     var notificationsEnabled by remember { mutableStateOf(settings.notificationsEnabled) }
     var notificationTimeSlot by remember { mutableStateOf(settings.notificationTimeSlot) }
+
+    fun applyAndSave() {
+        onSaveSettings(
+            settings.copy(
+                dailyNewWordsLimit = localLimit,
+                highContrast = localHighContrast,
+                reducedMotion = localReducedMotion,
+                textSize = localTextSize,
+                notificationsEnabled = notificationsEnabled,
+                notificationTimeSlot = notificationTimeSlot
+            )
+        )
+    }
+
+    // Sync notification permission state
+    var hasNotificationPermission by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            } else {
+                true
+            }
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasNotificationPermission = isGranted
+        if (isGranted) {
+            notificationsEnabled = true
+            applyAndSave()
+        } else {
+            notificationsEnabled = false
+            applyAndSave()
+        }
+    }
+
+    // Refresh permission state on resume (e.g. back from system settings)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                hasNotificationPermission =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_GRANTED
+                    } else {
+                        true
+                    }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     // Reset progress confirmation timer
     var isResetConfirmOpen by remember { mutableStateOf(false) }
@@ -119,18 +196,7 @@ fun SettingsBottomSheet(
         }
     }
 
-    fun applyAndSave() {
-        onSaveSettings(
-            settings.copy(
-                dailyNewWordsLimit = localLimit,
-                highContrast = localHighContrast,
-                reducedMotion = localReducedMotion,
-                textSize = localTextSize,
-                notificationsEnabled = notificationsEnabled,
-                notificationTimeSlot = notificationTimeSlot
-            )
-        )
-    }
+    // fun applyAndSave() was moved up
 
     // Credit dialog
     if (showCreditDialog) {
@@ -346,15 +412,56 @@ fun SettingsBottomSheet(
 
                         Switch(
                             checked = notificationsEnabled,
-                            onCheckedChange = {
-                                notificationsEnabled = it
-                                applyAndSave()
+                            onCheckedChange = { checked ->
+                                if (checked && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                    ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.POST_NOTIFICATIONS
+                                    ) != PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                } else {
+                                    notificationsEnabled = checked
+                                    applyAndSave()
+                                }
                             },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
                                 checkedTrackColor = colors.brandPrimary
                             )
                         )
+                    }
+
+                    // Warning if enabled but no permission
+                    if (notificationsEnabled && !hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 4.dp, bottom = 4.dp)
+                                .clickable {
+                                    val intent =
+                                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                            data =
+                                                Uri.fromParts("package", context.packageName, null)
+                                        }
+                                    context.startActivity(intent)
+                                },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = colors.badgeRoseText,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Text(
+                                text = "Brak uprawnień systemowych (dotknij, aby naprawić)",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.badgeRoseText
+                            )
+                        }
                     }
 
                     // Time-of-day slot picker — only relevant while notifications are enabled.

@@ -17,14 +17,14 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
-# --- Firebase ---
--keep class com.google.firebase.** { *; }
--keep class com.google.android.gms.** { *; }
+# --- Firebase / GMS ---
+# Firebase i Play Services dołączają własne consumer-rules.pro wewnątrz AAR,
+# więc ręczny -keep na cały pakiet nie jest potrzebny (i tylko psuł optymalizację).
 -dontwarn com.google.firebase.**
 -dontwarn com.google.android.gms.**
 
 # --- Credential Manager / Google Identity ---
--keep class androidx.credentials.** { *; }
+# Podobnie jak wyżej - biblioteki androidx same dostarczają swoje reguły.
 -keep class com.google.android.libraries.identity.googleid.** { *; }
 
 # --- Firestore model classes (kept for reflection) ---
@@ -32,3 +32,12 @@
     *;
 }
 
+# --- WorkManager / Room (Fix for NoSuchMethodException in WorkDatabase_Impl) ---
+-dontwarn androidx.room.**
+#noinspection ShrinkerUnresolvedReference
+-keep class * extends androidx.room.RoomDatabase {
+    <init>();
+}
+-keep class androidx.work.impl.WorkDatabase_Impl {
+    public <init>();
+}
