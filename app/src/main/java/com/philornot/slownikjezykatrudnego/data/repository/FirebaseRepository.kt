@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.firestore
 import com.philornot.slownikjezykatrudnego.data.model.AuthState
 import com.philornot.slownikjezykatrudnego.data.model.DeviceSession
@@ -199,24 +200,116 @@ class FirebaseRepository(
 
     private var syncJob: Job? = null
 
+    /** Real-time Firestore listener tracking remote changes to the user's document. */
+    private var realtimeProgressListener: ListenerRegistration? = null
+
     /**
      * Schedules a debounced sync of the local progress map to Firestore (2.5 second delay).
      * Identical to the web version's `syncProgressToCloud` debounce pattern.
      *
-     * @param userId      Firebase UID of the authenticated user.
-     * @param progressMap The complete word progress map to sync.
-     * @param scope       CoroutineScope in which to schedule the debounce.
+     * Uses a [progressMapProvider] lambda evaluated at the moment the debounce fires,
+     * so the sync always uploads the most up-to-date state rather than the snapshot
+     * captured at call time.
+     *
+     * @param userId              Firebase UID of the authenticated user.
+     * @param progressMapProvider Lambda that returns the current progress map at flush time.
+     * @param scope               CoroutineScope in which to schedule the debounce.
      */
     fun scheduleSyncProgress(
         userId: String,
-        progressMap: Map<String, UserWordProgress>,
+        progressMapProvider: () -> Map<String, UserWordProgress>,
         scope: CoroutineScope
     ) {
         syncJob?.cancel()
         syncJob = scope.launch {
             delay(2500.milliseconds)
-            syncProgressToCloud(userId, progressMap)
+            syncProgressToCloud(userId, progressMapProvider())
         }
+    }
+
+    /**
+     * Subscribes to real-time Firestore updates for the user's document.
+     * Mirrors the web version's `onSnapshot` listener in `+page.svelte`.
+     *
+     * Calls [onProgressChanged] whenever the cloud `progressMap` or `updatedAt`
+     * field changes so the app can merge remote edits (e.g. a lesson completed
+     * on the web) without requiring a restart.
+     *
+     * Also enforces session revocation: if the document's `sessionRevokedAt` is
+     * set and this device is no longer in the `devices` map, [onSessionRevoked]
+     * is called.
+     *
+     * @param userId            Firebase UID.
+     * @param onProgressChanged Callback with the parsed remote progress map.
+     * @param onSessionRevoked  Called when this device's session has been revoked.
+     */
+    fun setupRealtimeProgressListener(
+        userId: String,
+        onProgressChanged: (Map<String, UserWordProgress>) -> Unit,
+        onSessionRevoked: () -> Unit = {}
+    ) {
+        val db = db ?: return
+        removeRealtimeProgressListener()
+
+        val deviceId = preferencesRepository.getDeviceId()
+
+        realtimeProgressListener = db.collection("users").document(userId)
+            .addSnapshotListener { snap, error ->
+                if (error != null) {
+                    android.util.Log.w("FirebaseRepository", "Real-time listener error", error)
+                    return@addSnapshotListener
+                }
+                if (snap == null || !snap.exists()) return@addSnapshotListener
+
+                val data = snap.data ?: return@addSnapshotListener
+
+                // Session revocation check (mirrors web onSnapshot handler)
+                val sessionRevokedAt = data["sessionRevokedAt"] as? String
+                @Suppress("UNCHECKED_CAST")
+                val devices = data["devices"] as? Map<String, Any>
+                if (sessionRevokedAt != null && devices != null && !devices.containsKey(deviceId)) {
+                    onSessionRevoked()
+                    return@addSnapshotListener
+                }
+
+                // Parse progressMap from the snapshot
+                @Suppress("UNCHECKED_CAST")
+                val rawMap = data["progressMap"] as? Map<String, Map<String, Any>>
+                    ?: return@addSnapshotListener
+
+                try {
+                    val parsed = rawMap.mapValues { (_, v) ->
+                        @Suppress("UNCHECKED_CAST")
+                        val historyRaw = v["history"] as? List<Map<String, Any>> ?: emptyList()
+                        UserWordProgress(
+                            wordId = v["wordId"] as? String ?: "",
+                            repetitions = (v["repetitions"] as? Number)?.toInt() ?: 0,
+                            easeFactor = (v["easeFactor"] as? Number)?.toDouble() ?: 2.5,
+                            interval = (v["interval"] as? Number)?.toInt() ?: 0,
+                            nextReviewDate = v["nextReviewDate"] as? String ?: "",
+                            lastReviewedAt = v["lastReviewedAt"] as? String ?: "",
+                            history = historyRaw.map { h ->
+                                ReviewHistoryItem(
+                                    date = h["date"] as? String ?: "",
+                                    grade = (h["grade"] as? Number)?.toInt() ?: 0
+                                )
+                            }
+                        )
+                    }
+                    onProgressChanged(parsed)
+                } catch (e: Exception) {
+                    android.util.Log.w("FirebaseRepository", "Failed to parse real-time progress snapshot", e)
+                }
+            }
+    }
+
+    /**
+     * Removes the active Firestore real-time listener, if any.
+     * Should be called on user logout or ViewModel cleanup.
+     */
+    fun removeRealtimeProgressListener() {
+        realtimeProgressListener?.remove()
+        realtimeProgressListener = null
     }
 
     /**

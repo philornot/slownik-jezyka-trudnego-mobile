@@ -23,6 +23,8 @@ import com.philornot.slownikjezykatrudnego.ui.components.SjtTab
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -107,13 +109,32 @@ class SjtViewModel(
     val showNotificationPrompt: StateFlow<Boolean> = _showNotificationPrompt.asStateFlow()
 
     init {
-        startSession()
-        // Observe auth state changes — load profile on login, clear on logout.
+        // Observe auth state changes — start session once auth state is known,
+        // load profile on login, clear on logout.
+        // We deliberately do NOT call startSession() here unconditionally: if the
+        // user is already logged in, Firebase Auth emits Authenticated before any
+        // Firestore fetch, so launching startSession() at this point would use
+        // an empty local progressMap and mark the session as completed (Bug 1).
         viewModelScope.launch {
-            authState.collect { state ->
+            // Wait for the first definitive auth state (not Loading) before starting
+            // the session, so we can merge cloud data first if the user is signed in.
+            val initialState = authState.first { it !is AuthState.Loading }
+            if (initialState is AuthState.Authenticated) {
+                // onUserLoggedIn will call startSession(forceNew = true) after sync
+                onUserLoggedIn(initialState.user)
+            } else {
+                // Guest mode — start session immediately from local data
+                startSession()
+            }
+
+            // Keep observing *subsequent* state changes (login/logout events).
+            // drop(1) skips the current value that was already handled by authState.first()
+            // above, preventing a redundant double-call to onUserLoggedIn at startup.
+            authState.drop(1).collect { state ->
                 when (state) {
                     is AuthState.Authenticated -> onUserLoggedIn(state.user)
                     is AuthState.Unauthenticated -> {
+                        firebaseRepository.removeRealtimeProgressListener()
                         _userProfile.value = null
                     }
                     AuthState.Loading -> {}
@@ -226,6 +247,9 @@ class SjtViewModel(
     /**
      * Called when a user successfully logs in.
      * Registers the device, loads the cloud profile, and merges progress.
+     * Also sets up a real-time Firestore listener so changes made on other
+     * platforms (e.g. the web app) are reflected immediately without requiring
+     * an app restart.
      */
     private suspend fun onUserLoggedIn(user: FirebaseUser) {
         _isSyncing.value = true
@@ -265,6 +289,36 @@ class SjtViewModel(
 
             // Restart session with fresh merged data
             startSession(forceNew = true)
+
+            // Subscribe to real-time Firestore updates so changes made on other
+            // platforms (web, another phone) are applied automatically.
+            // This mirrors the web version's onSnapshot listener in +page.svelte.
+            firebaseRepository.setupRealtimeProgressListener(
+                userId = user.uid,
+                onProgressChanged = { remoteProgress ->
+                    viewModelScope.launch {
+                        val local = progressMap.value
+                        // Only merge and restart if the remote data differs from local
+                        if (remoteProgress != local) {
+                            val merged = firebaseRepository.mergeProgressMaps(
+                                local = local,
+                                cloud = remoteProgress
+                            )
+                            if (merged != local) {
+                                repository.saveProgressMap(merged)
+                                startSession(forceNew = true)
+                                android.util.Log.d(
+                                    "SjtViewModel",
+                                    "Real-time sync: merged ${remoteProgress.size} remote entries"
+                                )
+                            }
+                        }
+                    }
+                },
+                onSessionRevoked = {
+                    firebaseRepository.signOut()
+                }
+            )
         } catch (e: Exception) {
             android.util.Log.w("SjtViewModel", "Post-login sync failed", e)
         } finally {
@@ -417,10 +471,12 @@ class SjtViewModel(
 
         viewModelScope.launch {
             repository.saveWordProgress(updatedProgress)
-            // Schedule debounced cloud sync if logged in
+            // Schedule debounced cloud sync if logged in.
+            // Use a lambda so scheduleSyncProgress captures progressMap.value
+            // AFTER saveWordProgress has finished and updated the StateFlow (Bug 2 fix).
             val uid = firebaseRepository.currentUser?.uid
             if (uid != null) {
-                firebaseRepository.scheduleSyncProgress(uid, progressMap.value, viewModelScope)
+                firebaseRepository.scheduleSyncProgress(uid, { progressMap.value }, viewModelScope)
             }
         }
 
@@ -526,6 +582,40 @@ class SjtViewModel(
     fun closeAuth() { _isAuthOpen.value = false }
 
     fun getDeviceId(): String = repository.getDeviceId()
+
+    /**
+     * Called from [MainActivity.onResume] when the app returns to the foreground.
+     *
+     * If the user is logged in, performs a lightweight cloud fetch and merges
+     * any changes that happened on other platforms while the app was in the
+     * background. This is a safety-net on top of the real-time listener for
+     * cases where the listener was disconnected (network loss, app killer, etc.).
+     */
+    fun onAppForegrounded() {
+        val uid = firebaseRepository.currentUser?.uid ?: return
+        viewModelScope.launch {
+            try {
+                val remoteProgress = firebaseRepository.loadProgressFromCloud(uid) ?: return@launch
+                val local = progressMap.value
+                val merged = firebaseRepository.mergeProgressMaps(local = local, cloud = remoteProgress)
+                if (merged != local) {
+                    repository.saveProgressMap(merged)
+                    startSession(forceNew = true)
+                    android.util.Log.d("SjtViewModel", "Foreground sync: merged remote progress")
+                }
+            } catch (e: Exception) {
+                android.util.Log.w("SjtViewModel", "Foreground sync failed", e)
+            }
+        }
+    }
+
+    /**
+     * Cleans up the Firestore real-time listener when the ViewModel is destroyed.
+     */
+    override fun onCleared() {
+        super.onCleared()
+        firebaseRepository.removeRealtimeProgressListener()
+    }
 
     // ─────────────────────── Helpers ───────────────────────
 

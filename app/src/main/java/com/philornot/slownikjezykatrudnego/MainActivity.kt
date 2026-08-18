@@ -15,12 +15,14 @@ import com.philornot.slownikjezykatrudnego.ui.SjtViewModel
  */
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var viewModel: SjtViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         val app = application as SjtApplication
-        val viewModel = ViewModelProvider(
+        viewModel = ViewModelProvider(
             this,
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
@@ -39,6 +41,18 @@ class MainActivity : AppCompatActivity() {
                 viewModel = viewModel,
                 activity = this
             )
+        }
+    }
+
+    /**
+     * Called when the app returns to the foreground.
+     * Triggers a cloud data merge in case other platforms (web, another device)
+     * made changes while this app was in the background.
+     */
+    override fun onResume() {
+        super.onResume()
+        if (::viewModel.isInitialized) {
+            viewModel.onAppForegrounded()
         }
     }
 }
