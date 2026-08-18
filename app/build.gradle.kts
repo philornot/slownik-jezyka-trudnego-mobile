@@ -91,6 +91,9 @@ dependencies {
     // WorkManager for scheduling daily reminder notifications
     implementation(libs.androidx.work.runtime.ktx)
 
+    // Google Play In-App Updates
+    implementation(libs.play.app.update.ktx)
+
     // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

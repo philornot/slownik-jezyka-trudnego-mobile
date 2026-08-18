@@ -21,6 +21,7 @@ appcompat = "1.8.0"
 credentials = "1.6.0"
 googleid = "1.2.0"
 workRuntimeKtx = "2.10.5"
+playAppUpdate = "2.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,6 +50,7 @@ androidx-credentials = { group = "androidx.credentials", name = "credentials", v
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
+play-app-update-ktx = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "playAppUpdate" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
