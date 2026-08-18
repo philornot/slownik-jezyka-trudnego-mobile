@@ -231,22 +231,24 @@ class FirebaseRepository(
      * Subscribes to real-time Firestore updates for the user's document.
      * Mirrors the web version's `onSnapshot` listener in `+page.svelte`.
      *
-     * Calls [onProgressChanged] whenever the cloud `progressMap` or `updatedAt`
-     * field changes so the app can merge remote edits (e.g. a lesson completed
-     * on the web) without requiring a restart.
+     * Calls [onProgressChanged] whenever the cloud `progressMap` or
+     * `updatedAt` field changes so the app can merge remote edits (e.g.
+     * a lesson completed on the web) without requiring a restart.
      *
-     * Also enforces session revocation: if the document's `sessionRevokedAt` is
-     * set and this device is no longer in the `devices` map, [onSessionRevoked]
-     * is called.
+     * Also enforces session revocation: if the document's `sessionRevokedAt`
+     * is set and this device is no longer in the `devices` map,
+     * [onSessionRevoked] is called.
      *
-     * @param userId            Firebase UID.
-     * @param onProgressChanged Callback with the parsed remote progress map.
-     * @param onSessionRevoked  Called when this device's session has been revoked.
+     * @param userId Firebase UID.
+     * @param onProgressChanged Callback with the parsed remote progress map
+     *    and cloud session completion info.
+     * @param onSessionRevoked Called when this device's session has been
+     *    revoked.
      */
     fun setupRealtimeProgressListener(
         userId: String,
-        onProgressChanged: (Map<String, UserWordProgress>) -> Unit,
-        onSessionRevoked: () -> Unit = {}
+        onProgressChanged: (remoteProgress: Map<String, UserWordProgress>, lastCompletedSessionDate: String?, cardsReviewedToday: Int?) -> Unit,
+        onSessionRevoked: () -> Unit = {},
     ) {
         val db = db ?: return
         removeRealtimeProgressListener()
@@ -272,34 +274,45 @@ class FirebaseRepository(
                     return@addSnapshotListener
                 }
 
+                // Session completion state in cloud
+                val lastCompletedDate = data["lastCompletedSessionDate"] as? String
+                val cardsReviewed = (data["cardsReviewedToday"] as? Number)?.toInt()
+
                 // Parse progressMap from the snapshot
                 @Suppress("UNCHECKED_CAST")
                 val rawMap = data["progressMap"] as? Map<String, Map<String, Any>>
-                    ?: return@addSnapshotListener
-
-                try {
-                    val parsed = rawMap.mapValues { (_, v) ->
-                        @Suppress("UNCHECKED_CAST")
-                        val historyRaw = v["history"] as? List<Map<String, Any>> ?: emptyList()
-                        UserWordProgress(
-                            wordId = v["wordId"] as? String ?: "",
-                            repetitions = (v["repetitions"] as? Number)?.toInt() ?: 0,
-                            easeFactor = (v["easeFactor"] as? Number)?.toDouble() ?: 2.5,
-                            interval = (v["interval"] as? Number)?.toInt() ?: 0,
-                            nextReviewDate = v["nextReviewDate"] as? String ?: "",
-                            lastReviewedAt = v["lastReviewedAt"] as? String ?: "",
-                            history = historyRaw.map { h ->
-                                ReviewHistoryItem(
-                                    date = h["date"] as? String ?: "",
-                                    grade = (h["grade"] as? Number)?.toInt() ?: 0
-                                )
-                            }
+                val parsed = if (rawMap != null) {
+                    try {
+                        rawMap.mapValues { (_, v) ->
+                            @Suppress("UNCHECKED_CAST")
+                            val historyRaw = v["history"] as? List<Map<String, Any>> ?: emptyList()
+                            UserWordProgress(
+                                wordId = v["wordId"] as? String ?: "",
+                                repetitions = (v["repetitions"] as? Number)?.toInt() ?: 0,
+                                easeFactor = (v["easeFactor"] as? Number)?.toDouble() ?: 2.5,
+                                interval = (v["interval"] as? Number)?.toInt() ?: 0,
+                                nextReviewDate = v["nextReviewDate"] as? String ?: "",
+                                lastReviewedAt = v["lastReviewedAt"] as? String ?: "",
+                                history = historyRaw.map { h ->
+                                    ReviewHistoryItem(
+                                        date = h["date"] as? String ?: "",
+                                        grade = (h["grade"] as? Number)?.toInt() ?: 0
+                                    )
+                                }
+                            )
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.w(
+                            "FirebaseRepository",
+                            "Failed to parse real-time progress snapshot",
+                            e
                         )
+                        emptyMap()
                     }
-                    onProgressChanged(parsed)
-                } catch (e: Exception) {
-                    android.util.Log.w("FirebaseRepository", "Failed to parse real-time progress snapshot", e)
+                } else {
+                    emptyMap()
                 }
+                onProgressChanged(parsed, lastCompletedDate, cardsReviewed)
             }
     }
 
@@ -418,6 +431,66 @@ class FirebaseRepository(
             }
         }
     }
+
+    /**
+     * Persists today's session completion status to Firestore.
+     *
+     * @param userId Firebase UID.
+     * @param date Date of completion YYYY-MM-DD.
+     * @param cardsReviewedCount Number of cards reviewed in the session.
+     */
+    suspend fun syncSessionCompletionToCloud(
+        userId: String,
+        date: String,
+        cardsReviewedCount: Int,
+    ) = withContext(Dispatchers.IO) {
+        val db = db ?: return@withContext
+        try {
+            val now = java.time.Instant.now().toString()
+            db.collection("users").document(userId)
+                .set(
+                    mapOf(
+                        "lastCompletedSessionDate" to date,
+                        "cardsReviewedToday" to cardsReviewedCount,
+                        "updatedAt" to now
+                    ),
+                    com.google.firebase.firestore.SetOptions.merge()
+                ).await()
+        } catch (e: Exception) {
+            android.util.Log.w(
+                "FirebaseRepository",
+                "Failed to sync session completion to cloud",
+                e
+            )
+        }
+    }
+
+    /**
+     * Loads session completion metadata from Firestore.
+     *
+     * @param userId Firebase UID.
+     * @return Pair of `(lastCompletedSessionDate, cardsReviewedToday)` or
+     *    nulls.
+     */
+    suspend fun loadSessionCompletionFromCloud(userId: String): Pair<String?, Int?> =
+        withContext(Dispatchers.IO) {
+            val db = db ?: return@withContext Pair(null, null)
+            try {
+                val snap = db.collection("users").document(userId).get().await()
+                if (snap.exists()) {
+                    val date = snap.getString("lastCompletedSessionDate")
+                    val count = snap.getLong("cardsReviewedToday")?.toInt()
+                    return@withContext Pair(date, count)
+                }
+            } catch (e: Exception) {
+                android.util.Log.w(
+                    "FirebaseRepository",
+                    "Failed to load session completion from cloud",
+                    e
+                )
+            }
+            Pair(null, null)
+        }
 
     // ─────────────────────── Firestore: Settings ───────────────────────
 
@@ -645,6 +718,8 @@ class FirebaseRepository(
                 .set(
                     mapOf(
                         "progressMap" to emptyMap<String, Any>(),
+                        "lastCompletedSessionDate" to null,
+                        "cardsReviewedToday" to 0,
                         "updatedAt" to java.time.Instant.now().toString()
                     ),
                     com.google.firebase.firestore.SetOptions.merge()

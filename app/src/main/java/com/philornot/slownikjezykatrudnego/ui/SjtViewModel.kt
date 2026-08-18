@@ -298,23 +298,47 @@ class SjtViewModel(
             // Restart session with fresh merged data
             startSession(forceNew = true)
 
+            // Check if session was already completed on another device today
+            val today = SuperMemoEngine.getTodayDateString()
+            val (cloudCompletedDate, cloudCardsReviewed) = firebaseRepository.loadSessionCompletionFromCloud(
+                user.uid
+            )
+            if (cloudCompletedDate == today) {
+                _sessionCompleted.value = true
+                if (cloudCardsReviewed != null) {
+                    _cardsReviewedInSession.value = cloudCardsReviewed
+                }
+                persistActiveSessionState()
+            }
+
             // Subscribe to real-time Firestore updates so changes made on other
             // platforms (web, another phone) are applied automatically.
             // This mirrors the web version's onSnapshot listener in +page.svelte.
             firebaseRepository.setupRealtimeProgressListener(
                 userId = user.uid,
-                onProgressChanged = { remoteProgress ->
+                onProgressChanged = { remoteProgress, lastCompletedDate, cardsReviewed ->
                     viewModelScope.launch {
+                        val currentToday = SuperMemoEngine.getTodayDateString()
+                        if (lastCompletedDate == currentToday) {
+                            _sessionCompleted.value = true
+                            if (cardsReviewed != null) {
+                                _cardsReviewedInSession.value = cardsReviewed
+                            }
+                            persistActiveSessionState()
+                        }
+
                         val local = progressMap.value
                         // Only merge and restart if the remote data differs from local
-                        if (remoteProgress != local) {
+                        if (remoteProgress.isNotEmpty() && remoteProgress != local) {
                             val merged = firebaseRepository.mergeProgressMaps(
                                 local = local,
                                 cloud = remoteProgress
                             )
                             if (merged != local) {
                                 repository.saveProgressMap(merged)
-                                startSession(forceNew = true)
+                                if (lastCompletedDate != currentToday) {
+                                    startSession(forceNew = true)
+                                }
                                 android.util.Log.d(
                                     "SjtViewModel",
                                     "Real-time sync: merged ${remoteProgress.size} remote entries"
@@ -519,6 +543,14 @@ class SjtViewModel(
             } else {
                 SessionManager.getDailyCompletionMessage()
             }
+            val uid = firebaseRepository.currentUser?.uid
+            if (uid != null) {
+                val today = SuperMemoEngine.getTodayDateString()
+                val count = _cardsReviewedInSession.value
+                viewModelScope.launch {
+                    firebaseRepository.syncSessionCompletionToCloud(uid, today, count)
+                }
+            }
             if (!repository.hasPromptedForNotifications() && !settings.value.notificationsEnabled) {
                 _showNotificationPrompt.value = true
             }
@@ -613,12 +645,26 @@ class SjtViewModel(
         val uid = firebaseRepository.currentUser?.uid ?: return
         viewModelScope.launch {
             try {
+                val today = SuperMemoEngine.getTodayDateString()
+                val (cloudCompletedDate, cloudCardsReviewed) = firebaseRepository.loadSessionCompletionFromCloud(
+                    uid
+                )
+                if (cloudCompletedDate == today) {
+                    _sessionCompleted.value = true
+                    if (cloudCardsReviewed != null) {
+                        _cardsReviewedInSession.value = cloudCardsReviewed
+                    }
+                    persistActiveSessionState()
+                }
+
                 val remoteProgress = firebaseRepository.loadProgressFromCloud(uid) ?: return@launch
                 val local = progressMap.value
                 val merged = firebaseRepository.mergeProgressMaps(local = local, cloud = remoteProgress)
                 if (merged != local) {
                     repository.saveProgressMap(merged)
-                    startSession(forceNew = true)
+                    if (cloudCompletedDate != today) {
+                        startSession(forceNew = true)
+                    }
                     android.util.Log.d("SjtViewModel", "Foreground sync: merged remote progress")
                 }
             } catch (e: Exception) {
