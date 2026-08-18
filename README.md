@@ -1,75 +1,83 @@
-# Słownik Języka Trudnego — Android (Kotlin + Jetpack Compose)
+# Słownik Języka Trudnego — Android
 
-Natywna aplikacja Android dla projektu **Słownik Języka Trudnego**, stworzona z myślą o ergonomii obsługi kciukiem na urządzeniach mobilnych, z zachowaniem 100% funkcji i estetyki wersji Web.
-
----
-
-## 📱 Funkcje Aplikacji
-
-1. **Dwufazowa Sesja Dzienna (Daily Session)**:
-   - **Faza 1 (Prezentacja / Showcase)**: Poznawanie nowych słówek z odsłanianiem zamazanej definicji tapnięciem (`tap-to-reveal`), wymową fonetyczną, etymologią i przykładami w zdaniach.
-   - **Faza 2 (Quiz Aktywnego Przypominania)**: 4 warianty odpowiedzi, natychmiastowy feedback wizualny, pełny kontekst i odnośnik do SJP PWN.
-   - **Samoocena SM-2**: 4 przyciski oceny (Bardzo słabo [0], Słabo [3], Dobrze [4], Bardzo dobrze [5]). Przy ocenie 0 słówko wraca na koniec sesji.
-   - **Ekran podsumowania**: Puchar gratulacyjny, zliczone hasła, licznik serii dni (`Streak`).
-
-2. **Inteligentny Algorytm Spaced Repetition (SuperMemo SM-2)**:
-   - Dynamiczny współczynnik łatwości (`easeFactor`), wyznaczanie dat kolejnych powtórek.
-   - **Adaptacyjny limit słówek**: Automatyczne zmniejszanie/blokowanie puli nowych słów przy zaległościach powtórkowych, chroniąc przed przeciążeniem poznawczym.
-
-3. **Katalog (Słowniczek)**:
-   - Podział na **Poznane Słówka** (z odznakami powtórek) i **Oczekujące w kolejce**.
-   - Wyszukiwarka na żywo (po haśle i treści definicji) oraz filtry kategorii.
-   - Panel dolny szczegółów słowa (`ModalBottomSheet`).
-
-4. **Statystyki i Analiza**:
-   - Licznik serii dni (`Streak`).
-   - Wykres słupkowy aktywności z ostatnich 7 dni.
-   - Opanowanie słownictwa w podziale na 9 kategorii tematycznych.
-   - Lista najbardziej wymagających haseł.
-
-5. **Design System & Dostępność (a11y)**:
-   - Paleta barw: **Wyrazista Przydymiona Szałwia** (Sage Green Light & Dark).
-   - Typografia: `Libre Baskerville` (nagłówki) + `Inter` (interfejs).
-   - Tryb wysokiego kontrastu, 3 poziomy wielkości czcionki (Standardowy, Średni, Duży), redukcja ruchu.
-   - Bezpieczny reset postępów z 5-sekundowym odliczaniem.
-
-6. **Offline-First**:
-   - Pełna funkcjonalność i zapis postępów lokalnie na urządzeniu.
+Natywna, nowoczesna aplikacja mobilna na platformę Android służąca do efektywnej nauki
+wyrafinowanego słownictwa języka polskiego, oparta na metodzie powtórek w interwałach (Spaced
+Repetition).
 
 ---
 
-## 🛠️ Otwieranie w Android Studio
+## ✨ Kluczowe Możliwości
 
-1. Uruchom **Android Studio**.
-2. Wybierz **File -> Open...** i wskaż katalog:
-   `c:\Users\filip\Antigravity\Słownik Języka Trudnego ANDROID`
-3. Poczekaj na automatyczną synchronizację projektu Gradle (**Gradle Sync**).
-4. Wybierz emulator lub podłączone urządzenie i kliknij **Run 'app'** (▶).
+- **Dwufazowa Sesja Dzienna**:
+    - *Faza Prezentacji*: Poznawanie haseł, fonetyki, etymologii i zdań kontekstowych z funkcją
+      interaktywnego odsłaniania znaczenia (*tap-to-reveal*).
+    - *Faza Aktywnego Przypominania*: Quiz z 4 wariantami odpowiedzi oraz oceną trudności zgodną z
+      algorytmem SM-2.
+- **Algorytm SuperMemo SM-2 & Ochrona Poznawcza**:
+    - Dynamiczne obliczanie współczynnika łatwości (`easeFactor`) i interwałów powtórek.
+    - Adaptacyjny limit nowych słówek chroniący przed przeciążeniem przy zaległościach powtórkowych.
+- **Katalog & Wyszukiwarka**:
+    - Pełna baza wyselekcjonowanych haseł z podziałem na 9 kategorii tematycznych.
+    - Wyszukiwanie w czasie rzeczywistym po haśle oraz treści definicji.
+- **Statystyki i Monitorowanie Postępów**:
+    - Śledzenie ciągłości nauki (*Streak*), wykres 7-dniowej aktywności i identyfikacja
+      najtrudniejszych haseł.
+- **Inteligentne Powiadomienia (WorkManager)**:
+    - Kontekstowe przypomnienia uwzględniające aktualnie powtarzane słówka, serię dni, liczbę haseł
+      w kolejce oraz preferowaną porę dnia.
+- **Synchronizacja Chmurowa & Offline-First**:
+    - Pełna funkcjonalność bez dostępu do sieci z automatyczną synchronizacją i zarządzaniem sesjami
+      wielu urządzeń przez Firebase (Auth & Firestore).
+- **Dostępność i Design System**:
+    - Estetyka *Sage Green* (jasny i ciemny motyw), typografia `Libre Baskerville` + `Inter`,
+      regulacja rozmiaru tekstu, tryb wysokiego kontrastu oraz redukcja ruchu.
 
 ---
 
-## 🏗️ Struktura Kodu
+## 🛠️ Stack Technologiczny
+
+| Warstwa                | Technologie                                                                            |
+|------------------------|----------------------------------------------------------------------------------------|
+| **Język & Środowisko** | Kotlin, JDK 17, Android SDK 35 (min SDK 26)                                            |
+| **UI & Architektura**  | Jetpack Compose, Material 3, Single Activity (Edge-to-Edge), ViewModel + MVI/StateFlow |
+| **Pamięć & Usługi**    | SharedPreferences / Kotlinx Serialization, WorkManager                                 |
+| **Backend & Sync**     | Firebase Authentication, Cloud Firestore (zabezpieczone regułami bezpieczeństwa)       |
+| **Testy**              | JUnit 4, Kotlinx Coroutines Test                                                       |
+
+---
+
+## 📁 Struktura Projektu
 
 ```
-app/src/main/java/pl/slownikjezykatrudnego/app/
+app/src/main/java/com/philornot/slownikjezykatrudnego/
 ├── data/
-│   ├── datasource/          # Baza 91 wyrafinowanych słów (DictionaryWordsData.kt)
-│   ├── model/               # Modele DictionaryWord, UserWordProgress, UserSettings, SessionCard
-│   └── repository/          # Zapis SharedPreferences / JSON (PreferencesRepository.kt)
-├── domain/
-│   ├── SuperMemoEngine.kt   # Algorytm SM-2, wyznaczanie interwałów, kalkulator serii dni
-│   └── SessionManager.kt    # Generator sesji dziennej, Mulberry32 PRNG, adaptacyjny limit
+│   ├── datasource/          # Baza haseł słownikowych (DictionaryWordsData.kt)
+│   ├── model/               # Modele domenowe i DTO (DictionaryWord, UserWordProgress, itp.)
+│   └── repository/          # Zarządzanie danymi lokalnymi i synchronizacją Firebase
+├── domain/                  # Silnik SuperMemo SM-2, zarządca sesji (SessionManager.kt)
+├── notifications/           # Harmonogram i generator inteligentnych powiadomień (WorkManager)
 ├── ui/
-│   ├── theme/               # Paleta szałwiowa (Color.kt), Typografia (Type.kt), Motywy (Theme.kt)
-│   ├── components/          # Przyciski dotykowe, odznaki, pasek górny i dolny
-│   ├── lesson/              # Faza 1 Showcase, Faza 2 Quiz, Podsumowanie sesji
-│   ├── catalog/             # Wyszukiwarka, filtr kategorii, arkusz szczegółów hasła
-│   ├── stats/               # Wykres 7 dni, statystyki kategorii, trudne słówka
-│   ├── settings/            # Ustawienia limitu, motywu, dostępności, reset postępów
-│   ├── account/             # Informacja o trybie offline / synchronizacji
-│   ├── common/              # Polityka prywatności i formularz kontaktowy
-│   ├── SjtViewModel.kt      # Główny stan aplikacji i przepływ lekcji
-│   └── SjtApp.kt            # Główny interfejs Scaffold i BottomSheet
-├── MainActivity.kt          # Aktywność główna z Edge-to-Edge
-└── SjtApplication.kt        # Klasa aplikacji
+│   ├── theme/               # Kolorystyka (Sage Green), typografia, motywy
+│   ├── components/          # Reużywalne komponenty interfejsu (TopBar, BottomNav, Card)
+│   ├── lesson/              # Ekrany sesji nauki, quizu i podsumowania
+│   ├── catalog/             # Przeglądarka haseł, filtry i arkusz szczegółów
+│   ├── stats/               # Panel analityczny i statystyki nauki
+│   ├── settings/            # Ustawienia powiadomień, dostępności i motywu
+│   ├── account/             # Logowanie, rejestracja, profil i sesje urządzeń
+│   ├── SjtViewModel.kt      # Główny stan aplikacji
+│   └── SjtApp.kt            # Główny kontener Scaffold
+└── MainActivity.kt          # Punkt wejścia aplikacji
 ```
+
+---
+
+## 🚀 Budowanie i Testy
+
+```bash
+# Uruchomienie testów jednostkowych
+./gradlew testDebugUnitTest
+
+# Zbudowanie pakietu instalacyjnego APK
+./gradlew assembleDebug
+```
+
