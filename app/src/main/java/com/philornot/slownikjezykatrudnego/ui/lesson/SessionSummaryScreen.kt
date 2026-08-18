@@ -177,7 +177,7 @@ fun SessionSummaryScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Text(
-                                text = "PRZEJRZANE HASŁA",
+                                text = "PRZEJRZANE SŁOWA",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = colors.textMuted,
