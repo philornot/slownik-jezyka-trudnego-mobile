@@ -188,6 +188,19 @@ object SessionManager {
     }
 
     /**
+     * Returns count of words reviewed today (either in history or
+     * lastReviewedAt).
+     */
+    fun getWordsReviewedTodayCount(
+        progressMap: Map<String, UserWordProgress>,
+        todayStr: String = SuperMemoEngine.getTodayDateString(),
+    ): Int {
+        return progressMap.values.count { p ->
+            p.history.any { it.date == todayStr } || p.lastReviewedAt.startsWith(todayStr)
+        }
+    }
+
+    /**
      * Adaptively throttles daily new words to avoid cognitive overload.
      */
     fun calculateAdaptiveNewWordsLimit(
@@ -276,10 +289,20 @@ object SessionManager {
         // Mieszamy nowe słówka i powtórki razem (tak jak w wersji web)
         val cards = shuffleList(newCards + reviewCards, sessionRng)
 
-        // If the regular session is empty, fall back to a bonus review of all
-        // in-progress words that aren't officially due yet. This ensures the user
-        // always has something meaningful to practice every day.
+        // If the regular session is empty, check whether the user has already reviewed
+        // words today. If so, today's daily session is already completed!
         if (cards.isEmpty()) {
+            val reviewedTodayCount = getWordsReviewedTodayCount(progressMap, todayStr)
+            if (reviewedTodayCount > 0) {
+                return DailySessionData(
+                    cards = emptyList(),
+                    dueCount = 0,
+                    newCount = 0,
+                    isBonusSession = false
+                )
+            }
+
+            // Otherwise, fall back to a voluntary bonus review of all in-progress words.
             val bonusWords = getInProgressNotDueWords(progressMap, allWords, todayStr)
             val bonusRng = Mulberry32("sjt-bonus-$todayStr")
             val bonusCards = bonusWords.map { word ->

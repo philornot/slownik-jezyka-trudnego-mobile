@@ -440,22 +440,25 @@ class SjtViewModel(
 
         val savedState = if (!forceNew) repository.loadSessionState() else null
         val today = SuperMemoEngine.getTodayDateString()
+        val reviewedTodayCount = SessionManager.getWordsReviewedTodayCount(progressMap.value, today)
 
         if (savedState != null && savedState.date == today) {
             _sessionPhase.value = savedState.sessionPhase
             _currentCardIndex.value = savedState.currentCardIndex.coerceIn(0, maxOf(0, cards.size - 1))
-            _cardsReviewedInSession.value = savedState.cardsReviewedInSession
-            _sessionCompleted.value = savedState.sessionCompleted
+            _cardsReviewedInSession.value =
+                if (savedState.cardsReviewedInSession > 0) savedState.cardsReviewedInSession else reviewedTodayCount
+            _sessionCompleted.value =
+                savedState.sessionCompleted || (cards.isEmpty() && reviewedTodayCount > 0)
             _newWordsToLearn.value = cards.filter { it.isNew }.map { it.word }
         } else {
             _currentCardIndex.value = 0
             _sessionCompleted.value = cards.isEmpty()
+            _cardsReviewedInSession.value = if (cards.isEmpty()) reviewedTodayCount else 0
             _completionMessage.value = if (sessionData.isBonusSession) {
                 SessionManager.getBonusCompletionMessage()
             } else {
                 SessionManager.getDailyCompletionMessage()
             }
-            _cardsReviewedInSession.value = 0
 
             val newWords = cards.filter { it.isNew }.map { it.word }
             if (newWords.isNotEmpty()) {
