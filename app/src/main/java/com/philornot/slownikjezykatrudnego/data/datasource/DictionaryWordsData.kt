@@ -179,19 +179,19 @@ object DictionaryWordsData {
             id = "serendypnosc",
             word = "Serendypność",
             phonetic = "[se-ren-dyp-ność]",
-            shortDefinition = "Szczęśliwe odkrycie czegoś wartościowego przez przypadek.",
-            fullDefinition = "Zdolność do przypadkowego odkrywania czegoś wartościowego, interesującego lub użytecznego podczas poszukiwania czegoś innego, a także umiejętność dostrzeżenia znaczenia takiego nieoczekiwanego odkrycia.",
-            etymology = "Z angielskiego: serendipity, od dawnej perskiej nazwy Sri Lanki – Serendip.",
+            shortDefinition = "Dar dokonywania szczęśliwych odkryć przez przypadek.",
+            fullDefinition = "Zdolność lub właściwość polegająca na przypadkowym odnajdywaniu wartościowych, pięknych lub cennych rzeczy, podczas gdy szukało się czegoś zupełnie innego.",
+            etymology = "Z angielskiego: serendipity (od dawnej nazwy Sri Lanki - Serendib).",
             examples = listOf(
-                "Odkrycie penicyliny jest często podawane jako przykład serendypności w nauce.",
-                "Dzięki serendypności, szukając innej książki, trafił w antykwariacie na cenne pierwsze wydanie."
+                "Odkrycie penicyliny było klasycznym przykładem serendypności w nauce.",
+                "Dzięki serendypności trafił w antykwariacie na pierwsze wydanie ukochanej książki."
             ),
-            category = "Czas i Zjawiska",
+            category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/serendypno%C5%9B%C4%87.html",
             distractors = listOf(
-                "Dokładne planowanie każdego etapu pracy.",
+                "Ciężka praca fizyczna wykonywana według planu.",
                 "Poczucie winy wynikające z popełnionego błędu.",
-                "Szybkie uleganie pokusom i brak silnej woli."
+                "Szybkie uleganie pokusom i braki w silnej woli."
             )
         ),
         DictionaryWord(
