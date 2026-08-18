@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.domain
+package com.philornot.slownikjezykatrudnego.domain
 
 import com.philornot.slownikjezykatrudnego.data.model.DictionaryWord
 import com.philornot.slownikjezykatrudnego.data.model.SessionCard
@@ -182,31 +182,26 @@ object SessionManager {
         val newWords = shuffledUnstarted.take(adaptiveLimit)
 
         // 3. Assemble Session Cards
-        val cards = mutableListOf<SessionCard>()
-
-        for (word in newWords) {
-            val options = generateOptionsForWord(word, allWords, sessionRng)
-            cards.add(
-                SessionCard(
-                    word = word,
-                    isNew = true,
-                    userProgress = null,
-                    options = options
-                )
+        val newCards = newWords.map { word ->
+            SessionCard(
+                word = word,
+                isNew = true,
+                userProgress = null,
+                options = generateOptionsForWord(word, allWords, sessionRng)
             )
         }
 
-        for (word in dueWords) {
-            val options = generateOptionsForWord(word, allWords, sessionRng)
-            cards.add(
-                SessionCard(
-                    word = word,
-                    isNew = false,
-                    userProgress = progressMap[word.id],
-                    options = options
-                )
+        val reviewCards = dueWords.map { word ->
+            SessionCard(
+                word = word,
+                isNew = false,
+                userProgress = progressMap[word.id],
+                options = generateOptionsForWord(word, allWords, sessionRng)
             )
         }
+
+        // Mieszamy nowe słówka i powtórki razem (tak jak w wersji web)
+        val cards = shuffleList(newCards + reviewCards, sessionRng)
 
         return DailySessionData(
             cards = cards,
