@@ -67,6 +67,7 @@ fun SjtApp(
     val currentCardIndex by viewModel.currentCardIndex.collectAsState()
     val cardsReviewedCount by viewModel.cardsReviewedInSession.collectAsState()
     val completionMessage by viewModel.completionMessage.collectAsState()
+    val isBonusSession by viewModel.isBonusSession.collectAsState()
     val authState by viewModel.authState.collectAsState()
     val userProfile by viewModel.userProfile.collectAsState()
     val isSyncing by viewModel.isSyncing.collectAsState()
@@ -112,6 +113,7 @@ fun SjtApp(
                 currentCardIndex = currentCardIndex,
                 cardsReviewedCount = cardsReviewedCount,
                 completionMessage = completionMessage,
+                isBonusSession = isBonusSession,
                 authState = authState,
                 userProfile = userProfile,
                 isSyncing = isSyncing,
@@ -164,6 +166,7 @@ private fun SjtAppScaffold(
     currentCardIndex: Int,
     cardsReviewedCount: Int,
     completionMessage: com.philornot.slownikjezykatrudnego.domain.SessionManager.CompletionMessageType,
+    isBonusSession: Boolean,
     authState: com.philornot.slownikjezykatrudnego.data.model.AuthState,
     userProfile: com.philornot.slownikjezykatrudnego.data.model.UserProfile?,
     isSyncing: Boolean,
@@ -215,6 +218,7 @@ private fun SjtAppScaffold(
                         cardsReviewedCount = cardsReviewedCount,
                         streakDays = streakDays,
                         completionMessage = completionMessage,
+                        isBonusSession = isBonusSession,
                         onFinishShowcase = { viewModel.finishShowcase() },
                         onGradeCard = { viewModel.gradeCard(it) },
                         onNavigateCatalog = { viewModel.setActiveTab(SjtTab.CATALOG) },

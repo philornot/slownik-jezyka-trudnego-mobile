@@ -14,6 +14,11 @@ object SessionManager {
         val cards: List<SessionCard>,
         val dueCount: Int,
         val newCount: Int,
+        /**
+         * True when the regular SM-2 session was empty and this is a voluntary
+         * bonus review.
+         */
+        val isBonusSession: Boolean = false,
     )
 
     /**
@@ -24,15 +29,53 @@ object SessionManager {
      * title/description is a UI concern and belongs in `strings.xml`, not in
      * the domain layer — that keeps this class testable independently of the
      * copy shown on screen.
+     *
+     * Regular variants are shown after a normal SM-2 session. Bonus variants
+     * are shown after a voluntary extra review session.
      */
     enum class CompletionMessageType {
+        // ── Regular session variants ──────────────────────────────────────
         GREAT_JOB,
         SESSION_DONE,
-        ERUDITION_GROWING
+        ERUDITION_GROWING,
+        VOCABULARY_MASTERED,
+        DAY_WELL_SPENT,
+        LEXICON_GROWS,
+        ONE_STEP_FURTHER,
+        BRAIN_TRAINED,
+        KNOWLEDGE_IS_POWER,
+        SHORT_SESSIONS_WIN,
+
+        // ── Bonus session variants ────────────────────────────────────────
+        BONUS_GREAT_INITIATIVE,
+        BONUS_BEYOND_THE_PLAN,
+        BONUS_EXTRA_DOSE,
+        BONUS_CONSISTENT,
     }
 
+    private val regularMessages = listOf(
+        CompletionMessageType.GREAT_JOB,
+        CompletionMessageType.SESSION_DONE,
+        CompletionMessageType.ERUDITION_GROWING,
+        CompletionMessageType.VOCABULARY_MASTERED,
+        CompletionMessageType.DAY_WELL_SPENT,
+        CompletionMessageType.LEXICON_GROWS,
+        CompletionMessageType.ONE_STEP_FURTHER,
+        CompletionMessageType.BRAIN_TRAINED,
+        CompletionMessageType.KNOWLEDGE_IS_POWER,
+        CompletionMessageType.SHORT_SESSIONS_WIN,
+    )
+
+    private val bonusMessages = listOf(
+        CompletionMessageType.BONUS_GREAT_INITIATIVE,
+        CompletionMessageType.BONUS_BEYOND_THE_PLAN,
+        CompletionMessageType.BONUS_EXTRA_DOSE,
+        CompletionMessageType.BONUS_CONSISTENT,
+    )
+
     /**
-     * Mulberry32 seeded pseudo-random number generator for deterministic daily card ordering.
+     * Mulberry32 seeded pseudo-random number generator for deterministic daily
+     * card ordering.
      */
     class Mulberry32(seedString: String) {
         private var state: Long
@@ -88,7 +131,37 @@ object SessionManager {
     }
 
     /**
-     * Returns count of words in progress from previous days that are not yet mastered (repetitions < 3).
+     * Returns words that are currently in-progress (started but not yet
+     * mastered) and are NOT yet scheduled for review today.
+     *
+     * These words are used to build a voluntary "bonus" practice session when
+     * the regular SM-2 session would otherwise be empty (e.g. due to adaptive
+     * throttling). Cards are sorted by first-encounter date ascending so the
+     * oldest unmastered words get priority.
+     *
+     * @param progressMap Current word progress keyed by word ID.
+     * @param allWords Full dictionary word list.
+     * @param todayStr Today's date as YYYY-MM-DD (defaults to system date).
+     * @return Sorted list of in-progress, not-yet-due [DictionaryWord]s.
+     */
+    fun getInProgressNotDueWords(
+        progressMap: Map<String, UserWordProgress>,
+        allWords: List<DictionaryWord>,
+        todayStr: String = SuperMemoEngine.getTodayDateString(),
+    ): List<DictionaryWord> {
+        val wordMap = allWords.associateBy { it.id }
+        return progressMap.values
+            .filter { p ->
+                p.repetitions < 3 &&
+                        !SuperMemoEngine.isWordDueToday(p, todayStr)
+            }
+            .sortedBy { p -> p.history.firstOrNull()?.date ?: todayStr }
+            .mapNotNull { p -> wordMap[p.wordId] }
+    }
+
+    /**
+     * Returns count of words in progress from previous days that are not yet
+     * mastered (repetitions < 3).
      */
     fun getUnmasteredWordsFromPreviousDaysCount(
         progressMap: Map<String, UserWordProgress>,
@@ -203,6 +276,28 @@ object SessionManager {
         // Mieszamy nowe słówka i powtórki razem (tak jak w wersji web)
         val cards = shuffleList(newCards + reviewCards, sessionRng)
 
+        // If the regular session is empty, fall back to a bonus review of all
+        // in-progress words that aren't officially due yet. This ensures the user
+        // always has something meaningful to practice every day.
+        if (cards.isEmpty()) {
+            val bonusWords = getInProgressNotDueWords(progressMap, allWords, todayStr)
+            val bonusRng = Mulberry32("sjt-bonus-$todayStr")
+            val bonusCards = bonusWords.map { word ->
+                SessionCard(
+                    word = word,
+                    isNew = false,
+                    userProgress = progressMap[word.id],
+                    options = generateOptionsForWord(word, allWords, bonusRng)
+                )
+            }
+            return DailySessionData(
+                cards = bonusCards,
+                dueCount = 0,
+                newCount = 0,
+                isBonusSession = bonusCards.isNotEmpty()
+            )
+        }
+
         return DailySessionData(
             cards = cards,
             dueCount = dueWords.size,
@@ -214,11 +309,17 @@ object SessionManager {
      * Picks a random congratulatory message variant for the daily session
      * summary screen.
      *
-     * @return A randomly selected [CompletionMessageType]. The caller (UI
-     *    layer) is responsible for resolving it to localized title/description
-     *    strings.
+     * @return A randomly selected [CompletionMessageType] from the regular
+     *    pool. The caller (UI layer) is responsible for resolving it to
+     *    localized title/description strings.
      */
-    fun getDailyCompletionMessage(): CompletionMessageType {
-        return CompletionMessageType.entries.random()
-    }
+    fun getDailyCompletionMessage(): CompletionMessageType = regularMessages.random()
+
+    /**
+     * Picks a random congratulatory message variant for a voluntary bonus
+     * review session (shown when no regular SM-2 cards were due today).
+     *
+     * @return A randomly selected [CompletionMessageType] from the bonus pool.
+     */
+    fun getBonusCompletionMessage(): CompletionMessageType = bonusMessages.random()
 }

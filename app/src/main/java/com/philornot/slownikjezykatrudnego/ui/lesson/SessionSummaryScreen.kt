@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.ui.lesson
+package com.philornot.slownikjezykatrudnego.ui.lesson
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -42,13 +42,18 @@ import com.philornot.slownikjezykatrudnego.ui.components.SjtTouchButton
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 
 /**
- * Session completion summary screen with trophy, study metrics, and navigation actions.
+ * Session completion summary screen with trophy, study metrics, and
+ * navigation actions.
+ *
+ * @param isBonusSession When true, shows bonus-session-specific copy and
+ *    icon instead of the regular completion message.
  */
 @Composable
 fun SessionSummaryScreen(
     cardsReviewedCount: Int,
     streakDays: Int,
     completionMessage: SessionManager.CompletionMessageType,
+    isBonusSession: Boolean,
     onNavigateCatalog: () -> Unit,
     onNavigateStats: () -> Unit,
     modifier: Modifier = Modifier,
@@ -78,7 +83,7 @@ fun SessionSummaryScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                // Trophy Icon Box
+                // Trophy / Bonus Icon Box
                 Box(
                     modifier = Modifier
                         .size(76.dp)
@@ -91,7 +96,7 @@ fun SessionSummaryScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.EmojiEvents,
+                        imageVector = if (isBonusSession) Icons.Default.AutoAwesome else Icons.Default.EmojiEvents,
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(44.dp)
@@ -270,4 +275,37 @@ private fun SessionManager.CompletionMessageType.toStringRes(): Pair<Int, Int> =
 
     SessionManager.CompletionMessageType.ERUDITION_GROWING ->
         R.string.completion_erudition_title to R.string.completion_erudition_description
+
+    SessionManager.CompletionMessageType.VOCABULARY_MASTERED ->
+        R.string.completion_vocabulary_mastered_title to R.string.completion_vocabulary_mastered_description
+
+    SessionManager.CompletionMessageType.DAY_WELL_SPENT ->
+        R.string.completion_day_well_spent_title to R.string.completion_day_well_spent_description
+
+    SessionManager.CompletionMessageType.LEXICON_GROWS ->
+        R.string.completion_lexicon_grows_title to R.string.completion_lexicon_grows_description
+
+    SessionManager.CompletionMessageType.ONE_STEP_FURTHER ->
+        R.string.completion_one_step_further_title to R.string.completion_one_step_further_description
+
+    SessionManager.CompletionMessageType.BRAIN_TRAINED ->
+        R.string.completion_brain_trained_title to R.string.completion_brain_trained_description
+
+    SessionManager.CompletionMessageType.KNOWLEDGE_IS_POWER ->
+        R.string.completion_knowledge_is_power_title to R.string.completion_knowledge_is_power_description
+
+    SessionManager.CompletionMessageType.SHORT_SESSIONS_WIN ->
+        R.string.completion_short_sessions_win_title to R.string.completion_short_sessions_win_description
+
+    SessionManager.CompletionMessageType.BONUS_GREAT_INITIATIVE ->
+        R.string.completion_bonus_great_initiative_title to R.string.completion_bonus_great_initiative_description
+
+    SessionManager.CompletionMessageType.BONUS_BEYOND_THE_PLAN ->
+        R.string.completion_bonus_beyond_the_plan_title to R.string.completion_bonus_beyond_the_plan_description
+
+    SessionManager.CompletionMessageType.BONUS_EXTRA_DOSE ->
+        R.string.completion_bonus_extra_dose_title to R.string.completion_bonus_extra_dose_description
+
+    SessionManager.CompletionMessageType.BONUS_CONSISTENT ->
+        R.string.completion_bonus_consistent_title to R.string.completion_bonus_consistent_description
 }

@@ -84,6 +84,14 @@ class SjtViewModel(
     private val _sessionCompleted = MutableStateFlow(false)
     val sessionCompleted: StateFlow<Boolean> = _sessionCompleted.asStateFlow()
 
+    private val _isBonusSession = MutableStateFlow(false)
+
+    /**
+     * True when the current session is a voluntary bonus review (no regular
+     * SM-2 cards today).
+     */
+    val isBonusSession: StateFlow<Boolean> = _isBonusSession.asStateFlow()
+
     private val _cardsReviewedInSession = MutableStateFlow(0)
     val cardsReviewedInSession: StateFlow<Int> = _cardsReviewedInSession.asStateFlow()
 
@@ -404,6 +412,7 @@ class SjtViewModel(
 
         val cards = sessionData.cards
         _sessionCards.value = cards
+        _isBonusSession.value = sessionData.isBonusSession
 
         val savedState = if (!forceNew) repository.loadSessionState() else null
         val today = SuperMemoEngine.getTodayDateString()
@@ -417,6 +426,11 @@ class SjtViewModel(
         } else {
             _currentCardIndex.value = 0
             _sessionCompleted.value = cards.isEmpty()
+            _completionMessage.value = if (sessionData.isBonusSession) {
+                SessionManager.getBonusCompletionMessage()
+            } else {
+                SessionManager.getDailyCompletionMessage()
+            }
             _cardsReviewedInSession.value = 0
 
             val newWords = cards.filter { it.isNew }.map { it.word }
@@ -500,7 +514,11 @@ class SjtViewModel(
             _currentCardIndex.value += 1
         } else {
             _sessionCompleted.value = true
-            _completionMessage.value = SessionManager.getDailyCompletionMessage()
+            _completionMessage.value = if (_isBonusSession.value) {
+                SessionManager.getBonusCompletionMessage()
+            } else {
+                SessionManager.getDailyCompletionMessage()
+            }
             if (!repository.hasPromptedForNotifications() && !settings.value.notificationsEnabled) {
                 _showNotificationPrompt.value = true
             }

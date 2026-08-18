@@ -1,14 +1,50 @@
 <resources>
     <string name="app_name">Słownik Języka Trudnego</string>
-    <string name="app_version">0.12.1</string>
 
-    <!-- Daily session completion messages. One pair per CompletionMessageType entry. -->
+    <!-- Daily session completion messages (Regular). Gender-neutral and natural. -->
     <string name="completion_great_job_title">Świetna robota!</string>
     <string name="completion_great_job_description">Dzisiejsza porcja wyrafinowanego słownictwa została w pełni zrealizowana.</string>
 
     <string name="completion_session_done_title">Sesja ukończona!</string>
-    <string name="completion_session_done_description">Twoja pamięć została wzmocniona dzięki regularnemu treningowi.</string>
+    <string name="completion_session_done_description">Twoja pamięć zyskała solidne wzmocnienie dzięki regularnemu treningowi.</string>
 
     <string name="completion_erudition_title">Erudycja rośnie!</string>
-    <string name="completion_erudition_description">Kolejny krok ku bogatszemu, precyzyjniejszemu wysławianiu się za Tobą.</string>
+    <string name="completion_erudition_description">Kolejny krok ku bogatszemu i bardziej precyzyjnemu wysławianiu się za Tobą.</string>
+
+    <string name="completion_vocabulary_mastered_title">Cel osiągnięty!</string>
+    <string name="completion_vocabulary_mastered_description">Wszystkie zaplanowane na dziś powtórki są już zrobione. Dobry rytm to podstawa sukcesu.</string>
+
+    <string name="completion_day_well_spent_title">Wartościowy trening!</string>
+    <string name="completion_day_well_spent_description">Kilka minut skupienia dziennie przynosi znakomite rezultaty językowe.</string>
+
+    <string name="completion_lexicon_grows_title">Bogatsze słownictwo!</string>
+    <string name="completion_lexicon_grows_description">Nowe pojęcia i subtelne znaczenia utrwalają się w Twojej pamięci długotrwałej.</string>
+
+    <string name="completion_one_step_further_title">Krok do przodu!</string>
+    <string name="completion_one_step_further_description">Systematyczność buduje imponujący zasób słów. Do zobaczenia przy kolejnej powtórce!</string>
+
+    <string name="completion_brain_trained_title">Umysł w formie!</string>
+    <string name="completion_brain_trained_description">Ćwiczenie pamięci z algorytmem powtórek gwarantuje trwałe zapamiętywanie bez wysiłku.</string>
+
+    <string name="completion_knowledge_is_power_title">Moc precyzji!</string>
+    <string name="completion_knowledge_is_power_description">Większy zasób słów pozwala wyrażać myśli z niezwykłą dokładnością i lekkością.</string>
+
+    <string name="completion_short_sessions_win_title">Małe kroki, wielki efekt!</string>
+    <string name="completion_short_sessions_win_description">Krótka, regularna praca z językiem działa znacznie lepiej niż rzadkie, długie zrywy.</string>
+
+    <!-- Bonus session completion messages. Gender-neutral and encouraging. -->
+    <string name="completion_bonus_great_initiative_title">Świetna inicjatywa!</string>
+    <string name="completion_bonus_great_initiative_description">Dodatkowa powtórka to znakomity sposób na jeszcze trwalsze utrwalenie trudniejszych pojęć.</string>
+
+    <string name="completion_bonus_beyond_the_plan_title">Ponad program!</string>
+    <string name="completion_bonus_beyond_the_plan_description">Mimo tego, że algorytm nie zaplanował niczego na dziś, dodatkowy trening jest dobrą inwestycją w bogatszy język.</string>
+
+    <string name="completion_bonus_extra_dose_title">Dodatkowa dawka wiedzy!</string>
+    <string name="completion_bonus_extra_dose_description">Utrwalanie słówek w trakcie nauki przyspiesza ich przejście do pamięci długotrwałej.</string>
+
+    <string name="completion_bonus_consistent_title">Imponujące zaangażowanie!</string>
+    <string name="completion_bonus_consistent_description">Taka dociekliwość i chęć powtórek to najprostsza droga do prawdziwej językowej erudycji.</string>
+
+    <!-- UI Labels -->
+    <string name="bonus_session_label">Dodatkowa powtórka</string>
 </resources>
