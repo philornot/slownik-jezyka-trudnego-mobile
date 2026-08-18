@@ -144,6 +144,7 @@ class SjtViewModel(
                     is AuthState.Unauthenticated -> {
                         firebaseRepository.removeRealtimeProgressListener()
                         _userProfile.value = null
+                        repository.saveCachedUsername(null)
                     }
                     AuthState.Loading -> {}
                 }
@@ -266,7 +267,9 @@ class SjtViewModel(
             firebaseRepository.registerDeviceSession(user.uid, user.email)
 
             // Load profile
-            _userProfile.value = firebaseRepository.loadUserProfile(user.uid)
+            val profile = firebaseRepository.loadUserProfile(user.uid)
+            _userProfile.value = profile
+            repository.saveCachedUsername(profile?.username ?: user.displayName)
 
             // Load cloud settings (merge with local — cloud wins for cross-device consistency)
             val cloudSettings = firebaseRepository.loadSettingsFromCloud(user.uid)
@@ -369,8 +372,10 @@ class SjtViewModel(
         val uid = firebaseRepository.currentUser?.uid ?: return
         viewModelScope.launch {
             try {
-                firebaseRepository.saveUsername(uid, newUsername)
-                _userProfile.value = _userProfile.value?.copy(username = newUsername.trim())
+                val trimmed = newUsername.trim()
+                firebaseRepository.saveUsername(uid, trimmed)
+                _userProfile.value = _userProfile.value?.copy(username = trimmed)
+                repository.saveCachedUsername(trimmed)
                 onSuccess()
             } catch (e: Exception) {
                 onError("Nie udało się zapisać nazwy użytkownika.")

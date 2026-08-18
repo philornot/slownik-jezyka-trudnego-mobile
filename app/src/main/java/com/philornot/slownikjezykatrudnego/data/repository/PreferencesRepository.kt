@@ -176,6 +176,20 @@ class PreferencesRepository(context: Context) {
         return id
     }
 
+    /** Retrieves the last known cached display username. */
+    fun getCachedUsername(): String? {
+        return prefs.getString(KEY_CACHED_USERNAME, null)
+    }
+
+    /** Persists the cached display username. */
+    fun saveCachedUsername(username: String?) {
+        if (username.isNullOrBlank()) {
+            prefs.edit().remove(KEY_CACHED_USERNAME).apply()
+        } else {
+            prefs.edit().putString(KEY_CACHED_USERNAME, username.trim()).apply()
+        }
+    }
+
     companion object {
         private const val PREFS_NAME = "sjt_prefs_v1"
         private const val KEY_PROGRESS_MAP = "sjt_user_progress"
@@ -183,5 +197,6 @@ class PreferencesRepository(context: Context) {
         private const val KEY_SESSION_STATE = "sjt_session_state"
         private const val KEY_DEVICE_ID = "sjt_device_id"
         private const val KEY_PROMPTED_NOTIFICATIONS = "sjt_prompted_notifications"
+        private const val KEY_CACHED_USERNAME = "sjt_cached_username"
     }
 }
