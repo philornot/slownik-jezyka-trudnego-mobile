@@ -1,12 +1,10 @@
-﻿package com.philornot.slownikjezykatrudnego.ui.common
+package com.philornot.slownikjezykatrudnego.ui.common
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,10 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTouchButton
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
+import com.philornot.slownikjezykatrudnego.ui.theme.SlownikJezykaTrudnegoTheme
 
-/**
- * Privacy policy and RODO information bottom sheet.
- */
+/** Privacy policy and RODO information bottom sheet. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrivacyBottomSheet(
@@ -49,14 +46,15 @@ fun PrivacyBottomSheet(
         containerColor = colors.bgSurface,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp)
-                .padding(bottom = 24.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
+        SlownikJezykaTrudnegoTheme(settings = SjtTheme.settings) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp)
+                    .padding(bottom = 24.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -139,6 +137,7 @@ fun PrivacyBottomSheet(
                 text = "Rozumiem",
                 onClick = onDismiss
             )
+        }
         }
     }
 }

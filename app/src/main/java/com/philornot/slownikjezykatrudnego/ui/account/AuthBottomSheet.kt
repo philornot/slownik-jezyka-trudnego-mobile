@@ -1,19 +1,12 @@
 package com.philornot.slownikjezykatrudnego.ui.account
 
-import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -46,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,20 +47,21 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.philornot.slownikjezykatrudnego.R
 import com.philornot.slownikjezykatrudnego.ui.components.GoogleSignInButton
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTouchButton
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
+import com.philornot.slownikjezykatrudnego.ui.theme.SlownikJezykaTrudnegoTheme
 
 /**
- * Authentication Bottom Sheet providing email/password login, registration,
- * and Google Sign-In via Credential Manager.
+ * Authentication Bottom Sheet providing email/password login,
+ * registration, and Google Sign-In via Credential Manager.
  *
- * @param onSignInWithEmail   Callback for email+password sign-in attempt.
- * @param onRegisterWithEmail Callback for email+password registration attempt.
- * @param onSignInWithGoogle  Callback for Google Sign-In attempt.
- * @param onOpenPrivacy       Callback to open the Privacy Policy bottom sheet.
- * @param onDismiss           Callback when the sheet is dismissed.
+ * @param onSignInWithEmail Callback for email+password sign-in attempt.
+ * @param onRegisterWithEmail Callback for email+password registration
+ *    attempt.
+ * @param onSignInWithGoogle Callback for Google Sign-In attempt.
+ * @param onOpenPrivacy Callback to open the Privacy Policy bottom sheet.
+ * @param onDismiss Callback when the sheet is dismissed.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,20 +93,21 @@ fun AuthBottomSheet(
         containerColor = colors.bgSurface,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 32.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        SlownikJezykaTrudnegoTheme(settings = SjtTheme.settings) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 32.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Header
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -388,6 +382,7 @@ fun AuthBottomSheet(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
+        }
         }
     }
 }

@@ -45,8 +45,8 @@ enum class NotificationTimeSlot(val startHour: Int, val endHour: Int, val label:
  * @property highContrast High contrast mode for enhanced readability.
  * @property reducedMotion Reduces and disables non-essential UI
  *    animations.
- * @property textSize Font scaling level (SMALL = 100%, MEDIUM = 112.5%,
- *    LARGE = 125%).
+ * @property textSize Font scaling level (SMALL = 100%, MEDIUM = 118%,
+ *    LARGE = 136%).
  */
 @OptIn(InternalSerializationApi::class)
 @Serializable

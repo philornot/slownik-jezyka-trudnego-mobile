@@ -583,6 +583,10 @@ class SjtViewModel(
     fun saveSettings(newSettings: UserSettings) {
         val oldLimit = settings.value.dailyNewWordsLimit
         val oldSettings = settings.value
+        android.util.Log.d(
+            "SjtViewModel",
+            "[SETTINGS] saveSettings: textSize=${newSettings.textSize} (old: ${oldSettings.textSize}), highContrast=${newSettings.highContrast}, isDark=${newSettings.isDarkTheme}"
+        )
         viewModelScope.launch {
             repository.saveSettings(newSettings)
             val uid = firebaseRepository.currentUser?.uid

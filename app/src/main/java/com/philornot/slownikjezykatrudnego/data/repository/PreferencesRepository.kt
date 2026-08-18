@@ -2,16 +2,15 @@ package com.philornot.slownikjezykatrudnego.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.philornot.slownikjezykatrudnego.data.model.SessionState
+import com.philornot.slownikjezykatrudnego.data.model.UserSettings
+import com.philornot.slownikjezykatrudnego.data.model.UserWordProgress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import com.philornot.slownikjezykatrudnego.data.model.SessionState
-import com.philornot.slownikjezykatrudnego.data.model.UserSettings
-import com.philornot.slownikjezykatrudnego.data.model.UserWordProgress
 import java.util.UUID
 
 /**
@@ -75,10 +74,18 @@ class PreferencesRepository(context: Context) {
      * Loads user configuration settings from local storage.
      */
     fun loadSettings(): UserSettings {
-        val raw = prefs.getString(KEY_USER_SETTINGS, null) ?: return UserSettings()
+        val raw = prefs.getString(KEY_USER_SETTINGS, null) ?: return UserSettings().also {
+            android.util.Log.d(
+                "PreferencesRepo",
+                "[SETTINGS] loadSettings: no saved settings, using default $it"
+            )
+        }
         return try {
-            json.decodeFromString<UserSettings>(raw)
+            json.decodeFromString<UserSettings>(raw).also {
+                android.util.Log.d("PreferencesRepo", "[SETTINGS] loadSettings: loaded $it")
+            }
         } catch (e: Exception) {
+            android.util.Log.w("PreferencesRepo", "[SETTINGS] loadSettings decode error", e)
             UserSettings()
         }
     }
@@ -87,12 +94,18 @@ class PreferencesRepository(context: Context) {
      * Persists user settings to local storage.
      */
     suspend fun saveSettings(settings: UserSettings) {
+        android.util.Log.d("PreferencesRepo", "[SETTINGS] saveSettings: persisting $settings")
         _settingsFlow.value = settings
         withContext(Dispatchers.IO) {
             try {
                 val encoded = json.encodeToString(settings)
                 prefs.edit().putString(KEY_USER_SETTINGS, encoded).apply()
+                android.util.Log.d(
+                    "PreferencesRepo",
+                    "[SETTINGS] saveSettings: successfully saved to SharedPreferences"
+                )
             } catch (e: Exception) {
+                android.util.Log.e("PreferencesRepo", "[SETTINGS] saveSettings error", e)
                 e.printStackTrace()
             }
         }

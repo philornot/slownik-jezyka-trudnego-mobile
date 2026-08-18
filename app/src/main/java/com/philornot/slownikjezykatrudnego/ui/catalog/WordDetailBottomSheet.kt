@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.ui.catalog
+package com.philornot.slownikjezykatrudnego.ui.catalog
 
 import android.content.Intent
 import android.net.Uri
@@ -42,10 +42,9 @@ import com.philornot.slownikjezykatrudnego.data.model.DictionaryWord
 import com.philornot.slownikjezykatrudnego.ui.components.BadgeVariant
 import com.philornot.slownikjezykatrudnego.ui.components.SjtBadge
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
+import com.philornot.slownikjezykatrudnego.ui.theme.SlownikJezykaTrudnegoTheme
 
-/**
- * Bottom Sheet displaying full dictionary entry details.
- */
+/** Bottom Sheet displaying full dictionary entry details. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordDetailBottomSheet(
@@ -63,14 +62,15 @@ fun WordDetailBottomSheet(
         containerColor = colors.bgSurface,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp)
-                .padding(bottom = 24.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
+        SlownikJezykaTrudnegoTheme(settings = SjtTheme.settings) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp)
+                    .padding(bottom = 24.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
             // Header: Title & Close Button
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -235,6 +235,7 @@ fun WordDetailBottomSheet(
                     )
                 }
             }
+        }
         }
     }
 }

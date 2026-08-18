@@ -87,6 +87,7 @@ import com.philornot.slownikjezykatrudnego.data.model.UserSettings
 import com.philornot.slownikjezykatrudnego.ui.theme.CircularRevealThemeWrapper
 import com.philornot.slownikjezykatrudnego.ui.theme.LocalThemeTransitionState
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
+import com.philornot.slownikjezykatrudnego.ui.theme.SlownikJezykaTrudnegoTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
@@ -108,24 +109,38 @@ fun SettingsBottomSheet(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    var localLimit by remember { mutableIntStateOf(settings.dailyNewWordsLimit) }
-    var localHighContrast by remember { mutableStateOf(settings.highContrast) }
-    var localReducedMotion by remember { mutableStateOf(settings.reducedMotion) }
-    var localTextSize by remember { mutableStateOf(settings.textSize) }
-    var notificationsEnabled by remember { mutableStateOf(settings.notificationsEnabled) }
-    var notificationTimeSlot by remember { mutableStateOf(settings.notificationTimeSlot) }
+    var localLimit by remember(settings.dailyNewWordsLimit) { mutableIntStateOf(settings.dailyNewWordsLimit) }
+    var localHighContrast by remember(settings.highContrast) { mutableStateOf(settings.highContrast) }
+    var localReducedMotion by remember(settings.reducedMotion) { mutableStateOf(settings.reducedMotion) }
+    var localTextSize by remember(settings.textSize) { mutableStateOf(settings.textSize) }
+    var notificationsEnabled by remember(settings.notificationsEnabled) { mutableStateOf(settings.notificationsEnabled) }
+    var notificationTimeSlot by remember(settings.notificationTimeSlot) { mutableStateOf(settings.notificationTimeSlot) }
+
+    val currentSheetSettings = remember(
+        settings,
+        localLimit,
+        localHighContrast,
+        localReducedMotion,
+        localTextSize,
+        notificationsEnabled,
+        notificationTimeSlot
+    ) {
+        settings.copy(
+            dailyNewWordsLimit = localLimit,
+            highContrast = localHighContrast,
+            reducedMotion = localReducedMotion,
+            textSize = localTextSize,
+            notificationsEnabled = notificationsEnabled,
+            notificationTimeSlot = notificationTimeSlot
+        )
+    }
 
     fun applyAndSave() {
-        onSaveSettings(
-            settings.copy(
-                dailyNewWordsLimit = localLimit,
-                highContrast = localHighContrast,
-                reducedMotion = localReducedMotion,
-                textSize = localTextSize,
-                notificationsEnabled = notificationsEnabled,
-                notificationTimeSlot = notificationTimeSlot
-            )
+        android.util.Log.d(
+            "SjtSettings",
+            "[SETTINGS] applyAndSave: textSize=$localTextSize, highContrast=$localHighContrast, limit=$localLimit"
         )
+        onSaveSettings(currentSheetSettings)
     }
 
     // Sync notification permission state
@@ -248,15 +263,16 @@ fun SettingsBottomSheet(
             ) {}
         }
     ) {
-        val sheetContent: @Composable () -> Unit = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 18.dp)
-                    .padding(bottom = 24.dp)
-                    .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+        SlownikJezykaTrudnegoTheme(settings = currentSheetSettings) {
+            val sheetContent: @Composable () -> Unit = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 18.dp)
+                        .padding(bottom = 24.dp)
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                 // Title Bar
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -270,7 +286,7 @@ fun SettingsBottomSheet(
                             color = colors.textSerifTitle
                         )
                         Text(
-                            text = "Zmiany widoczne od razu · Zapisz, żeby zachować",
+                            text = "Zmiany widoczne od razu",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = colors.textMuted
@@ -783,8 +799,14 @@ fun SettingsBottomSheet(
 
                                         Surface(
                                             onClick = {
+                                                android.util.Log.d(
+                                                    "SjtSettings",
+                                                    "[TEXT_SIZE] Button clicked: $level (previous: $localTextSize)"
+                                                )
                                                 localTextSize = level
-                                                applyAndSave()
+                                                val updated =
+                                                    currentSheetSettings.copy(textSize = level)
+                                                onSaveSettings(updated)
                                             },
                                             modifier = Modifier.weight(1f),
                                             shape = RoundedCornerShape(10.dp),
@@ -1028,13 +1050,14 @@ fun SettingsBottomSheet(
         if (themeTransitionState != null) {
             CircularRevealThemeWrapper(
                 state = themeTransitionState,
-                skipAnimation = settings.reducedMotion,
+                skipAnimation = currentSheetSettings.reducedMotion,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 sheetContent()
             }
         } else {
             sheetContent()
+        }
         }
     }
 }

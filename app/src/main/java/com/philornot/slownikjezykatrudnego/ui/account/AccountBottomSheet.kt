@@ -1,7 +1,6 @@
 package com.philornot.slownikjezykatrudnego.ui.account
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -14,14 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Delete
@@ -29,7 +26,6 @@ import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Smartphone
-import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -60,6 +56,7 @@ import com.philornot.slownikjezykatrudnego.data.model.DeviceSession
 import com.philornot.slownikjezykatrudnego.data.model.UserProfile
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTouchButton
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
+import com.philornot.slownikjezykatrudnego.ui.theme.SlownikJezykaTrudnegoTheme
 
 /**
  * Account & Sync bottom sheet with three states:
@@ -67,16 +64,17 @@ import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
  * 2. Loading — sync in progress indicator
  * 3. Authenticated — full profile view with devices, settings, danger zone
  *
- * @param authState       Current Firebase authentication state.
- * @param userProfile     Loaded user profile (may be null while loading).
- * @param isSyncing       True while a cloud sync operation is in progress.
- * @param currentDeviceId The device ID of this device (for highlighting in device list).
- * @param onOpenAuth      Callback to open the authentication bottom sheet.
- * @param onSignOut       Callback to sign out the current user.
- * @param onSaveUsername  Callback to save a new display username.
+ * @param authState Current Firebase authentication state.
+ * @param userProfile Loaded user profile (may be null while loading).
+ * @param isSyncing True while a cloud sync operation is in progress.
+ * @param currentDeviceId The device ID of this device (for highlighting in
+ *    device list).
+ * @param onOpenAuth Callback to open the authentication bottom sheet.
+ * @param onSignOut Callback to sign out the current user.
+ * @param onSaveUsername Callback to save a new display username.
  * @param onLogoutAllDevices Callback to revoke all device sessions.
  * @param onDeleteAccount Callback to permanently delete the account.
- * @param onDismiss       Callback when the sheet is dismissed.
+ * @param onDismiss Callback when the sheet is dismissed.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,24 +100,25 @@ fun AccountBottomSheet(
         containerColor = colors.bgSurface,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp)
-                .padding(bottom = 28.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        SlownikJezykaTrudnegoTheme(settings = SjtTheme.settings) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp)
+                    .padding(bottom = 28.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Header
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                     Icon(Icons.Default.Person, contentDescription = null, tint = colors.brandPrimary)
                     Text(
                         text = "Profil i Synchronizacja",
@@ -140,7 +139,9 @@ fun AccountBottomSheet(
                 when (state) {
                     AuthState.Loading -> {
                         Box(
-                            modifier = Modifier.fillMaxWidth().padding(32.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(color = colors.brandPrimary)
@@ -170,6 +171,7 @@ fun AccountBottomSheet(
             }
         }
     }
+}
 }
 
 @Composable
@@ -389,7 +391,9 @@ private fun AuthenticatedContent(
                                 Icons.Default.Edit,
                                 contentDescription = "Edytuj nazwę",
                                 tint = colors.brandPrimary,
-                                modifier = Modifier.padding(4.dp).size(18.dp)
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .size(18.dp)
                             )
                         }
                     }

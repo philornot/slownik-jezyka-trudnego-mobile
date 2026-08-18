@@ -113,7 +113,7 @@ fun LessonScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Faza 2 · ${currentCardIndex + 1}/${sessionCards.size}",
+                                text = "Faza 2: ${currentCardIndex + 1}/${sessionCards.size}",
                                 color = colors.brandPrimary,
                                 fontSize = 11.5.sp,
                                 fontWeight = FontWeight.ExtraBold

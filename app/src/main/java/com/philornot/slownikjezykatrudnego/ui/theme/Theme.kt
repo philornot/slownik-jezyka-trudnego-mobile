@@ -11,8 +11,12 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Density
 import androidx.core.view.WindowCompat
+import com.philornot.slownikjezykatrudnego.data.model.TextSizeLevel
 import com.philornot.slownikjezykatrudnego.data.model.UserSettings
 
 val LocalSjtColors = staticCompositionLocalOf { SageLightColors }
@@ -86,6 +90,26 @@ fun SlownikJezykaTrudnegoTheme(
         baseColors
     }
 
+    val currentDensity = LocalDensity.current
+    val systemFontScale = LocalConfiguration.current.fontScale
+    val fontScaleMultiplier = when (settings.textSize) {
+        TextSizeLevel.SMALL -> 1.0f
+        TextSizeLevel.MEDIUM -> 1.20f
+        TextSizeLevel.LARGE -> 1.40f
+    }
+    val effectiveFontScale = systemFontScale * fontScaleMultiplier
+    val scaledDensity = Density(
+        density = currentDensity.density,
+        fontScale = effectiveFontScale
+    )
+
+    SideEffect {
+        android.util.Log.d(
+            "SjtTheme",
+            "[THEME] SlownikJezykaTrudnegoTheme composing: textSize=${settings.textSize}, systemFontScale=$systemFontScale, multiplier=$fontScaleMultiplier, effectiveFontScale=$effectiveFontScale"
+        )
+    }
+
     val typography = createSjtTypography(settings.textSize)
 
     val materialColorScheme = if (isDark) {
@@ -129,7 +153,8 @@ fun SlownikJezykaTrudnegoTheme(
     CompositionLocalProvider(
         LocalSjtColors provides colors,
         LocalUserSettings provides settings,
-        LocalMotionDurationScale provides motionDurationScale
+        LocalMotionDurationScale provides motionDurationScale,
+        LocalDensity provides scaledDensity
     ) {
         MaterialTheme(
             colorScheme = materialColorScheme,
