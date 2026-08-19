@@ -31,7 +31,6 @@ class NotificationHelperTest {
             val message = NotificationHelper.generateReminderText(
                 streak = 0,
                 sessionWords = emptyList(),
-                inProgressWords = emptyList(),
                 reviewDueCount = 0,
                 username = null
             )
@@ -48,7 +47,6 @@ class NotificationHelperTest {
             val message = NotificationHelper.generateReminderText(
                 streak = 2,
                 sessionWords = listOf(word),
-                inProgressWords = emptyList(),
                 reviewDueCount = 1,
                 username = null
             )
@@ -62,6 +60,22 @@ class NotificationHelperTest {
     }
 
     @Test
+    fun testGenerateReminderText_withoutSessionWords_neverMentionsWordTemplate() {
+        for (i in 0 until 100) {
+            val message = NotificationHelper.generateReminderText(
+                streak = 3,
+                sessionWords = emptyList(),
+                reviewDueCount = 0,
+                username = null
+            )
+            assertFalse(message.contains("Pamiętasz jeszcze, co oznacza"))
+            assertFalse(message.contains("Czy potrafisz poprawnie użyć słowa"))
+            assertFalse(message.contains("czeka na utrwalenie w Twojej pamięci"))
+            assertFalse(message.contains("Dziś w Twoim planie jest m.in."))
+        }
+    }
+
+    @Test
     fun testGenerateReminderText_withUsername_includesUsernameInSomeOutputs() {
         val username = "Filip"
         var foundUser = false
@@ -70,7 +84,6 @@ class NotificationHelperTest {
             val message = NotificationHelper.generateReminderText(
                 streak = 5,
                 sessionWords = emptyList(),
-                inProgressWords = emptyList(),
                 reviewDueCount = 0,
                 username = username
             )
@@ -89,7 +102,6 @@ class NotificationHelperTest {
             val message = NotificationHelper.generateReminderText(
                 streak = 10,
                 sessionWords = listOf("imponderabilia"),
-                inProgressWords = emptyList(),
                 reviewDueCount = 3,
                 username = null
             )
@@ -106,7 +118,6 @@ class NotificationHelperTest {
             val message = NotificationHelper.generateReminderText(
                 streak = 15,
                 sessionWords = emptyList(),
-                inProgressWords = emptyList(),
                 reviewDueCount = 0,
                 username = null
             )

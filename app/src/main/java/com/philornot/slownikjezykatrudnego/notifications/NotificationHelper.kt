@@ -53,24 +53,22 @@ object NotificationHelper {
      *
      * @param streak Current study streak in consecutive days.
      * @param sessionWords Words appearing in the upcoming daily lesson cards.
-     * @param inProgressWords Words currently being studied by the user.
-     * @param reviewDueCount Number of words in the session.
+     * @param reviewDueCount Number of words remaining in the session.
      * @param username Display name of the user if set.
      * @return Selected notification text.
      */
     fun generateReminderText(
         streak: Int,
         sessionWords: List<String>,
-        inProgressWords: List<String>,
         reviewDueCount: Int,
         username: String?,
     ): String {
         val candidates = mutableListOf<String>()
 
-        // 1. Actively learned word recall (from upcoming session or user's in-progress vocabulary)
-        val activeWordsPool = (sessionWords + inProgressWords).distinct().filter { it.isNotBlank() }
-        if (activeWordsPool.isNotEmpty()) {
-            val randomWord = activeWordsPool.random()
+        // 1. Actively learned word recall (strictly from words appearing in today's lesson)
+        val validSessionWords = sessionWords.filter { it.isNotBlank() }.distinct()
+        if (validSessionWords.isNotEmpty()) {
+            val randomWord = validSessionWords.random()
             candidates.add("Pamiętasz jeszcze, co oznacza „$randomWord”? Sprawdź się w dzisiejszej lekcji!")
             candidates.add("Czy potrafisz poprawnie użyć słowa „$randomWord”? Czas na krótką powtórkę.")
             candidates.add("Słowo „$randomWord” czeka na utrwalenie w Twojej pamięci!")
@@ -164,11 +162,19 @@ object NotificationHelper {
             allWords = DictionaryWordsData.WORDS
         )
 
-        val sessionWords = session.cards.map { it.word.word }
-        val inProgressWords = SessionManager.getInProgressNotDueWords(
-            progressMap = progressMap,
-            allWords = DictionaryWordsData.WORDS
-        ).map { it.word }
+        val savedState = repository.loadSessionState()
+        val today = SuperMemoEngine.getTodayDateString()
+        val remainingCards = if (savedState != null && savedState.date == today) {
+            if (savedState.sessionCompleted) {
+                emptyList()
+            } else {
+                session.cards.drop(savedState.currentCardIndex.coerceIn(0, session.cards.size))
+            }
+        } else {
+            session.cards
+        }
+
+        val sessionWords = remainingCards.map { it.word.word }
 
         val username = repository.getCachedUsername() ?: try {
             com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.displayName
@@ -179,8 +185,7 @@ object NotificationHelper {
         val body = generateReminderText(
             streak = streak,
             sessionWords = sessionWords,
-            inProgressWords = inProgressWords,
-            reviewDueCount = session.cards.size,
+            reviewDueCount = remainingCards.size,
             username = username
         )
 
