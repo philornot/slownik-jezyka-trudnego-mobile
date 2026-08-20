@@ -19,6 +19,8 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -43,10 +45,19 @@ import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 
 /**
  * Session completion summary screen with trophy, study metrics, and
- * navigation actions.
+ * navigation actions including on-demand learning.
  *
  * @param isBonusSession When true, shows bonus-session-specific copy and
  *    icon instead of the regular completion message.
+ * @param newWordsBatchSize The batch size of new words configured by the
+ *    user.
+ * @param hasUnstartedWords True if there are remaining unstarted words in
+ *    dictionary.
+ * @param hasWordsToPractice True if user has any words in progress to
+ *    practice.
+ * @param onStartExtraLesson Callback to start an extra lesson immediately.
+ * @param onStartReviewPractice Callback to start a practice session for
+ *    difficult words.
  */
 @Composable
 fun SessionSummaryScreen(
@@ -54,6 +65,11 @@ fun SessionSummaryScreen(
     streakDays: Int,
     completionMessage: SessionManager.CompletionMessageType,
     isBonusSession: Boolean,
+    newWordsBatchSize: Int = 3,
+    hasUnstartedWords: Boolean = true,
+    hasWordsToPractice: Boolean = true,
+    onStartExtraLesson: () -> Unit = {},
+    onStartReviewPractice: () -> Unit = {},
     onNavigateCatalog: () -> Unit,
     onNavigateStats: () -> Unit,
     modifier: Modifier = Modifier,
@@ -219,34 +235,74 @@ fun SessionSummaryScreen(
                 // Action Buttons
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    SjtTouchButton(
-                        text = "Przeglądaj Słowniczek",
-                        onClick = onNavigateCatalog,
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.AutoStories,
-                                contentDescription = null,
-                                tint = colors.btnPrimaryText,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    )
+                    if (hasUnstartedWords) {
+                        SjtTouchButton(
+                            text = stringResource(
+                                R.string.action_learn_more_words,
+                                newWordsBatchSize
+                            ),
+                            onClick = onStartExtraLesson,
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.PlayArrow,
+                                    contentDescription = null,
+                                    tint = colors.btnPrimaryText,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        )
+                    }
 
-                    SjtSecondaryButton(
-                        text = "Zobacz Statystyki",
-                        onClick = onNavigateStats,
+                    if (hasWordsToPractice) {
+                        SjtSecondaryButton(
+                            text = stringResource(R.string.action_practice_hard_words),
+                            onClick = onStartReviewPractice,
+                            modifier = Modifier.fillMaxWidth(),
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = null,
+                                    tint = colors.textPrimary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        )
+                    }
+
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.BarChart,
-                                contentDescription = null,
-                                tint = colors.textPrimary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    )
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        SjtSecondaryButton(
+                            text = "Słowniczek",
+                            onClick = onNavigateCatalog,
+                            modifier = Modifier.weight(1f),
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.AutoStories,
+                                    contentDescription = null,
+                                    tint = colors.textPrimary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        )
+
+                        SjtSecondaryButton(
+                            text = "Statystyki",
+                            onClick = onNavigateStats,
+                            modifier = Modifier.weight(1f),
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.BarChart,
+                                    contentDescription = null,
+                                    tint = colors.textPrimary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }

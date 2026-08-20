@@ -47,4 +47,7 @@
 
     <!-- UI Labels -->
     <string name="bonus_session_label">Dodatkowa powtórka</string>
+    <string name="action_learn_more_words">Ucz się dalej (+%1$d nowe słowa)</string>
+    <string name="action_practice_hard_words">Powtórz trudne słówka</string>
+    <string name="all_words_started_label">Odkryto wszystkie słówka!</string>
 </resources>

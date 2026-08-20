@@ -497,8 +497,53 @@ class SjtViewModel(
     }
 
     /**
-     * Grades the current flashcard and advances the session.
-     * Triggers a debounced cloud sync if the user is logged in.
+     * Starts an on-demand extra lesson with new unstarted words.
+     *
+     * @param count Number of new words to learn (defaults to user's daily
+     *    limit preference).
+     */
+    fun startExtraLesson(count: Int = settings.value.dailyNewWordsLimit) {
+        val extraCards = SessionManager.createExtraNewWordsSession(
+            progressMap = progressMap.value,
+            allWords = allWords,
+            count = count
+        )
+        if (extraCards.isEmpty()) return
+
+        _sessionCards.value = extraCards
+        _newWordsToLearn.value = extraCards.map { it.word }
+        _currentCardIndex.value = 0
+        _sessionPhase.value = SessionPhase.SHOWCASE
+        _sessionCompleted.value = false
+        _isBonusSession.value = false
+        persistActiveSessionState()
+    }
+
+    /**
+     * Starts a practice session focusing on difficult in-progress words.
+     *
+     * @param count Number of cards to practice (default 5).
+     */
+    fun startReviewPractice(count: Int = 5) {
+        val practiceCards = SessionManager.createHardWordsPracticeSession(
+            progressMap = progressMap.value,
+            allWords = allWords,
+            count = count
+        )
+        if (practiceCards.isEmpty()) return
+
+        _sessionCards.value = practiceCards
+        _newWordsToLearn.value = emptyList()
+        _currentCardIndex.value = 0
+        _sessionPhase.value = SessionPhase.QUIZ
+        _sessionCompleted.value = false
+        _isBonusSession.value = true
+        persistActiveSessionState()
+    }
+
+    /**
+     * Grades the current flashcard and advances the session. Triggers a
+     * debounced cloud sync if the user is logged in.
      *
      * @param grade The SM-2 review grade (0, 3, 4, or 5).
      */
@@ -645,13 +690,19 @@ class SjtViewModel(
 
     fun getDeviceId(): String = repository.getDeviceId()
 
+    fun hasUnstartedWords(): Boolean = SessionManager.hasUnstartedWords(progressMap.value, allWords)
+
+    fun hasWordsToPractice(): Boolean = SessionManager.hasWordsToPractice(progressMap.value)
+
     /**
-     * Called from [MainActivity.onResume] when the app returns to the foreground.
+     * Called from [MainActivity.onResume] when the app returns to the
+     * foreground.
      *
      * If the user is logged in, performs a lightweight cloud fetch and merges
      * any changes that happened on other platforms while the app was in the
      * background. This is a safety-net on top of the real-time listener for
-     * cases where the listener was disconnected (network loss, app killer, etc.).
+     * cases where the listener was disconnected (network loss, app killer,
+     * etc.).
      */
     fun onAppForegrounded() {
         val uid = firebaseRepository.currentUser?.uid ?: return

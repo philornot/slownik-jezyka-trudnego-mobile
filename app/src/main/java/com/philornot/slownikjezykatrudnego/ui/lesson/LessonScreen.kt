@@ -51,6 +51,11 @@ fun LessonScreen(
     streakDays: Int,
     completionMessage: SessionManager.CompletionMessageType,
     isBonusSession: Boolean,
+    newWordsBatchSize: Int = 3,
+    hasUnstartedWords: Boolean = true,
+    hasWordsToPractice: Boolean = true,
+    onStartExtraLesson: () -> Unit = {},
+    onStartReviewPractice: () -> Unit = {},
     onFinishShowcase: () -> Unit,
     onGradeCard: (ReviewGrade) -> Unit,
     onNavigateCatalog: () -> Unit,
@@ -154,6 +159,11 @@ fun LessonScreen(
                 streakDays = streakDays,
                 completionMessage = completionMessage,
                 isBonusSession = isBonusSession,
+                newWordsBatchSize = newWordsBatchSize,
+                hasUnstartedWords = hasUnstartedWords,
+                hasWordsToPractice = hasWordsToPractice,
+                onStartExtraLesson = onStartExtraLesson,
+                onStartReviewPractice = onStartReviewPractice,
                 onNavigateCatalog = onNavigateCatalog,
                 onNavigateStats = onNavigateStats
             )

@@ -201,24 +201,30 @@ object SessionManager {
     }
 
     /**
-     * Adaptively throttles daily new words to avoid cognitive overload.
+     * Adaptively calculates daily new words limit respecting user
+     * configuration. Only throttles new words if there is an excessive backlog
+     * of overdue reviews.
      */
     fun calculateAdaptiveNewWordsLimit(
         progressMap: Map<String, UserWordProgress>,
         userConfiguredLimit: Int,
-        todayStr: String = SuperMemoEngine.getTodayDateString()
+        todayStr: String = SuperMemoEngine.getTodayDateString(),
+    ): Int = calculateAdaptiveNewWordsLimit(progressMap, userConfiguredLimit, 0, todayStr)
+
+    fun calculateAdaptiveNewWordsLimit(
+        progressMap: Map<String, UserWordProgress>,
+        userConfiguredLimit: Int,
+        dueWordsCount: Int = 0,
+        todayStr: String = SuperMemoEngine.getTodayDateString(),
     ): Int {
         val startedToday = getWordsStartedTodayCount(progressMap, todayStr)
         val maxRemaining = (userConfiguredLimit - startedToday).coerceAtLeast(0)
         if (maxRemaining <= 0) return 0
 
-        val unmasteredPrev = getUnmasteredWordsFromPreviousDaysCount(progressMap, todayStr)
-
-        return when {
-            unmasteredPrev >= 8 -> 0
-            unmasteredPrev >= 5 -> minOf(1, maxRemaining)
-            unmasteredPrev >= 3 -> minOf(2, maxRemaining)
-            else -> maxRemaining
+        return if (dueWordsCount > 20) {
+            minOf(1, maxRemaining)
+        } else {
+            maxRemaining
         }
     }
 
@@ -261,7 +267,12 @@ object SessionManager {
         val dueWords = getDueReviewWords(progressMap, allWords, todayStr)
 
         // 2. Adaptive New Words
-        val adaptiveLimit = calculateAdaptiveNewWordsLimit(progressMap, settings.dailyNewWordsLimit, todayStr)
+        val adaptiveLimit = calculateAdaptiveNewWordsLimit(
+            progressMap = progressMap,
+            userConfiguredLimit = settings.dailyNewWordsLimit,
+            dueWordsCount = dueWords.size,
+            todayStr = todayStr
+        )
         val unstartedWords = allWords.filter { it.id !in progressMap }
         val poolRng = Mulberry32("sjt-pool-$todayStr")
         val shuffledUnstarted = shuffleList(unstartedWords, poolRng)
@@ -327,6 +338,83 @@ object SessionManager {
             newCount = newWords.size
         )
     }
+
+    /**
+     * Creates an extra on-demand lesson consisting of new unstarted words.
+     *
+     * @param progressMap Current user progress map.
+     * @param allWords Complete dictionary list.
+     * @param count Number of new words to learn.
+     * @param seed Seed string for deterministic card shuffling.
+     * @return List of newly constructed [SessionCard]s.
+     */
+    fun createExtraNewWordsSession(
+        progressMap: Map<String, UserWordProgress>,
+        allWords: List<DictionaryWord>,
+        count: Int,
+        seed: String = System.currentTimeMillis().toString(),
+    ): List<SessionCard> {
+        val unstartedWords = allWords.filter { it.id !in progressMap }
+        val rng = Mulberry32("sjt-extra-$seed")
+        val selectedWords = shuffleList(unstartedWords, rng).take(count)
+        return selectedWords.map { word ->
+            SessionCard(
+                word = word,
+                isNew = true,
+                userProgress = null,
+                options = generateOptionsForWord(word, allWords, rng)
+            )
+        }
+    }
+
+    /**
+     * Creates a practice session focusing on difficult in-progress words
+     * (lowest ease factors and lowest grades).
+     *
+     * @param progressMap Current user progress map.
+     * @param allWords Complete dictionary list.
+     * @param count Number of cards in practice session.
+     * @param seed Seed string for deterministic card shuffling.
+     * @return List of practice [SessionCard]s.
+     */
+    fun createHardWordsPracticeSession(
+        progressMap: Map<String, UserWordProgress>,
+        allWords: List<DictionaryWord>,
+        count: Int = 5,
+        seed: String = System.currentTimeMillis().toString(),
+    ): List<SessionCard> {
+        val wordMap = allWords.associateBy { it.id }
+        // Sort in-progress words by easeFactor ascending (hardest first), then by lowest recent grade
+        val sortedProgress = progressMap.values
+            .filter { it.wordId in wordMap }
+            .sortedWith(
+                compareBy<UserWordProgress> { it.easeFactor }
+                    .thenBy { it.history.lastOrNull()?.grade ?: 5 }
+                    .thenBy { it.lastReviewedAt }
+            )
+
+        val selectedWords = sortedProgress.take(count).mapNotNull { wordMap[it.wordId] }
+        val rng = Mulberry32("sjt-hard-$seed")
+        return selectedWords.map { word ->
+            SessionCard(
+                word = word,
+                isNew = false,
+                userProgress = progressMap[word.id],
+                options = generateOptionsForWord(word, allWords, rng)
+            )
+        }
+    }
+
+    /** Checks if there are any unstarted words remaining in the dictionary. */
+    fun hasUnstartedWords(
+        progressMap: Map<String, UserWordProgress>,
+        allWords: List<DictionaryWord>,
+    ): Boolean = allWords.any { it.id !in progressMap }
+
+    /** Checks if there are any words in progress available for practice. */
+    fun hasWordsToPractice(
+        progressMap: Map<String, UserWordProgress>,
+    ): Boolean = progressMap.isNotEmpty()
 
     /**
      * Picks a random congratulatory message variant for the daily session
