@@ -54,7 +54,15 @@ class InAppUpdateManager(private val activity: Activity) {
                 )
             }
         }.addOnFailureListener { e ->
-            Log.e(TAG, "Failed to check for in-app updates", e)
+            // ERROR_APP_NOT_OWNED (-10) is expected on sideloaded / debug builds
+            // where the app was not acquired from the Play Store.
+            val isNotOwned = e is com.google.android.play.core.install.InstallException &&
+                    e.errorCode == com.google.android.play.core.install.model.InstallErrorCode.ERROR_APP_NOT_OWNED
+            if (isNotOwned) {
+                Log.d(TAG, "Skipping in-app update check: app not installed from Play Store")
+            } else {
+                Log.e(TAG, "Failed to check for in-app updates", e)
+            }
         }
     }
 
