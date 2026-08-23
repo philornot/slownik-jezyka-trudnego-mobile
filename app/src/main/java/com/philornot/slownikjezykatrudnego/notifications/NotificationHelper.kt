@@ -40,6 +40,21 @@ object NotificationHelper {
     }
 
     /**
+     * Generates a random friendly notification title.
+     *
+     * @return Selected notification title.
+     */
+    fun generateReminderTitle(): String {
+        val titles = listOf(
+            "Pora na lekcję!",
+            "Słownik Języka Trudnego",
+            "Twoja codzienna lekcja",
+            "Czas na słówka!"
+        )
+        return titles.random()
+    }
+
+    /**
      * Generates a contextual reminder notification message from a pool of
      * dynamic templates.
      *
@@ -49,7 +64,7 @@ object NotificationHelper {
      * 3. Streak counts (zero days, small streaks 1-6 days, mastery streaks 7+
      *    days)
      * 4. Personalized username greeting (when available)
-     * 5. General erudition and rhetorical motivation
+     * 5. General erudition and rhetoric motivation
      *
      * @param streak Current study streak in consecutive days.
      * @param sessionWords Words appearing in the upcoming daily lesson cards.
@@ -69,56 +84,56 @@ object NotificationHelper {
         val validSessionWords = sessionWords.filter { it.isNotBlank() }.distinct()
         if (validSessionWords.isNotEmpty()) {
             val randomWord = validSessionWords.random()
-            candidates.add("Pamiętasz jeszcze, co oznacza „$randomWord”? Sprawdź się w dzisiejszej lekcji!")
-            candidates.add("Czy potrafisz poprawnie użyć słowa „$randomWord”? Czas na krótką powtórkę.")
-            candidates.add("Słowo „$randomWord” czeka na utrwalenie w Twojej pamięci!")
-            candidates.add("Dziś w Twoim planie jest m.in. „$randomWord”. Zobacz, czy pamiętasz jego znaczenie.")
+            candidates.add("Co dokładnie znaczy „$randomWord”? Otwórz lekcję i przypomnij sobie!")
+            candidates.add("„$randomWord” - użyjesz tego słowa w rozmowie? Sprawdź w dzisiejszej lekcji.")
+            candidates.add("Dziś w lekcji pojawi się „$randomWord”. Pamiętasz, co to znaczy?")
+            candidates.add("„$randomWord” wraca w dzisiejszej lekcji. Idealna okazja, żeby je utrwalić.")
         }
 
         // 2. Upcoming review count in today's session queue
         if (reviewDueCount > 0) {
             val countFormatted = formatWordCountPlural(reviewDueCount)
-            candidates.add("Masz dzisiaj $countFormatted do powtórzenia. Wystarczą 2 minuty!")
-            candidates.add("W Twojej kolejce czeka $countFormatted. Sprawdź, ile z nich pamiętasz!")
-            candidates.add("Czeka na Ciebie dzisiejsza sesja z $countFormatted. Opanuj je przed końcem dnia!")
+            candidates.add("$countFormatted na dziś. Szybka lekcja i masz to z głowy!")
+            candidates.add("Tylko $countFormatted do powtórki. Wpadnij na szybką lekcję!")
+            candidates.add("Dzisiejsza lekcja: $countFormatted. Dasz radę w kilka minut!")
         }
 
         // 3. Streak-based motivational messages
         when {
             streak <= 0 -> {
-                candidates.add("Każda wielka seria zaczyna się od pierwszego dnia. Rozpocznij swój streak już dziś!")
-                candidates.add("Dziś jest idealny moment na powtórkę. Zbuduj swój codzienny nawyk nauki!")
-                candidates.add("Zrób pierwszy krok ku bogatszemu słownictwu – Twoja dzisiejsza sesja czeka!")
+                candidates.add("Czas zacząć nową serię! Jedna lekcja to wszystko, czego potrzebujesz.")
+                candidates.add("Idealny moment na szybką lekcję. Zacznij serię od dziś!")
+                candidates.add("Nowe słówka czekają. Otwórz lekcję i zacznij budować serię!")
             }
 
             streak in 1..6 -> {
-                candidates.add("Świetnie Ci idzie! Masz już $streak dni serii z rzędu – utrzymaj tę passę!")
-                candidates.add("Już $streak dni regularnej nauki! Nie pozwól na przerwanie passy – zrób szybką sesję.")
-                candidates.add("To Twój $streak. dzień z rzędu! Krótka powtórka i seria trwa dalej.")
+                candidates.add("Już $streak dni z rzędu! Otwórz lekcję i przedłuż swoją serię.")
+                candidates.add("$streak dni serii, tak trzymaj! Dzisiejsza lekcja podtrzyma Twoje tempo.")
+                candidates.add("Twoja seria: $streak dni! Szybka lekcja i leci dalej.")
             }
 
             else -> { // streak >= 7
-                candidates.add("Imponująca seria: aż $streak dni z rzędu! Twoja erudycja stale rośnie.")
-                candidates.add("Mistrzowska dyscyplina! To już $streak dni bez przerw. Czas na dzisiejszą dawkę trudnych słów.")
-                candidates.add("Aż $streak dni w serii! Nie zwalniaj tempa – kolejna porcja wiedzy jest gotowa.")
+                candidates.add("$streak dni z rzędu, brawo! Nie zatrzymuj się teraz.")
+                candidates.add("Seria $streak dni! To robi wrażenie. Otwórz dzisiejszą lekcję!")
+                candidates.add("Wow, $streak dni bez przerwy! Dzisiejsza lekcja już na Ciebie czeka.")
             }
         }
 
         // 4. Personalized username greetings
         val cleanName = username?.trim()
         if (!cleanName.isNullOrBlank()) {
-            candidates.add("Cześć $cleanName! Czas na Twoją codzienną porcję wyrafinowanego języka.")
-            candidates.add("$cleanName, Twoje trudne słówka czekają na dzisiejszy trening umysłu.")
-            candidates.add("Gotowy na dzisiejsze wyzwanie językowe, $cleanName?")
+            candidates.add("Hej $cleanName! Twoja dzisiejsza lekcja jest gotowa.")
+            candidates.add("$cleanName, masz dziś nowe słówka do odkrycia!")
+            candidates.add("Cześć $cleanName! Wpadnij na szybką lekcję?")
         }
 
-        // 5. General erudition and rhetoric motivation (always available)
-        candidates.add("Chwila dla umysłu – wzbogać swój język o nowe, wyszukane konstrukcje.")
-        candidates.add("Systematyczność to klucz do bogatego słownictwa. Gotowy na 3-minutową sesję?")
-        candidates.add("Precyzja słowa to potęga myśli. Zobacz dzisiejsze propozycje w Słowniku!")
-        candidates.add("Kilka minut nauki dziennie wystarczy, by wypowiadać się z niezwykłą swobodą.")
-        candidates.add("Twoje trudne słówka czekają na dzisiejszą powtórkę.")
-        candidates.add("Czas na krótką sesję ze Słownikiem Języka Trudnego!")
+        // 5. General encouragement and habit motivation (always available)
+        candidates.add("Masz minutę? Twoja lekcja jest gotowa.")
+        candidates.add("Nowe słówka do nauki. Otwórz lekcję, kiedy masz chwilę!")
+        candidates.add("Krótka lekcja teraz to mniejsza powtórka jutro!")
+        candidates.add("Codziennie trochę, za miesiąc dużo. Czas na lekcję!")
+        candidates.add("Twoje słówka na dziś są przygotowane. Wpadnij na lekcję!")
+        candidates.add("Szybka lekcja przed dalszym dniem?")
 
         return candidates.random()
     }
@@ -182,6 +197,7 @@ object NotificationHelper {
             null
         }
 
+        val title = generateReminderTitle()
         val body = generateReminderText(
             streak = streak,
             sessionWords = sessionWords,
@@ -201,7 +217,7 @@ object NotificationHelper {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher_monochrome)
-            .setContentTitle("Pora na powtórkę!")
+            .setContentTitle(title)
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

@@ -60,6 +60,20 @@ class NotificationHelperTest {
     }
 
     @Test
+    fun testGenerateReminderTitle_returnsValidTitle() {
+        val expectedTitles = setOf(
+            "Pora na lekcję!",
+            "Słownik Języka Trudnego",
+            "Twoja codzienna lekcja",
+            "Czas na słówka!"
+        )
+        for (i in 0 until 50) {
+            val title = NotificationHelper.generateReminderTitle()
+            assertTrue(expectedTitles.contains(title))
+        }
+    }
+
+    @Test
     fun testGenerateReminderText_withoutSessionWords_neverMentionsWordTemplate() {
         for (i in 0 until 100) {
             val message = NotificationHelper.generateReminderText(
@@ -68,10 +82,10 @@ class NotificationHelperTest {
                 reviewDueCount = 0,
                 username = null
             )
-            assertFalse(message.contains("Pamiętasz jeszcze, co oznacza"))
-            assertFalse(message.contains("Czy potrafisz poprawnie użyć słowa"))
-            assertFalse(message.contains("czeka na utrwalenie w Twojej pamięci"))
-            assertFalse(message.contains("Dziś w Twoim planie jest m.in."))
+            assertFalse(message.contains("Co dokładnie znaczy"))
+            assertFalse(message.contains("użyjesz tego słowa w rozmowie"))
+            assertFalse(message.contains("Dziś w lekcji pojawi się"))
+            assertFalse(message.contains("wraca w dzisiejszej lekcji"))
         }
     }
 
@@ -107,29 +121,26 @@ class NotificationHelperTest {
             )
             assertFalse(message.contains("null"))
             assertFalse(message.contains("Cześć !"))
+            assertFalse(message.contains("Hej !"))
         }
     }
 
     @Test
     fun testGenerateReminderText_withHighStreak_generatesAppropriateContent() {
-        var foundHighStreakIndicator = false
+        val foundIndicators = mutableSetOf<String>()
 
-        for (i in 0 until 200) {
+        for (i in 0 until 300) {
             val message = NotificationHelper.generateReminderText(
                 streak = 15,
                 sessionWords = emptyList(),
                 reviewDueCount = 0,
                 username = null
             )
-            if (message.contains("15 dni") || message.contains("Imponująca seria") || message.contains(
-                    "Mistrzowska dyscyplina"
-                )
-            ) {
-                foundHighStreakIndicator = true
-                break
+            if (message.contains("15 dni") || message.contains("To robi wrażenie") || message.contains("bez przerwy")) {
+                foundIndicators.add("high_streak_matched")
             }
         }
 
-        assertTrue("Expected high streak message to be picked", foundHighStreakIndicator)
+        assertTrue("Expected high streak message to be picked", foundIndicators.isNotEmpty())
     }
 }
