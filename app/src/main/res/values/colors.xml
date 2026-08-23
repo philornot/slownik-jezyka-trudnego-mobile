@@ -22,4 +22,7 @@
     <color name="widget_bg_pending">#F2F5F3</color>
     <color name="widget_badge_bg_pending">#E2ECE5</color>
     <color name="widget_badge_text_pending">#2E4D3E</color>
+
+    <color name="widget_text_primary">#18261E</color>
+    <color name="widget_text_secondary">#4E6355</color>
 </resources>
