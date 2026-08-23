@@ -9,6 +9,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.philornot.slownikjezykatrudnego.data.repository.PreferencesRepository
 import com.philornot.slownikjezykatrudnego.domain.SuperMemoEngine
+import com.philornot.slownikjezykatrudnego.widget.StreakWidgetUpdater
 
 /**
  * One-shot worker that checks in the late evening if an active study streak
@@ -24,6 +25,8 @@ class StreakSaverWorker(
     override suspend fun doWork(): Result {
         val repository = PreferencesRepository(applicationContext)
         val settings = repository.loadSettings()
+
+        StreakWidgetUpdater.update(applicationContext)
 
         if (!settings.notificationsEnabled) {
             return Result.success()

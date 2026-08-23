@@ -57,6 +57,22 @@ class MainActivity : AppCompatActivity() {
                 activity = this
             )
         }
+
+        handleIntent(intent)
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: android.content.Intent?) {
+        if (intent?.getBooleanExtra(EXTRA_AUTO_START_LESSON, false) == true) {
+            if (::viewModel.isInitialized) {
+                viewModel.setActiveTab(com.philornot.slownikjezykatrudnego.ui.components.SjtTab.LESSON)
+            }
+        }
     }
 
     /**
@@ -72,5 +88,9 @@ class MainActivity : AppCompatActivity() {
         if (::inAppUpdateManager.isInitialized) {
             inAppUpdateManager.onResume(updateResultLauncher)
         }
+    }
+
+    companion object {
+        const val EXTRA_AUTO_START_LESSON = "com.philornot.slownikjezykatrudnego.EXTRA_AUTO_START_LESSON"
     }
 }

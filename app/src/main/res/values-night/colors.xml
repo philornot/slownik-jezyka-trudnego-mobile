@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Streak Widget Night Theme Colors -->
+    <color name="widget_bg_completed">#14241B</color>
+    <color name="widget_badge_bg_completed">#1D3B2B</color>
+    <color name="widget_badge_text_completed">#86EFAC</color>
+
+    <color name="widget_bg_urgent">#2B1418</color>
+    <color name="widget_badge_bg_urgent">#4C1D24</color>
+    <color name="widget_badge_text_urgent">#FDA4AF</color>
+
+    <color name="widget_bg_pending">#16201B</color>
+    <color name="widget_badge_bg_pending">#22332B</color>
+    <color name="widget_badge_text_pending">#86A394</color>
+</resources>

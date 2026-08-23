@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import com.philornot.slownikjezykatrudnego.data.model.SessionState
 import com.philornot.slownikjezykatrudnego.data.model.UserSettings
 import com.philornot.slownikjezykatrudnego.data.model.UserWordProgress
+import com.philornot.slownikjezykatrudnego.widget.StreakWidgetUpdater
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +19,7 @@ import java.util.UUID
  */
 class PreferencesRepository(context: Context) {
 
+    private val appContext: Context = context.applicationContext
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     private val json = Json {
@@ -56,6 +58,7 @@ class PreferencesRepository(context: Context) {
             val encoded = json.encodeToString(map)
             prefs.edit().putString(KEY_PROGRESS_MAP, encoded).apply()
             _progressMapFlow.value = map
+            StreakWidgetUpdater.update(appContext)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -148,6 +151,7 @@ class PreferencesRepository(context: Context) {
     suspend fun clearAllProgress() = withContext(Dispatchers.IO) {
         prefs.edit().remove(KEY_PROGRESS_MAP).remove(KEY_SESSION_STATE).apply()
         _progressMapFlow.value = emptyMap()
+        StreakWidgetUpdater.update(appContext)
     }
 
     /**

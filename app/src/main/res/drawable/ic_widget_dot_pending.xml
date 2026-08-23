@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
+    <!-- Muted hollow ring -->
+    <path
+        android:strokeColor="#94A3B8"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.6"
+        android:fillColor="#00000000"
+        android:pathData="M10,4C6.69,4 4,6.69 4,10C4,13.31 6.69,16 10,16C13.31,16 16,13.31 16,10C16,6.69 13.31,4 10,4Z" />
+</vector>

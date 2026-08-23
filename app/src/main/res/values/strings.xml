@@ -50,4 +50,14 @@
     <string name="action_learn_more_words">Ucz się dalej (+%1$d nowe słowa)</string>
     <string name="action_practice_hard_words">Powtórz trudne słówka</string>
     <string name="all_words_started_label">Odkryto wszystkie słówka!</string>
+
+    <!-- Widget Strings -->
+    <string name="widget_streak_name">Seria nauki</string>
+    <string name="widget_streak_description">Śledź swoją codzienną serię powtórek i nie pozwól jej wygasnąć.</string>
+    <string name="widget_streak_saved">Seria zabezpieczona</string>
+    <string name="widget_streak_todo">Zrób powtórkę</string>
+    <string name="widget_streak_urgent">Uratuj serię!</string>
+    <string name="widget_streak_start_now">Zacznij serię</string>
+    <string name="widget_streak_action_learn">Ucz się</string>
+    <string name="widget_streak_action_open">Otwórz</string>
 </resources>
