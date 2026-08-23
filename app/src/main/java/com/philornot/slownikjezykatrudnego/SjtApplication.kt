@@ -33,6 +33,6 @@ class SjtApplication : Application() {
         // reminder survive app updates / WorkManager DB resets, not just device reboots
         // (device reboots alone are already handled by WorkManager's own persistence).
         NotificationHelper.ensureChannel(this)
-        NotificationScheduler.scheduleDailyReminder(this, preferencesRepository.loadSettings())
+        NotificationScheduler.scheduleReminders(this, preferencesRepository.loadSettings())
     }
 }

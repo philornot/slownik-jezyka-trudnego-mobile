@@ -650,7 +650,7 @@ class SjtViewModel(
         if (newSettings.notificationsEnabled != oldSettings.notificationsEnabled ||
             newSettings.notificationTimeSlot != oldSettings.notificationTimeSlot
         ) {
-            NotificationScheduler.scheduleDailyReminder(appContext, newSettings)
+            NotificationScheduler.scheduleReminders(appContext, newSettings)
         }
     }
 

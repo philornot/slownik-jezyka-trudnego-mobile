@@ -11,17 +11,12 @@ import com.philornot.slownikjezykatrudnego.data.repository.PreferencesRepository
 import com.philornot.slownikjezykatrudnego.domain.SuperMemoEngine
 
 /**
- * One-shot worker that fires the daily study reminder and immediately
- * re-arms [NotificationScheduler] for the next day, so the "one random
- * notification per chosen time-of-day slot" chain keeps running for as
- * long as the user leaves notifications enabled.
- *
- * Reads settings fresh from [PreferencesRepository] rather than trusting
- * stale WorkRequest input data, since the user may have changed the time
- * slot or disabled notifications entirely since this work was originally
- * scheduled (potentially a day ago).
+ * One-shot worker that checks in the late evening if an active study streak
+ * is at risk of being lost today (i.e. user has an active streak but has not
+ * yet completed today's lesson). If at risk, displays a streak saver
+ * reminder and re-arms [NotificationScheduler] for tomorrow evening.
  */
-class ReminderWorker(
+class StreakSaverWorker(
     context: Context,
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
@@ -31,7 +26,6 @@ class ReminderWorker(
         val settings = repository.loadSettings()
 
         if (!settings.notificationsEnabled) {
-            // Disabled since this was scheduled — don't notify, don't reschedule.
             return Result.success()
         }
 
@@ -42,14 +36,17 @@ class ReminderWorker(
                 ) == PackageManager.PERMISSION_GRANTED
 
         if (hasPermission) {
-            NotificationHelper.showDailyReminder(applicationContext)
-            repository.setLastRegularReminderDate(SuperMemoEngine.getTodayDateString())
+            val progressMap = repository.loadProgressMap()
+            val streak = SuperMemoEngine.calculateStreak(progressMap)
+            val isCompleted = NotificationHelper.isTodaySessionCompleted(applicationContext)
+
+            if (streak > 0 && !isCompleted) {
+                NotificationHelper.showStreakSaverReminder(applicationContext)
+            }
         }
 
-        // Re-arm for tomorrow's random moment inside the (possibly updated) preferred slot.
-        // forceTomorrow=true: we just fired today's notification, so the next one must land
-        // tomorrow even if today's window is still technically open.
-        NotificationScheduler.scheduleDailyReminder(
+        // Re-arm for tomorrow evening
+        NotificationScheduler.scheduleStreakSaverReminder(
             applicationContext,
             settings,
             forceTomorrow = true

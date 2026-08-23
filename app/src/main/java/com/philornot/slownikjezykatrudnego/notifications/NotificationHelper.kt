@@ -23,6 +23,7 @@ object NotificationHelper {
 
     const val CHANNEL_ID = "sjt_daily_reminder_channel"
     private const val NOTIFICATION_ID = 1001
+    private const val STREAK_SAVER_NOTIFICATION_ID = 1002
 
     /**
      * Formats Polish grammatical pluralization for the word count.
@@ -40,7 +41,7 @@ object NotificationHelper {
     }
 
     /**
-     * Generates a random friendly notification title.
+     * Generates a random friendly notification title for daily reminders.
      *
      * @return Selected notification title.
      */
@@ -52,6 +53,81 @@ object NotificationHelper {
             "Czas na słówka!"
         )
         return titles.random()
+    }
+
+    /**
+     * Generates a random friendly notification title for streak saver reminders.
+     *
+     * @return Selected notification title.
+     */
+    fun generateStreakSaverTitle(): String {
+        val titles = listOf(
+            "Uratuj swoją serię!",
+            "Twoja seria jest zagrożona!",
+            "Nie trać serii!",
+            "Szybka lekcja przed końcem dnia?"
+        )
+        return titles.random()
+    }
+
+    /**
+     * Generates an urgent yet friendly streak protection notification text.
+     *
+     * @param streak Current study streak in consecutive days.
+     * @param username Display name of the user if set.
+     * @return Selected streak saver notification text.
+     */
+    fun generateStreakSaverText(streak: Int, username: String?): String {
+        val candidates = mutableListOf<String>()
+
+        candidates.add("Masz serię $streak dni! Zrób szybką lekcję przed północą, żeby jej nie stracić.")
+        candidates.add("Szkoda byłoby przerwać passę $streak dni. Wpadnij na 2 minuty przed końcem dnia!")
+        candidates.add("Dzień powoli się kończy, a Twoja seria ($streak dni) czeka na podtrzymanie.")
+        candidates.add("Zostało jeszcze trochę czasu. Krótka powtórka i Twoja seria $streak dni jest bezpieczna!")
+        candidates.add("Tylko jedna krótka lekcja dzieli Cię od uratowania serii $streak dni!")
+
+        val cleanName = username?.trim()
+        if (!cleanName.isNullOrBlank()) {
+            candidates.add("$cleanName, Twoja seria $streak dni czeka na uratowanie! Wystarczą 2 minuty.")
+            candidates.add("Hej $cleanName! Nie pozwól przepaść serii $streak dni. Zrób szybką powtórkę.")
+        }
+
+        return candidates.random()
+    }
+
+    /**
+     * Checks if today's study session is already completed.
+     *
+     * @param context Application context.
+     * @return True if today's lesson is completed or has no remaining cards.
+     */
+    fun isTodaySessionCompleted(context: Context): Boolean {
+        val repository = PreferencesRepository(context)
+        val progressMap = repository.loadProgressMap()
+        val settings = repository.loadSettings()
+        val today = SuperMemoEngine.getTodayDateString()
+
+        val savedState = repository.loadSessionState()
+        if (savedState != null && savedState.date == today && savedState.sessionCompleted) {
+            return true
+        }
+
+        val session = SessionManager.createDailySession(
+            progressMap = progressMap,
+            settings = settings,
+            allWords = DictionaryWordsData.WORDS,
+            todayStr = today
+        )
+
+        if (session.cards.isEmpty()) {
+            return true
+        }
+
+        if (savedState != null && savedState.date == today) {
+            return savedState.currentCardIndex >= session.cards.size
+        }
+
+        return false
     }
 
     /**
@@ -231,6 +307,61 @@ object NotificationHelper {
             android.util.Log.w(
                 "NotificationHelper",
                 "POST_NOTIFICATIONS not granted, skipping reminder",
+                e
+            )
+        }
+    }
+
+    /**
+     * Builds and shows the streak saver notification.
+     *
+     * Caller is responsible for having verified the POST_NOTIFICATIONS
+     * permission is granted before invoking this.
+     */
+    fun showStreakSaverReminder(context: Context) {
+        ensureChannel(context)
+
+        val repository = PreferencesRepository(context)
+        val progressMap = repository.loadProgressMap()
+        val streak = SuperMemoEngine.calculateStreak(progressMap)
+
+        if (streak <= 0) return
+
+        val username = repository.getCachedUsername() ?: try {
+            com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.displayName
+        } catch (_: Throwable) {
+            null
+        }
+
+        val title = generateStreakSaverTitle()
+        val body = generateStreakSaverText(streak = streak, username = username)
+
+        val openAppIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val contentIntent = PendingIntent.getActivity(
+            context,
+            0,
+            openAppIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.mipmap.ic_launcher_monochrome)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(contentIntent)
+            .build()
+
+        try {
+            NotificationManagerCompat.from(context).notify(STREAK_SAVER_NOTIFICATION_ID, notification)
+        } catch (e: SecurityException) {
+            android.util.Log.w(
+                "NotificationHelper",
+                "POST_NOTIFICATIONS not granted, skipping streak saver reminder",
                 e
             )
         }

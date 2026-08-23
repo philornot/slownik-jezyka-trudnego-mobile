@@ -143,4 +143,56 @@ class NotificationHelperTest {
 
         assertTrue("Expected high streak message to be picked", foundIndicators.isNotEmpty())
     }
+
+    @Test
+    fun testGenerateStreakSaverTitle_returnsValidTitle() {
+        val expectedTitles = setOf(
+            "Uratuj swoją serię!",
+            "Twoja seria jest zagrożona!",
+            "Nie trać serii!",
+            "Szybka lekcja przed końcem dnia?"
+        )
+        for (i in 0 until 50) {
+            val title = NotificationHelper.generateStreakSaverTitle()
+            assertTrue(expectedTitles.contains(title))
+        }
+    }
+
+    @Test
+    fun testGenerateStreakSaverText_containsStreakCount() {
+        for (i in 0 until 50) {
+            val message = NotificationHelper.generateStreakSaverText(streak = 7, username = null)
+            assertTrue(message.contains("7 dni"))
+            assertFalse(message.contains("–")) // Verify em dash rule
+        }
+    }
+
+    @Test
+    fun testGenerateStreakSaverText_withUsername_includesUsernameInSomeOutputs() {
+        val username = "Filip"
+        var foundUser = false
+
+        for (i in 0 until 100) {
+            val message = NotificationHelper.generateStreakSaverText(streak = 12, username = username)
+            if (message.contains(username)) {
+                foundUser = true
+                break
+            }
+        }
+
+        assertTrue("Expected at least one streak saver message to feature the username", foundUser)
+    }
+
+    @Test
+    fun testGenerateReminderText_neverContainsEmDash() {
+        for (i in 0 until 200) {
+            val message = NotificationHelper.generateReminderText(
+                streak = i % 10,
+                sessionWords = listOf("konfabulacja", "imponderabilia"),
+                reviewDueCount = i % 5,
+                username = "Test"
+            )
+            assertFalse("Em dash found in reminder text: $message", message.contains("–"))
+        }
+    }
 }

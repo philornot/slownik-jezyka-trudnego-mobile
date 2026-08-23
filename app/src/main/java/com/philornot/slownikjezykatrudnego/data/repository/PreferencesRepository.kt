@@ -190,6 +190,16 @@ class PreferencesRepository(context: Context) {
         }
     }
 
+    /** Retrieves the last date (YYYY-MM-DD) on which the regular daily reminder was fired. */
+    fun getLastRegularReminderDate(): String? {
+        return prefs.getString(KEY_LAST_REGULAR_REMINDER_DATE, null)
+    }
+
+    /** Persists the date (YYYY-MM-DD) on which the regular daily reminder was fired. */
+    fun setLastRegularReminderDate(date: String) {
+        prefs.edit().putString(KEY_LAST_REGULAR_REMINDER_DATE, date).apply()
+    }
+
     companion object {
         private const val PREFS_NAME = "sjt_prefs_v1"
         private const val KEY_PROGRESS_MAP = "sjt_user_progress"
@@ -198,5 +208,6 @@ class PreferencesRepository(context: Context) {
         private const val KEY_DEVICE_ID = "sjt_device_id"
         private const val KEY_PROMPTED_NOTIFICATIONS = "sjt_prompted_notifications"
         private const val KEY_CACHED_USERNAME = "sjt_cached_username"
+        private const val KEY_LAST_REGULAR_REMINDER_DATE = "sjt_last_regular_reminder_date"
     }
 }

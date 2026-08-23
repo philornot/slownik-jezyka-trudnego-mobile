@@ -528,7 +528,7 @@ fun SettingsBottomSheet(
                                 }
                             }
                             Text(
-                                text = "Dostaniesz jedno powiadomienie dziennie, o losowej porze w tym przedziale.",
+                                text = "Powiadomienie przyjdzie o losowej porze w tym przedziale. Wieczorem otrzymasz też przypomnienie, jeśli Twoja seria będzie zagrożona.",
                                 fontSize = 10.5.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = colors.textMuted

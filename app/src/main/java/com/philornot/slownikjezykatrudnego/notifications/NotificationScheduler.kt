@@ -27,10 +27,25 @@ import kotlin.random.Random
 object NotificationScheduler {
 
     /**
-     * Unique WorkManager work name — reused so re-scheduling always replaces
-     * the pending job.
+     * Unique WorkManager work name for the regular daily reminder.
      */
     const val UNIQUE_WORK_NAME = "sjt_daily_reminder"
+
+    /**
+     * Unique WorkManager work name for the late-evening streak saver reminder.
+     */
+    const val UNIQUE_STREAK_SAVER_WORK_NAME = "sjt_streak_saver"
+
+    /**
+     * (Re)schedules all notification chains (daily reminder and streak saver).
+     */
+    fun scheduleReminders(
+        context: Context,
+        settings: UserSettings,
+    ) {
+        scheduleDailyReminder(context, settings)
+        scheduleStreakSaverReminder(context, settings)
+    }
 
     /**
      * (Re)schedules the daily reminder according to [settings]. If
@@ -69,8 +84,38 @@ object NotificationScheduler {
         workManager.enqueueUniqueWork(UNIQUE_WORK_NAME, ExistingWorkPolicy.REPLACE, request)
     }
 
+    /**
+     * (Re)schedules the late-evening streak saver reminder according to [settings].
+     *
+     * @param forceTomorrow When true, schedules for tomorrow evening rather than
+     *    today.
+     */
+    fun scheduleStreakSaverReminder(
+        context: Context,
+        settings: UserSettings,
+        forceTomorrow: Boolean = false,
+    ) {
+        val workManager = WorkManager.getInstance(context.applicationContext)
+
+        if (!settings.notificationsEnabled) {
+            workManager.cancelUniqueWork(UNIQUE_STREAK_SAVER_WORK_NAME)
+            return
+        }
+
+        val delayMillis = millisUntilNextStreakSaverMoment(forceTomorrow)
+
+        val request = OneTimeWorkRequestBuilder<StreakSaverWorker>()
+            .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+            .addTag(UNIQUE_STREAK_SAVER_WORK_NAME)
+            .build()
+
+        workManager.enqueueUniqueWork(UNIQUE_STREAK_SAVER_WORK_NAME, ExistingWorkPolicy.REPLACE, request)
+    }
+
     fun cancel(context: Context) {
-        WorkManager.getInstance(context.applicationContext).cancelUniqueWork(UNIQUE_WORK_NAME)
+        val workManager = WorkManager.getInstance(context.applicationContext)
+        workManager.cancelUniqueWork(UNIQUE_WORK_NAME)
+        workManager.cancelUniqueWork(UNIQUE_STREAK_SAVER_WORK_NAME)
     }
 
     /**
@@ -107,6 +152,38 @@ object NotificationScheduler {
         return Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, slot.startHour)
             set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+            add(Calendar.MINUTE, randomMinuteOffset)
+        }
+    }
+
+    /**
+     * Computes the delay (ms) until a random moment inside the late-evening
+     * streak saver window (21:15 - 21:45).
+     */
+    private fun millisUntilNextStreakSaverMoment(forceTomorrow: Boolean): Long {
+        val now = Calendar.getInstance()
+
+        val candidate = randomStreakSaverMomentToday()
+        val target = if (!forceTomorrow && candidate.after(now)) {
+            candidate
+        } else {
+            randomStreakSaverMomentToday().apply { add(Calendar.DAY_OF_YEAR, 1) }
+        }
+
+        return (target.timeInMillis - now.timeInMillis).coerceAtLeast(0L)
+    }
+
+    /**
+     * Builds a [Calendar] set to a random minute in the 21:15 - 21:45 window today.
+     */
+    private fun randomStreakSaverMomentToday(): Calendar {
+        val randomMinuteOffset = Random.nextInt(30) // 21:15 - 21:45
+
+        return Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 21)
+            set(Calendar.MINUTE, 15)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
             add(Calendar.MINUTE, randomMinuteOffset)
