@@ -40,14 +40,17 @@ import com.philornot.slownikjezykatrudnego.data.repository.PreferencesRepository
 
 /**
  * Modern, clean Duolingo-style Streak Widget built with Jetpack Glance.
- * Supports responsive layouts (Compact 2x2 and Wide 4x2) and Dynamic Color.
+ * Supports responsive layouts (1-row height and 2+ rows height across all widths)
+ * and dual-theme Material You dynamic colors.
  */
 class StreakWidget : GlanceAppWidget() {
 
     override val sizeMode: SizeMode = SizeMode.Responsive(
         setOf(
-            SMALL_SIZE,
-            WIDE_SIZE
+            SMALL_1_ROW,
+            WIDE_1_ROW,
+            SMALL_2_ROWS,
+            WIDE_2_ROWS
         )
     )
 
@@ -64,8 +67,10 @@ class StreakWidget : GlanceAppWidget() {
     }
 
     companion object {
-        val SMALL_SIZE = DpSize(120.dp, 100.dp)
-        val WIDE_SIZE = DpSize(240.dp, 100.dp)
+        val SMALL_1_ROW = DpSize(120.dp, 48.dp)
+        val WIDE_1_ROW = DpSize(220.dp, 48.dp)
+        val SMALL_2_ROWS = DpSize(120.dp, 90.dp)
+        val WIDE_2_ROWS = DpSize(220.dp, 90.dp)
     }
 }
 
@@ -83,32 +88,169 @@ private fun StreakWidgetContent(data: StreakWidgetData) {
     }
     val clickModifier = GlanceModifier.clickable(actionStartActivity(launchIntent))
 
-    if (size.width >= 230.dp) {
-        WideStreakWidget(data = data, clickModifier = clickModifier)
-    } else {
-        CompactStreakWidget(data = data, clickModifier = clickModifier)
+    val isOneRow = size.height < 85.dp
+    val isWide = size.width >= 210.dp
+
+    when {
+        isOneRow && isWide -> WideOneRowStreakWidget(data = data, clickModifier = clickModifier)
+        isOneRow && !isWide -> CompactOneRowStreakWidget(data = data, clickModifier = clickModifier)
+        !isOneRow && isWide -> WideMultiRowStreakWidget(data = data, clickModifier = clickModifier)
+        else -> CompactSquareStreakWidget(data = data, clickModifier = clickModifier)
     }
 }
 
 /**
- * Compact 2x2 square tile layout.
+ * 1-Row Compact layout (e.g. 2x1).
  */
 @androidx.compose.runtime.Composable
-private fun CompactStreakWidget(
+private fun CompactOneRowStreakWidget(
     data: StreakWidgetData,
     clickModifier: GlanceModifier
 ) {
-    val flameRes = when {
-        data.streakDays == 0 -> R.drawable.ic_widget_flame_muted
-        data.isUrgentEvening -> R.drawable.ic_widget_flame_urgent
-        else -> R.drawable.ic_widget_flame
-    }
+    val flameRes = getFlameResource(data)
+    val appearance = getWidgetAppearance(data)
 
-    val appearance = when {
-        data.isCompletedToday -> WidgetThemeColors.completedState()
-        data.isUrgentEvening -> WidgetThemeColors.urgentState()
-        else -> WidgetThemeColors.pendingState(data.streakDays)
+    Box(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .background(appearance.bg)
+            .cornerRadius(20.dp)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .then(clickModifier),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                provider = ImageProvider(flameRes),
+                contentDescription = "Płomień serii",
+                modifier = GlanceModifier.size(24.dp)
+            )
+            Spacer(modifier = GlanceModifier.width(6.dp))
+            Text(
+                text = "${data.streakDays}",
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurface,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Text(
+                text = if (data.streakDays == 1) " dzień" else " dni",
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurfaceVariant,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            )
+            Spacer(modifier = GlanceModifier.defaultWeight())
+            StatusBadge(text = appearance.statusText, bg = appearance.badgeBg, textColor = appearance.badgeText, isSmall = true)
+        }
     }
+}
+
+/**
+ * 1-Row Wide layout (e.g. 3x1, 4x1, 5x1).
+ */
+@androidx.compose.runtime.Composable
+private fun WideOneRowStreakWidget(
+    data: StreakWidgetData,
+    clickModifier: GlanceModifier
+) {
+    val flameRes = getFlameResource(data)
+    val appearance = getWidgetAppearance(data)
+
+    Box(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .background(appearance.bg)
+            .cornerRadius(20.dp)
+            .padding(horizontal = 14.dp, vertical = 6.dp)
+            .then(clickModifier),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Left: Flame + Streak
+            Image(
+                provider = ImageProvider(flameRes),
+                contentDescription = "Płomień serii",
+                modifier = GlanceModifier.size(24.dp)
+            )
+            Spacer(modifier = GlanceModifier.width(6.dp))
+            Text(
+                text = "${data.streakDays}",
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurface,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Text(
+                text = if (data.streakDays == 1) " dzień" else " dni",
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurfaceVariant,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            )
+
+            Spacer(modifier = GlanceModifier.defaultWeight())
+
+            // Center: 7-day compact dots
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                data.weekDays.forEach { day ->
+                    val dotRes = when {
+                        day.isCompleted -> R.drawable.ic_widget_dot_done
+                        day.isToday -> R.drawable.ic_widget_dot_today_pending
+                        else -> R.drawable.ic_widget_dot_pending
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = GlanceModifier.padding(horizontal = 3.dp)
+                    ) {
+                        Text(
+                            text = day.dayName,
+                            style = TextStyle(
+                                color = if (day.isToday) GlanceTheme.colors.primary else GlanceTheme.colors.onSurfaceVariant,
+                                fontSize = 8.sp,
+                                fontWeight = if (day.isToday) FontWeight.Bold else FontWeight.Normal
+                            )
+                        )
+                        Spacer(modifier = GlanceModifier.height(1.dp))
+                        Image(
+                            provider = ImageProvider(dotRes),
+                            contentDescription = day.dayName,
+                            modifier = GlanceModifier.size(13.dp)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = GlanceModifier.defaultWeight())
+
+            // Right: Status Badge
+            StatusBadge(text = appearance.statusText, bg = appearance.badgeBg, textColor = appearance.badgeText, isSmall = true)
+        }
+    }
+}
+
+/**
+ * 2x2 Square tile layout.
+ */
+@androidx.compose.runtime.Composable
+private fun CompactSquareStreakWidget(
+    data: StreakWidgetData,
+    clickModifier: GlanceModifier
+) {
+    val flameRes = getFlameResource(data)
+    val appearance = getWidgetAppearance(data)
 
     Box(
         modifier = GlanceModifier
@@ -134,22 +276,7 @@ private fun CompactStreakWidget(
                     modifier = GlanceModifier.size(28.dp)
                 )
                 Spacer(modifier = GlanceModifier.defaultWeight())
-                Box(
-                    modifier = GlanceModifier
-                        .background(appearance.badgeBg)
-                        .cornerRadius(12.dp)
-                        .padding(horizontal = 8.dp, vertical = 3.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = appearance.statusText,
-                        style = TextStyle(
-                            color = appearance.badgeText,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
+                StatusBadge(text = appearance.statusText, bg = appearance.badgeBg, textColor = appearance.badgeText, isSmall = false)
             }
 
             Spacer(modifier = GlanceModifier.defaultWeight())
@@ -195,24 +322,15 @@ private fun CompactStreakWidget(
 }
 
 /**
- * Wide 4x2 banner layout with 7-day progress timeline and quick CTA.
+ * Wide Multi-Row layout (3x2, 4x2, 5x2) with 7-day timeline and full breathing room.
  */
 @androidx.compose.runtime.Composable
-private fun WideStreakWidget(
+private fun WideMultiRowStreakWidget(
     data: StreakWidgetData,
     clickModifier: GlanceModifier
 ) {
-    val flameRes = when {
-        data.streakDays == 0 -> R.drawable.ic_widget_flame_muted
-        data.isUrgentEvening -> R.drawable.ic_widget_flame_urgent
-        else -> R.drawable.ic_widget_flame
-    }
-
-    val appearance = when {
-        data.isCompletedToday -> WidgetThemeColors.completedState()
-        data.isUrgentEvening -> WidgetThemeColors.urgentState()
-        else -> WidgetThemeColors.pendingState(data.streakDays)
-    }
+    val flameRes = getFlameResource(data)
+    val appearance = getWidgetAppearance(data)
 
     Box(
         modifier = GlanceModifier
@@ -241,38 +359,24 @@ private fun WideStreakWidget(
                     )
                 )
                 Spacer(modifier = GlanceModifier.defaultWeight())
-                Box(
-                    modifier = GlanceModifier
-                        .background(appearance.badgeBg)
-                        .cornerRadius(10.dp)
-                        .padding(horizontal = 8.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = appearance.statusText,
-                        style = TextStyle(
-                            color = appearance.badgeText,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
+                StatusBadge(text = appearance.statusText, bg = appearance.badgeBg, textColor = appearance.badgeText, isSmall = false)
             }
 
             Spacer(modifier = GlanceModifier.height(6.dp))
 
-            // Main Content Row: Left (Flame + Streak) | Middle (7 Days) | Right (Action Button)
+            // Main Content Row: Left (Flame + Big Streak) | Right (7-Day timeline)
             Row(
                 modifier = GlanceModifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Left Column: Flame and big streak count
+                // Left: Flame and streak counter
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
                         provider = ImageProvider(flameRes),
                         contentDescription = "Płomień serii",
-                        modifier = GlanceModifier.size(36.dp)
+                        modifier = GlanceModifier.size(34.dp)
                     )
                     Spacer(modifier = GlanceModifier.width(8.dp))
                     Column {
@@ -297,7 +401,7 @@ private fun WideStreakWidget(
 
                 Spacer(modifier = GlanceModifier.defaultWeight())
 
-                // Middle: 7-Day timeline
+                // Right: 7-Day timeline
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -311,7 +415,7 @@ private fun WideStreakWidget(
 
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = GlanceModifier.padding(horizontal = 3.dp)
+                            modifier = GlanceModifier.padding(horizontal = 4.dp)
                         ) {
                             Text(
                                 text = day.dayName,
@@ -330,29 +434,52 @@ private fun WideStreakWidget(
                         }
                     }
                 }
-
-                Spacer(modifier = GlanceModifier.defaultWeight())
-
-                // Right: Action Button
-                val buttonText = if (data.isCompletedToday) "Otwórz" else "Ucz się"
-                Box(
-                    modifier = GlanceModifier
-                        .background(GlanceTheme.colors.primary)
-                        .cornerRadius(14.dp)
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = buttonText,
-                        style = TextStyle(
-                            color = GlanceTheme.colors.onPrimary,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
             }
         }
+    }
+}
+
+@androidx.compose.runtime.Composable
+private fun StatusBadge(
+    text: String,
+    bg: ColorProvider,
+    textColor: ColorProvider,
+    isSmall: Boolean
+) {
+    Box(
+        modifier = GlanceModifier
+            .background(bg)
+            .cornerRadius(if (isSmall) 10.dp else 12.dp)
+            .padding(
+                horizontal = if (isSmall) 6.dp else 8.dp,
+                vertical = if (isSmall) 2.dp else 3.dp
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            style = TextStyle(
+                color = textColor,
+                fontSize = if (isSmall) 10.sp else 11.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+    }
+}
+
+private fun getFlameResource(data: StreakWidgetData): Int {
+    return when {
+        data.streakDays == 0 -> R.drawable.ic_widget_flame_muted
+        data.isUrgentEvening -> R.drawable.ic_widget_flame_urgent
+        else -> R.drawable.ic_widget_flame
+    }
+}
+
+private fun getWidgetAppearance(data: StreakWidgetData): WidgetStateAppearance {
+    return when {
+        data.isCompletedToday -> WidgetThemeColors.completedState()
+        data.isUrgentEvening -> WidgetThemeColors.urgentState()
+        else -> WidgetThemeColors.pendingState(data.streakDays)
     }
 }
 
