@@ -4,8 +4,6 @@ package com.philornot.slownikjezykatrudnego.ui.settings
  * Settings Bottom Sheet for configuring daily limits, theme,
  * accessibility, and resetting progress. Strictly aligned with the WEB
  * version styling and functionality.
- *
- * Theme toggle now uses circular reveal animation (same as web version).
  */
 
 import android.Manifest
@@ -84,12 +82,11 @@ import com.philornot.slownikjezykatrudnego.BuildConfig
 import com.philornot.slownikjezykatrudnego.data.model.NotificationTimeSlot
 import com.philornot.slownikjezykatrudnego.data.model.TextSizeLevel
 import com.philornot.slownikjezykatrudnego.data.model.UserSettings
-import com.philornot.slownikjezykatrudnego.ui.theme.CircularRevealThemeWrapper
-import com.philornot.slownikjezykatrudnego.ui.theme.LocalThemeTransitionState
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 import com.philornot.slownikjezykatrudnego.ui.theme.SlownikJezykaTrudnegoTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,43 +102,11 @@ fun SettingsBottomSheet(
     val colors = SjtTheme.colors
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
-    val themeTransitionState = LocalThemeTransitionState.current
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    // Local state for smooth slider dragging before saving
     var localLimit by remember(settings.dailyNewWordsLimit) { mutableIntStateOf(settings.dailyNewWordsLimit) }
-    var localHighContrast by remember(settings.highContrast) { mutableStateOf(settings.highContrast) }
-    var localReducedMotion by remember(settings.reducedMotion) { mutableStateOf(settings.reducedMotion) }
-    var localTextSize by remember(settings.textSize) { mutableStateOf(settings.textSize) }
-    var notificationsEnabled by remember(settings.notificationsEnabled) { mutableStateOf(settings.notificationsEnabled) }
-    var notificationTimeSlot by remember(settings.notificationTimeSlot) { mutableStateOf(settings.notificationTimeSlot) }
-
-    val currentSheetSettings = remember(
-        settings,
-        localLimit,
-        localHighContrast,
-        localReducedMotion,
-        localTextSize,
-        notificationsEnabled,
-        notificationTimeSlot
-    ) {
-        settings.copy(
-            dailyNewWordsLimit = localLimit,
-            highContrast = localHighContrast,
-            reducedMotion = localReducedMotion,
-            textSize = localTextSize,
-            notificationsEnabled = notificationsEnabled,
-            notificationTimeSlot = notificationTimeSlot
-        )
-    }
-
-    fun applyAndSave() {
-        android.util.Log.d(
-            "SjtSettings",
-            "[SETTINGS] applyAndSave: textSize=$localTextSize, highContrast=$localHighContrast, limit=$localLimit"
-        )
-        onSaveSettings(currentSheetSettings)
-    }
 
     // Sync notification permission state
     var hasNotificationPermission by remember {
@@ -161,13 +126,7 @@ fun SettingsBottomSheet(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         hasNotificationPermission = isGranted
-        if (isGranted) {
-            notificationsEnabled = true
-            applyAndSave()
-        } else {
-            notificationsEnabled = false
-            applyAndSave()
-        }
+        onSaveSettings(settings.copy(notificationsEnabled = isGranted))
     }
 
     // Refresh permission state on resume (e.g. back from system settings)
@@ -212,8 +171,6 @@ fun SettingsBottomSheet(
         }
     }
 
-    // fun applyAndSave() was moved up
-
     // Credit dialog
     if (showCreditDialog) {
         AlertDialog(
@@ -246,10 +203,7 @@ fun SettingsBottomSheet(
     }
 
     ModalBottomSheet(
-        onDismissRequest = {
-            applyAndSave()
-            onDismiss()
-        },
+        onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = colors.bgSurface,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
@@ -263,16 +217,15 @@ fun SettingsBottomSheet(
             ) {}
         }
     ) {
-        SlownikJezykaTrudnegoTheme(settings = currentSheetSettings) {
-            val sheetContent: @Composable () -> Unit = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 18.dp)
-                        .padding(bottom = 24.dp)
-                        .verticalScroll(scrollState),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
+        SlownikJezykaTrudnegoTheme(settings = settings) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp)
+                    .padding(bottom = 24.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
                 // Title Bar
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -293,10 +246,7 @@ fun SettingsBottomSheet(
                         )
                     }
 
-                    IconButton(onClick = {
-                        applyAndSave()
-                        onDismiss()
-                    }) {
+                    IconButton(onClick = onDismiss) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Zamknij",
@@ -358,11 +308,13 @@ fun SettingsBottomSheet(
                             Slider(
                                 value = localLimit.toFloat(),
                                 onValueChange = {
-                                    localLimit = it.toInt()
-                                    applyAndSave()
+                                    localLimit = it.roundToInt()
+                                },
+                                onValueChangeFinished = {
+                                    onSaveSettings(settings.copy(dailyNewWordsLimit = localLimit))
                                 },
                                 valueRange = 1f..20f,
-                                steps = 19,
+                                steps = 18,
                                 colors = SliderDefaults.colors(
                                     thumbColor = colors.brandPrimary,
                                     activeTrackColor = colors.brandPrimary,
@@ -428,7 +380,7 @@ fun SettingsBottomSheet(
                         }
 
                         Switch(
-                            checked = notificationsEnabled,
+                            checked = settings.notificationsEnabled,
                             onCheckedChange = { checked ->
                                 if (checked && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                                     ContextCompat.checkSelfPermission(
@@ -438,8 +390,7 @@ fun SettingsBottomSheet(
                                 ) {
                                     permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                                 } else {
-                                    notificationsEnabled = checked
-                                    applyAndSave()
+                                    onSaveSettings(settings.copy(notificationsEnabled = checked))
                                 }
                             },
                             colors = SwitchDefaults.colors(
@@ -450,7 +401,7 @@ fun SettingsBottomSheet(
                     }
 
                     // Warning if enabled but no permission
-                    if (notificationsEnabled && !hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (settings.notificationsEnabled && !hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -481,8 +432,8 @@ fun SettingsBottomSheet(
                         }
                     }
 
-                    // Time-of-day slot picker — only relevant while notifications are enabled.
-                    AnimatedVisibility(visible = notificationsEnabled) {
+                    // Time-of-day slot picker - only relevant while notifications are enabled.
+                    AnimatedVisibility(visible = settings.notificationsEnabled) {
                         Column(
                             modifier = Modifier.padding(top = 2.dp),
                             verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -498,11 +449,10 @@ fun SettingsBottomSheet(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 NotificationTimeSlot.entries.forEach { slot ->
-                                    val selected = notificationTimeSlot == slot
+                                    val selected = settings.notificationTimeSlot == slot
                                     Surface(
                                         onClick = {
-                                            notificationTimeSlot = slot
-                                            applyAndSave()
+                                            onSaveSettings(settings.copy(notificationTimeSlot = slot))
                                         },
                                         modifier = Modifier.weight(1f),
                                         shape = RoundedCornerShape(10.dp),
@@ -560,7 +510,7 @@ fun SettingsBottomSheet(
                         )
                     }
 
-                    // Theme Toggle Card (circular reveal — like web version)
+                    // Theme Toggle Card (circular reveal - like web version)
                     val isDark = settings.isDarkTheme ?: false
                     Surface(
                         onClick = {
@@ -572,23 +522,6 @@ fun SettingsBottomSheet(
                                         "ThemeTransition",
                                         "[UI] Theme setting clicked in SettingsBottomSheet. Origin: $origin"
                                     )
-                                    val snapshot = try {
-                                        themeTransitionState?.graphicsLayer?.toImageBitmap()
-                                    } catch (e: Exception) {
-                                        android.util.Log.e(
-                                            "ThemeTransition",
-                                            "Failed to capture graphicsLayer snapshot",
-                                            e
-                                        )
-                                        null
-                                    }
-                                    if (snapshot != null) {
-                                        android.util.Log.d(
-                                            "ThemeTransition",
-                                            "[STEP 0/5: CAPTURE] Composable graphicsLayer snapshot captured (${snapshot.width}x${snapshot.height}px)."
-                                        )
-                                    }
-                                    themeTransitionState?.oldBitmap = snapshot
                                     onToggleTheme(origin)
                                 }
                             }
@@ -624,7 +557,7 @@ fun SettingsBottomSheet(
                                         color = colors.textPrimary
                                     )
                                     Text(
-                                        text = if (isDark) "Przełącz na jasne barwy dzienne" else "Głębokie, stonowane szałwiowe barwy nocne",
+                                        text = if (isDark) "Przełącz na jasne barwy dzienne" else "Stonowane barwy nocne",
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.SemiBold,
                                         color = colors.textMuted
@@ -632,38 +565,8 @@ fun SettingsBottomSheet(
                                 }
                             }
 
-                            // Theme toggle button — captures position for circular reveal
+                            // Theme toggle button indicator - captures position for circular reveal origin
                             Surface(
-                                onClick = {
-                                    if (onToggleTheme != null) {
-                                        coroutineScope.launch {
-                                            val origin =
-                                                if (themeButtonCenter != Offset.Zero) themeButtonCenter else null
-                                            android.util.Log.d(
-                                                "ThemeTransition",
-                                                "[UI] Theme icon button clicked in SettingsBottomSheet. Origin: $origin"
-                                            )
-                                            val snapshot = try {
-                                                themeTransitionState?.graphicsLayer?.toImageBitmap()
-                                            } catch (e: Exception) {
-                                                android.util.Log.e(
-                                                    "ThemeTransition",
-                                                    "Failed to capture graphicsLayer snapshot",
-                                                    e
-                                                )
-                                                null
-                                            }
-                                            if (snapshot != null) {
-                                                android.util.Log.d(
-                                                    "ThemeTransition",
-                                                    "[STEP 0/5: CAPTURE] Composable graphicsLayer snapshot captured (${snapshot.width}x${snapshot.height}px)."
-                                                )
-                                            }
-                                            themeTransitionState?.oldBitmap = snapshot
-                                            onToggleTheme(origin)
-                                        }
-                                    }
-                                },
                                 modifier = Modifier
                                     .size(44.dp)
                                     .onGloballyPositioned { coords ->
@@ -675,8 +578,7 @@ fun SettingsBottomSheet(
                                         )
                                     },
                                 shape = RoundedCornerShape(10.dp),
-                                color = colors.brandPrimary,
-                                enabled = onToggleTheme != null
+                                color = colors.brandPrimary
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
                                     Icon(
@@ -746,10 +648,9 @@ fun SettingsBottomSheet(
                                     )
                                 }
                                 Switch(
-                                    checked = localHighContrast,
-                                    onCheckedChange = {
-                                        localHighContrast = it
-                                        applyAndSave()
+                                    checked = settings.highContrast,
+                                    onCheckedChange = { checked ->
+                                        onSaveSettings(settings.copy(highContrast = checked))
                                     },
                                     colors = SwitchDefaults.colors(
                                         checkedThumbColor = Color.White,
@@ -785,7 +686,7 @@ fun SettingsBottomSheet(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     TextSizeLevel.entries.forEach { level ->
-                                        val isSelected = localTextSize == level
+                                        val isSelected = settings.textSize == level
                                         val label = when (level) {
                                             TextSizeLevel.SMALL -> "Mały"
                                             TextSizeLevel.MEDIUM -> "Średni"
@@ -801,12 +702,9 @@ fun SettingsBottomSheet(
                                             onClick = {
                                                 android.util.Log.d(
                                                     "SjtSettings",
-                                                    "[TEXT_SIZE] Button clicked: $level (previous: $localTextSize)"
+                                                    "[TEXT_SIZE] Button clicked: $level (previous: ${settings.textSize})"
                                                 )
-                                                localTextSize = level
-                                                val updated =
-                                                    currentSheetSettings.copy(textSize = level)
-                                                onSaveSettings(updated)
+                                                onSaveSettings(settings.copy(textSize = level))
                                             },
                                             modifier = Modifier.weight(1f),
                                             shape = RoundedCornerShape(10.dp),
@@ -867,10 +765,9 @@ fun SettingsBottomSheet(
                                     )
                                 }
                                 Switch(
-                                    checked = localReducedMotion,
-                                    onCheckedChange = {
-                                        localReducedMotion = it
-                                        applyAndSave()
+                                    checked = settings.reducedMotion,
+                                    onCheckedChange = { checked ->
+                                        onSaveSettings(settings.copy(reducedMotion = checked))
                                     },
                                     colors = SwitchDefaults.colors(
                                         checkedThumbColor = Color.White,
@@ -1025,7 +922,7 @@ fun SettingsBottomSheet(
                             color = colors.textMuted.copy(alpha = 0.6f)
                         )
                         Text(text = "•", color = colors.textMuted.copy(alpha = 0.3f))
-                        // Serduszko — credit dla Dawida Siekielskiego
+                        // Serduszko - credit dla Dawida Siekielskiego
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = "Autor logo",
@@ -1045,19 +942,6 @@ fun SettingsBottomSheet(
                     )
                 }
             }
-        }
-
-        if (themeTransitionState != null) {
-            CircularRevealThemeWrapper(
-                state = themeTransitionState,
-                skipAnimation = currentSheetSettings.reducedMotion,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                sheetContent()
-            }
-        } else {
-            sheetContent()
-        }
         }
     }
 }
