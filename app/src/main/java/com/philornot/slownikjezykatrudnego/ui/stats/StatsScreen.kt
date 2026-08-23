@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -83,12 +84,12 @@ fun StatsScreen(
 
         val today = LocalDate.now()
         val dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val dayNames = listOf("Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Niedz")
+        val dayNames = listOf("Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd")
 
         (6 downTo 0).map { offset ->
             val d = today.minusDays(offset.toLong())
             val dateStr = d.format(dtf)
-            val label = if (offset == 0) "Dziś" else dayNames[d.dayOfWeek.value - 1]
+            val label = dayNames[d.dayOfWeek.value - 1]
             val count = countByDate[dateStr] ?: 0
             Triple(label, count, offset == 0)
         }
@@ -267,8 +268,8 @@ fun StatsScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(110.dp)
-                        .padding(top = 10.dp),
+                        .height(120.dp)
+                        .padding(top = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom
                 ) {
@@ -277,33 +278,55 @@ fun StatsScreen(
 
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Bottom,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
                         ) {
-                            Text(
-                                text = if (count > 0) "$count" else "",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (isToday) colors.brandPrimary else colors.textMuted
-                            )
+                            // Review count number above bar
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (count > 0) {
+                                    Text(
+                                        text = "$count",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isToday) colors.brandPrimary else colors.textMuted
+                                    )
+                                }
+                            }
 
                             Spacer(modifier = Modifier.height(4.dp))
 
+                            // Bar track / bar container with bottom baseline alignment
                             Box(
                                 modifier = Modifier
-                                    .width(22.dp)
-                                    .height((70 * barHeightFraction).dp)
-                                    .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
-                                    .background(
-                                        if (isToday) colors.brandPrimary else if (count > 0) colors.brandPrimary.copy(alpha = 0.5f) else colors.progressTrack
-                                    )
-                            )
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                contentAlignment = Alignment.BottomCenter
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .width(22.dp)
+                                        .fillMaxHeight(barHeightFraction)
+                                        .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
+                                        .background(
+                                            if (isToday) colors.brandPrimary
+                                            else if (count > 0) colors.brandPrimary.copy(alpha = 0.5f)
+                                            else colors.progressTrack
+                                        )
+                                )
+                            }
 
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
 
+                            // Day of week label
                             Text(
                                 text = label,
-                                fontSize = 10.sp,
+                                fontSize = 11.sp,
                                 fontWeight = if (isToday) FontWeight.ExtraBold else FontWeight.Medium,
                                 color = if (isToday) colors.brandPrimary else colors.textMuted
                             )
