@@ -433,7 +433,12 @@ fun SettingsBottomSheet(
                     }
 
                     // Time-of-day slot picker - only relevant while notifications are enabled.
-                    AnimatedVisibility(visible = settings.notificationsEnabled) {
+                    val skipAnimations = SjtTheme.skipAnimations
+                    AnimatedVisibility(
+                        visible = settings.notificationsEnabled,
+                        enter = if (skipAnimations) androidx.compose.animation.EnterTransition.None else androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(),
+                        exit = if (skipAnimations) androidx.compose.animation.ExitTransition.None else androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically()
+                    ) {
                         Column(
                             modifier = Modifier.padding(top = 2.dp),
                             verticalArrangement = Arrangement.spacedBy(6.dp)

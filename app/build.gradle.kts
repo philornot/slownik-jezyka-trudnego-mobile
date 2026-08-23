@@ -22,8 +22,8 @@ android {
         applicationId = "com.philornot.slownikjezykatrudnego"
         minSdk = 26
         targetSdk = 37
-        versionCode = 25
-        versionName = "1.4.6"
+        versionCode = 26
+        versionName = "1.4.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

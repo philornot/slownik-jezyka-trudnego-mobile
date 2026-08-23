@@ -131,9 +131,16 @@ fun AccountBottomSheet(
                 }
             }
 
+            val skipAnimations = SjtTheme.skipAnimations
             AnimatedContent(
                 targetState = authState,
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                transitionSpec = {
+                    if (skipAnimations) {
+                        androidx.compose.animation.EnterTransition.None togetherWith androidx.compose.animation.ExitTransition.None
+                    } else {
+                        fadeIn() togetherWith fadeOut()
+                    }
+                },
                 label = "accountState"
             ) { state ->
                 when (state) {

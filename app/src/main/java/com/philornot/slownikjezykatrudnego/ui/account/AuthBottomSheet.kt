@@ -241,8 +241,14 @@ fun AuthBottomSheet(
                 shape = RoundedCornerShape(12.dp)
             )
 
+            val skipAnimations = SjtTheme.skipAnimations
+
             // Confirm Password (register mode only)
-            AnimatedVisibility(visible = mode == AuthMode.Register) {
+            AnimatedVisibility(
+                visible = mode == AuthMode.Register,
+                enter = if (skipAnimations) androidx.compose.animation.EnterTransition.None else androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(),
+                exit = if (skipAnimations) androidx.compose.animation.ExitTransition.None else androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically()
+            ) {
                 OutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it; errorMessage = null },
@@ -276,7 +282,11 @@ fun AuthBottomSheet(
             }
 
             // Error message
-            AnimatedVisibility(visible = errorMessage != null) {
+            AnimatedVisibility(
+                visible = errorMessage != null,
+                enter = if (skipAnimations) androidx.compose.animation.EnterTransition.None else androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(),
+                exit = if (skipAnimations) androidx.compose.animation.ExitTransition.None else androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically()
+            ) {
                 Surface(
                     shape = RoundedCornerShape(10.dp),
                     color = colors.badgeRoseBg,
@@ -294,7 +304,11 @@ fun AuthBottomSheet(
             }
 
             // Success message
-            AnimatedVisibility(visible = successMessage != null) {
+            AnimatedVisibility(
+                visible = successMessage != null,
+                enter = if (skipAnimations) androidx.compose.animation.EnterTransition.None else androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(),
+                exit = if (skipAnimations) androidx.compose.animation.ExitTransition.None else androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically()
+            ) {
                 Surface(
                     shape = RoundedCornerShape(10.dp),
                     color = colors.badgeEmeraldBg,

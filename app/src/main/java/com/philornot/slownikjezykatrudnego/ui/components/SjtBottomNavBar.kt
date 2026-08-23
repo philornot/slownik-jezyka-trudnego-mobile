@@ -83,17 +83,21 @@ fun SjtBottomNavBar(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val skipAnimations = SjtTheme.skipAnimations
                 SjtTab.values().forEach { tab ->
                     val isSelected = currentTab == tab
                     val interactionSource = remember { MutableInteractionSource() }
 
+                    val targetColor = if (isSelected) colors.brandPrimary else colors.textMuted
                     val iconTint by animateColorAsState(
-                        targetValue = if (isSelected) colors.brandPrimary else colors.textMuted,
+                        targetValue = targetColor,
+                        animationSpec = if (skipAnimations) androidx.compose.animation.core.snap() else androidx.compose.animation.core.spring(),
                         label = "iconTint"
                     )
 
                     val textTint by animateColorAsState(
-                        targetValue = if (isSelected) colors.brandPrimary else colors.textMuted,
+                        targetValue = targetColor,
+                        animationSpec = if (skipAnimations) androidx.compose.animation.core.snap() else androidx.compose.animation.core.spring(),
                         label = "textTint"
                     )
 

@@ -80,16 +80,17 @@ fun GoogleSignInButton(
     val borderColor = if (isDark) Color(0xFF8E918F) else Color(0xFF747775)
     val textColor = if (isDark) Color(0xFFE3E3E3) else Color(0xFF1F1F1F)
 
+    val skipAnimations = SjtTheme.skipAnimations
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
-        targetValue = if (isPressed && enabled && !isLoading) 0.98f else 1f,
-        animationSpec = tween(120),
+        targetValue = if (isPressed && enabled && !isLoading && !skipAnimations) 0.98f else 1f,
+        animationSpec = if (skipAnimations) androidx.compose.animation.core.snap() else tween(120),
         label = "googleButtonScale"
     )
     val elevation by animateFloatAsState(
         targetValue = if (isDark) 0f else if (isPressed) 0.5f else 1.5f,
-        animationSpec = tween(120),
+        animationSpec = if (skipAnimations) androidx.compose.animation.core.snap() else tween(120),
         label = "googleButtonElevation"
     )
 
@@ -115,7 +116,13 @@ fun GoogleSignInButton(
         ) {
             AnimatedContent(
                 targetState = isLoading,
-                transitionSpec = { fadeIn(tween(150)) togetherWith fadeOut(tween(150)) },
+                transitionSpec = {
+                    if (skipAnimations) {
+                        androidx.compose.animation.EnterTransition.None togetherWith androidx.compose.animation.ExitTransition.None
+                    } else {
+                        fadeIn(tween(150)) togetherWith fadeOut(tween(150))
+                    }
+                },
                 label = "googleButtonContent"
             ) { loading ->
                 Row(

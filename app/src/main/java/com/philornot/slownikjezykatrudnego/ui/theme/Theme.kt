@@ -43,7 +43,7 @@ object SjtTheme {
     val skipAnimations: Boolean
         @Composable
         @ReadOnlyComposable
-        get() = LocalMotionDurationScale.current == 0f
+        get() = LocalUserSettings.current.reducedMotion || LocalMotionDurationScale.current == 0f
 }
 
 /**
