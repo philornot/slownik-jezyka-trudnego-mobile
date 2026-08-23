@@ -185,7 +185,7 @@ fun SettingsBottomSheet(
             },
             text = {
                 Text(
-                    text = "Autor logo strony: Dawid Siekielski",
+                    text = "Autor logo: Dawid Siekielski",
                     color = colors.textPrimary,
                     fontSize = 14.sp
                 )
