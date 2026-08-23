@@ -54,7 +54,7 @@
     <!-- Widget Strings -->
     <string name="widget_streak_name">Seria nauki</string>
     <string name="widget_streak_description">Śledź swoją codzienną serię powtórek i nie pozwól jej wygasnąć.</string>
-    <string name="widget_streak_saved">Seria zabezpieczona</string>
+    <string name="widget_streak_saved">Wykonano</string>
     <string name="widget_streak_todo">Zrób powtórkę</string>
     <string name="widget_streak_urgent">Uratuj serię!</string>
     <string name="widget_streak_start_now">Zacznij serię</string>

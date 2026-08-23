@@ -39,9 +39,8 @@ import com.philornot.slownikjezykatrudnego.R
 import com.philornot.slownikjezykatrudnego.data.repository.PreferencesRepository
 
 /**
- * Modern, clean Duolingo-style Streak Widget built with Jetpack Glance.
- * Supports exact size adaptation for 1-row (2x1, 3x1, 4x1) and multi-row (2x2, 3x2, 4x2)
- * layouts with zero clipping and dual-theme Material You dynamic colors.
+ * Modern, ultra-clean Duolingo-style Streak Widget built with Jetpack Glance.
+ * Clean, minimalistic design focused on flame, streak count, and weekly timeline.
  */
 class StreakWidget : GlanceAppWidget() {
 
@@ -95,7 +94,7 @@ private fun StreakWidgetContent(data: StreakWidgetData) {
 }
 
 /**
- * 1-Row Compact layout (e.g. 2x1): Flame + Streak Count + Status Badge.
+ * 1-Row Compact layout (e.g. 2x1): Flame + Streak Count.
  */
 @androidx.compose.runtime.Composable
 private fun OneRowCompactWidget(
@@ -110,7 +109,7 @@ private fun OneRowCompactWidget(
             .fillMaxSize()
             .background(appearance.bg)
             .cornerRadius(20.dp)
-            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .padding(horizontal = 14.dp, vertical = 6.dp)
             .then(clickModifier),
         contentAlignment = Alignment.Center
     ) {
@@ -121,38 +120,32 @@ private fun OneRowCompactWidget(
             Image(
                 provider = ImageProvider(flameRes),
                 contentDescription = "Płomień serii",
-                modifier = GlanceModifier.size(24.dp)
+                modifier = GlanceModifier.size(26.dp)
             )
-            Spacer(modifier = GlanceModifier.width(6.dp))
+            Spacer(modifier = GlanceModifier.width(8.dp))
             Text(
                 text = "${data.streakDays}",
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurface,
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
             )
             Text(
-                text = if (data.streakDays == 1) " dzień" else " dni",
+                text = if (data.streakDays == 1) " dzień serii" else " dni serii",
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurfaceVariant,
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Medium
                 )
             )
             Spacer(modifier = GlanceModifier.defaultWeight())
-            StatusBadge(
-                text = appearance.statusText,
-                bg = appearance.badgeBg,
-                textColor = appearance.badgeText,
-                isSmall = true
-            )
         }
     }
 }
 
 /**
- * 1-Row Medium-Wide layout (e.g. 3x1): Flame + Compact Streak ("1 d.") + 7 Days timeline.
+ * 1-Row Medium-Wide layout (e.g. 3x1): Flame + Streak ("1 dzień") + 7 Days timeline.
  */
 @androidx.compose.runtime.Composable
 private fun OneRowMediumWideWidget(
@@ -178,66 +171,6 @@ private fun OneRowMediumWideWidget(
             Image(
                 provider = ImageProvider(flameRes),
                 contentDescription = "Płomień serii",
-                modifier = GlanceModifier.size(22.dp)
-            )
-            Spacer(modifier = GlanceModifier.width(5.dp))
-            Text(
-                text = "${data.streakDays}",
-                style = TextStyle(
-                    color = GlanceTheme.colors.onSurface,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-            Text(
-                text = if (data.streakDays == 1) " d." else " dni",
-                style = TextStyle(
-                    color = GlanceTheme.colors.onSurfaceVariant,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            )
-
-            Spacer(modifier = GlanceModifier.defaultWeight())
-
-            // 7 Days timeline (ultra-compact)
-            WeekTimelineRow(
-                weekDays = data.weekDays,
-                dotSize = 12.dp,
-                dotHorizontalPadding = 1.5.dp,
-                textSize = 8.sp
-            )
-        }
-    }
-}
-
-/**
- * 1-Row Very-Wide layout (e.g. 4x1, 5x1): Flame + Streak + 7 Days + Badge.
- */
-@androidx.compose.runtime.Composable
-private fun OneRowVeryWideWidget(
-    data: StreakWidgetData,
-    clickModifier: GlanceModifier
-) {
-    val flameRes = getFlameResource(data)
-    val appearance = getWidgetAppearance(data)
-
-    Box(
-        modifier = GlanceModifier
-            .fillMaxSize()
-            .background(appearance.bg)
-            .cornerRadius(20.dp)
-            .padding(horizontal = 14.dp, vertical = 6.dp)
-            .then(clickModifier),
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            modifier = GlanceModifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                provider = ImageProvider(flameRes),
-                contentDescription = "Płomień serii",
                 modifier = GlanceModifier.size(24.dp)
             )
             Spacer(modifier = GlanceModifier.width(6.dp))
@@ -260,20 +193,71 @@ private fun OneRowVeryWideWidget(
 
             Spacer(modifier = GlanceModifier.defaultWeight())
 
+            // 7 Days timeline
             WeekTimelineRow(
                 weekDays = data.weekDays,
                 dotSize = 13.dp,
-                dotHorizontalPadding = 2.5.dp,
-                textSize = 9.sp
+                dotHorizontalPadding = 2.dp,
+                textSize = 8.sp
+            )
+        }
+    }
+}
+
+/**
+ * 1-Row Very-Wide layout (e.g. 4x1, 5x1): Flame + Full Streak + 7 Days timeline.
+ */
+@androidx.compose.runtime.Composable
+private fun OneRowVeryWideWidget(
+    data: StreakWidgetData,
+    clickModifier: GlanceModifier
+) {
+    val flameRes = getFlameResource(data)
+    val appearance = getWidgetAppearance(data)
+
+    Box(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .background(appearance.bg)
+            .cornerRadius(20.dp)
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .then(clickModifier),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                provider = ImageProvider(flameRes),
+                contentDescription = "Płomień serii",
+                modifier = GlanceModifier.size(26.dp)
+            )
+            Spacer(modifier = GlanceModifier.width(8.dp))
+            Text(
+                text = "${data.streakDays}",
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurface,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Text(
+                text = if (data.streakDays == 1) " dzień serii" else " dni serii",
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurfaceVariant,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium
+                )
             )
 
             Spacer(modifier = GlanceModifier.defaultWeight())
 
-            StatusBadge(
-                text = appearance.statusText,
-                bg = appearance.badgeBg,
-                textColor = appearance.badgeText,
-                isSmall = true
+            WeekTimelineRow(
+                weekDays = data.weekDays,
+                dotSize = 14.dp,
+                dotHorizontalPadding = 3.dp,
+                textSize = 9.sp
             )
         }
     }
@@ -303,24 +287,12 @@ private fun MultiRowSquareWidget(
             modifier = GlanceModifier.fillMaxSize(),
             verticalAlignment = Alignment.Top
         ) {
-            // Top: Flame + Status Badge
-            Row(
-                modifier = GlanceModifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    provider = ImageProvider(flameRes),
-                    contentDescription = "Płomień serii",
-                    modifier = GlanceModifier.size(28.dp)
-                )
-                Spacer(modifier = GlanceModifier.defaultWeight())
-                StatusBadge(
-                    text = appearance.statusText,
-                    bg = appearance.badgeBg,
-                    textColor = appearance.badgeText,
-                    isSmall = false
-                )
-            }
+            // Top: Flame
+            Image(
+                provider = ImageProvider(flameRes),
+                contentDescription = "Płomień serii",
+                modifier = GlanceModifier.size(32.dp)
+            )
 
             Spacer(modifier = GlanceModifier.defaultWeight())
 
@@ -332,7 +304,7 @@ private fun MultiRowSquareWidget(
                     text = "${data.streakDays}",
                     style = TextStyle(
                         color = GlanceTheme.colors.onSurface,
-                        fontSize = 32.sp,
+                        fontSize = 36.sp,
                         fontWeight = FontWeight.Bold
                     )
                 )
@@ -344,7 +316,7 @@ private fun MultiRowSquareWidget(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     ),
-                    modifier = GlanceModifier.padding(bottom = 3.dp)
+                    modifier = GlanceModifier.padding(bottom = 4.dp)
                 )
             }
 
@@ -377,16 +349,15 @@ private fun MultiRowWideWidget(
     val appearance = getWidgetAppearance(data)
 
     val isMediumWidth = widgetWidth < 250.dp
-    val titleText = if (isMediumWidth) "SERIA NAUKI" else "SŁOWNIK JĘZYKA TRUDNEGO"
-    val dotPadding = if (isMediumWidth) 1.5.dp else 3.5.dp
-    val dotSize = if (isMediumWidth) 13.dp else 15.dp
+    val dotPadding = if (isMediumWidth) 2.dp else 4.dp
+    val dotSize = if (isMediumWidth) 14.dp else 16.dp
 
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(appearance.bg)
             .cornerRadius(24.dp)
-            .padding(horizontal = 14.dp, vertical = 10.dp)
+            .padding(horizontal = 14.dp, vertical = 12.dp)
             .then(clickModifier),
         contentAlignment = Alignment.Center
     ) {
@@ -394,29 +365,22 @@ private fun MultiRowWideWidget(
             modifier = GlanceModifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Header Row: Title + Status Badge
+            // Header Row: App Name
             Row(
                 modifier = GlanceModifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = titleText,
+                    text = "SŁOWNIK JĘZYKA TRUDNEGO",
                     style = TextStyle(
                         color = GlanceTheme.colors.onSurfaceVariant,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
                     )
                 )
-                Spacer(modifier = GlanceModifier.defaultWeight())
-                StatusBadge(
-                    text = appearance.statusText,
-                    bg = appearance.badgeBg,
-                    textColor = appearance.badgeText,
-                    isSmall = isMediumWidth
-                )
             }
 
-            Spacer(modifier = GlanceModifier.height(4.dp))
+            Spacer(modifier = GlanceModifier.height(6.dp))
 
             // Main Content Row: Left (Flame + Streak) | Right (7-Day timeline)
             Row(
@@ -430,20 +394,20 @@ private fun MultiRowWideWidget(
                     Image(
                         provider = ImageProvider(flameRes),
                         contentDescription = "Płomień serii",
-                        modifier = GlanceModifier.size(if (isMediumWidth) 26.dp else 32.dp)
+                        modifier = GlanceModifier.size(if (isMediumWidth) 30.dp else 34.dp)
                     )
-                    Spacer(modifier = GlanceModifier.width(6.dp))
+                    Spacer(modifier = GlanceModifier.width(8.dp))
                     Column {
                         Text(
                             text = "${data.streakDays}",
                             style = TextStyle(
                                 color = GlanceTheme.colors.onSurface,
-                                fontSize = if (isMediumWidth) 22.sp else 26.sp,
+                                fontSize = if (isMediumWidth) 24.sp else 28.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         )
                         Text(
-                            text = if (data.streakDays == 1) "dzień" else "dni",
+                            text = if (data.streakDays == 1) "dzień serii" else "dni serii",
                             style = TextStyle(
                                 color = GlanceTheme.colors.onSurfaceVariant,
                                 fontSize = 10.sp,
@@ -511,34 +475,6 @@ private fun WeekTimelineRow(
     }
 }
 
-@androidx.compose.runtime.Composable
-private fun StatusBadge(
-    text: String,
-    bg: ColorProvider,
-    textColor: ColorProvider,
-    isSmall: Boolean
-) {
-    Box(
-        modifier = GlanceModifier
-            .background(bg)
-            .cornerRadius(if (isSmall) 10.dp else 12.dp)
-            .padding(
-                horizontal = if (isSmall) 6.dp else 8.dp,
-                vertical = if (isSmall) 2.dp else 3.dp
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            style = TextStyle(
-                color = textColor,
-                fontSize = if (isSmall) 10.sp else 11.sp,
-                fontWeight = FontWeight.Bold
-            )
-        )
-    }
-}
-
 private fun getFlameResource(data: StreakWidgetData): Int {
     return when {
         data.streakDays == 0 -> R.drawable.ic_widget_flame_muted
@@ -551,18 +487,15 @@ private fun getWidgetAppearance(data: StreakWidgetData): WidgetStateAppearance {
     return when {
         data.isCompletedToday -> WidgetThemeColors.completedState()
         data.isUrgentEvening -> WidgetThemeColors.urgentState()
-        else -> WidgetThemeColors.pendingState(data.streakDays)
+        else -> WidgetThemeColors.pendingState()
     }
 }
 
 /**
- * Helper container holding theme colors and state text for the 3 dynamic states.
+ * Helper container holding theme colors and subtitle text.
  */
 private data class WidgetStateAppearance(
     val bg: ColorProvider,
-    val badgeBg: ColorProvider,
-    val badgeText: ColorProvider,
-    val statusText: String,
     val subtitleText: String
 )
 
@@ -571,9 +504,6 @@ private object WidgetThemeColors {
     fun completedState(): WidgetStateAppearance {
         return WidgetStateAppearance(
             bg = ColorProvider(R.color.widget_bg_completed),
-            badgeBg = ColorProvider(R.color.widget_badge_bg_completed),
-            badgeText = ColorProvider(R.color.widget_badge_text_completed),
-            statusText = "Zabezpieczona",
             subtitleText = "Świetna robota na dziś!"
         )
     }
@@ -581,19 +511,13 @@ private object WidgetThemeColors {
     fun urgentState(): WidgetStateAppearance {
         return WidgetStateAppearance(
             bg = ColorProvider(R.color.widget_bg_urgent),
-            badgeBg = ColorProvider(R.color.widget_badge_bg_urgent),
-            badgeText = ColorProvider(R.color.widget_badge_text_urgent),
-            statusText = "Uratuj serię!",
             subtitleText = "Powtórz słówka przed północą"
         )
     }
 
-    fun pendingState(streakDays: Int): WidgetStateAppearance {
+    fun pendingState(): WidgetStateAppearance {
         return WidgetStateAppearance(
             bg = ColorProvider(R.color.widget_bg_pending),
-            badgeBg = ColorProvider(R.color.widget_badge_bg_pending),
-            badgeText = ColorProvider(R.color.widget_badge_text_pending),
-            statusText = if (streakDays > 0) "Do zrobienia" else "Zacznij serię",
             subtitleText = "Kliknij, aby rozpocząć naukę"
         )
     }

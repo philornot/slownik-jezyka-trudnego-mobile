@@ -15,25 +15,6 @@
         android:contentDescription="@string/widget_streak_name"
         android:src="@drawable/ic_widget_flame" />
 
-    <!-- Top Right: Status Badge -->
-    <TextView
-        android:id="@+id/preview_badge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/bg_widget_badge_preview"
-        android:paddingLeft="8dp"
-        android:paddingTop="3dp"
-        android:paddingRight="8dp"
-        android:paddingBottom="3dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/widget_streak_todo"
-        android:textColor="@color/widget_badge_text_pending"
-        android:textSize="11sp"
-        android:textStyle="bold" />
-
     <!-- Bottom Content: Streak counter + Subtitle -->
     <LinearLayout
         android:layout_width="match_parent"
