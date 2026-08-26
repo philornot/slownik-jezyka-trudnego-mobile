@@ -18,6 +18,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -146,11 +147,13 @@ fun LessonScreen(
                         }
                     }
 
-                    HybridQuizCard(
-                        card = currentCard,
-                        onGrade = onGradeCard,
-                        modifier = Modifier.weight(1f)
-                    )
+                    key(currentCardIndex) {
+                        HybridQuizCard(
+                            card = currentCard,
+                            onGrade = onGradeCard,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             }
         } else {

@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.data.datasource
+package com.philornot.slownikjezykatrudnego.data.datasource
 
 import com.philornot.slownikjezykatrudnego.data.model.DictionaryWord
 
@@ -772,14 +772,14 @@ object DictionaryWordsData {
         ),
         DictionaryWord(
             id = "metanoia",
-            word = "Metanoia",
+            word = "Metanoja",
             phonetic = "[me-ta-no-ja]",
             shortDefinition = "Głęboka przemiana duchowa i zmiana sposobu myślenia.",
             fullDefinition = "Radykalna zmiana myślenia i postawy, wewnętrzne nawrócenie lub transformacja duchowa prowadząca do całkowicie nowego spojrzenia na życie.",
             etymology = "Z greki: metanoia (meta- - po/ponad + nous - umysł).",
             examples = listOf("Pobyt w więzieniu stał się dla niego metanoją - wyszedł stamtąd zupełnie innym człowiekiem.", "Filozofowie stoiccy opisywali metanoję jako wewnętrzny przewrót, który wyzwala od namiętności."),
             category = "Filozofia i Pojęcia",
-            sjpUrl = "https://sjp.pwn.pl/szukaj/metanoia.html",
+            sjpUrl = "https://sjp.pwn.pl/szukaj/metanoja.html",
             distractors = listOf("Powierzchowna zmiana przyzwyczajeń bez głębszej refleksji.", "Stopniowe zapominanie dawnych przekonań.", "Nagłe pogorszenie stanu zdrowia psychicznego.")
         ),
         DictionaryWord(
