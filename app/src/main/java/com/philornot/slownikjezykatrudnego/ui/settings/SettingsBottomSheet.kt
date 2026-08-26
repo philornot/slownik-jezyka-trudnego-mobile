@@ -179,7 +179,6 @@ fun SettingsBottomSheet(
             title = {
                 Text(
                     text = ":>",
-                    fontWeight = FontWeight.ExtraBold,
                     color = colors.textSerifTitle
                 )
             },

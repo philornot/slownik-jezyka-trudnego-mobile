@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.ui.components
+package com.philornot.slownikjezykatrudnego.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
@@ -47,7 +47,8 @@ fun SjtInteractiveCard(
     modifier: Modifier = Modifier,
     backgroundColor: Color = SjtTheme.colors.bgSurface,
     borderColor: Color = SjtTheme.colors.borderDefault,
-    cornerRadius: Dp = 14.dp,
+    cornerRadius: Dp = 16.dp,
+    elevation: Dp = 1.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(
@@ -55,7 +56,8 @@ fun SjtInteractiveCard(
         modifier = modifier,
         shape = RoundedCornerShape(cornerRadius),
         color = backgroundColor,
-        border = BorderStroke(1.dp, borderColor)
+        border = BorderStroke(1.dp, borderColor),
+        shadowElevation = elevation
     ) {
         Column {
             content()

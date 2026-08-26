@@ -17,13 +17,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +50,7 @@ import com.philornot.slownikjezykatrudnego.ui.components.BadgeVariant
 import com.philornot.slownikjezykatrudnego.ui.components.SjtBadge
 import com.philornot.slownikjezykatrudnego.ui.components.SjtCard
 import com.philornot.slownikjezykatrudnego.ui.components.SjtInteractiveCard
+import com.philornot.slownikjezykatrudnego.ui.theme.SerifFontFamily
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 
 /**
@@ -270,7 +273,7 @@ fun CatalogScreen(
                     ) {
                         Column(
                             modifier = Modifier.padding(14.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -300,20 +303,51 @@ fun CatalogScreen(
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(2.dp))
                             Text(
                                 text = word.shortDefinition,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = colors.textSecondary,
-                                lineHeight = 18.sp
+                                lineHeight = 18.sp,
+                                maxLines = 3
                             )
 
-                            Spacer(modifier = Modifier.height(2.dp))
-                            SjtBadge(
-                                text = word.category,
-                                variant = BadgeVariant.NEUTRAL
+                            HorizontalDivider(
+                                color = colors.borderDefault,
+                                thickness = 1.dp,
+                                modifier = Modifier.padding(top = 2.dp)
                             )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = word.category,
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = colors.textAmberBrand
+                                )
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text(
+                                        text = "Szczegóły",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.brandPrimary
+                                    )
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                                        contentDescription = null,
+                                        tint = colors.brandPrimary,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -346,34 +380,97 @@ fun CatalogScreen(
                 items(filteredLocked, key = { it.id }) { word ->
                     SjtCard(
                         modifier = Modifier.fillMaxWidth(),
-                        backgroundColor = colors.bgSurfaceElevated.copy(alpha = 0.5f)
+                        backgroundColor = colors.bgSurfaceElevated,
+                        borderColor = colors.borderDefault,
+                        elevation = 0.dp
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = word.word,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = colors.textMuted
-                                )
-                                Text(
-                                    text = word.category,
-                                    fontSize = 11.5.sp,
-                                    color = colors.textMuted.copy(alpha = 0.7f)
-                                )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = word.word,
+                                        style = MaterialTheme.typography.titleLarge.copy(fontFamily = SerifFontFamily),
+                                        color = colors.textMuted
+                                    )
+                                    if (!word.phonetic.isNullOrBlank()) {
+                                        Text(
+                                            text = word.phonetic,
+                                            fontSize = 11.5.sp,
+                                            fontStyle = FontStyle.Italic,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.textMuted.copy(alpha = 0.8f)
+                                        )
+                                    }
+                                }
+
+                                Surface(
+                                    shape = RoundedCornerShape(9999.dp),
+                                    color = colors.bgSurface,
+                                    border = BorderStroke(1.dp, colors.borderDefault)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Lock,
+                                            contentDescription = null,
+                                            tint = colors.textMuted,
+                                            modifier = Modifier.size(12.dp)
+                                        )
+                                        Text(
+                                            text = "Zablokowane",
+                                            fontSize = 10.5.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = colors.textMuted
+                                        )
+                                    }
+                                }
                             }
 
-                            Icon(
-                                imageVector = Icons.Default.Lock,
-                                contentDescription = "Zablokowane",
-                                tint = colors.textMuted,
-                                modifier = Modifier.size(16.dp)
+                            Text(
+                                text = word.shortDefinition,
+                                fontSize = 12.5.sp,
+                                fontStyle = FontStyle.Italic,
+                                fontWeight = FontWeight.Medium,
+                                color = colors.textMuted.copy(alpha = 0.45f),
+                                lineHeight = 17.sp,
+                                maxLines = 2
                             )
+
+                            HorizontalDivider(
+                                color = colors.borderDefault.copy(alpha = 0.7f),
+                                thickness = 1.dp,
+                                modifier = Modifier.padding(top = 2.dp)
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = word.category,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textMuted
+                                )
+
+                                Text(
+                                    text = "Poznasz w lekcji",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = colors.brandPrimary
+                                )
+                            }
                         }
                     }
                 }
