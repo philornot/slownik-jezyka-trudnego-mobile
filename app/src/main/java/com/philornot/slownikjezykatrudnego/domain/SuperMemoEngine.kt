@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.domain
+package com.philornot.slownikjezykatrudnego.domain
 
 import com.philornot.slownikjezykatrudnego.data.model.ReviewGrade
 import com.philornot.slownikjezykatrudnego.data.model.ReviewHistoryItem
@@ -89,7 +89,13 @@ object SuperMemoEngine {
         var easeFactor = currentProgress?.easeFactor ?: 2.5
         var interval = currentProgress?.interval ?: 1
         val existingHistory = currentProgress?.history ?: emptyList()
-        val updatedHistory = existingHistory + historyItem
+        val updatedHistory = if (existingHistory.isNotEmpty() &&
+            existingHistory.last().let { it.date == today && it.grade < 3 }
+        ) {
+            existingHistory.dropLast(1) + historyItem
+        } else {
+            existingHistory + historyItem
+        }
 
         val gradeVal = grade.value
 

@@ -571,7 +571,9 @@ class SjtViewModel(
             }
         }
 
-        _cardsReviewedInSession.value += 1
+        if (grade != ReviewGrade.AGAIN) {
+            _cardsReviewedInSession.value += 1
+        }
 
         val updatedCards = cards.toMutableList()
 

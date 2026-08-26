@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego
+package com.philornot.slownikjezykatrudnego
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -65,6 +65,40 @@ class SuperMemoEngineTest {
 
         assertEquals(0, failedResult.repetitions)
         assertEquals(1, failedResult.interval)
+    }
+
+    @Test
+    fun testRepeatedFailedReviewsInSameSession_doNotInflateHistory() {
+        var progress = SuperMemoEngine.calculateSM2(
+            wordId = "abnegat",
+            grade = ReviewGrade.AGAIN
+        )
+        assertEquals(1, progress.history.size)
+        assertEquals(0, progress.history.first().grade)
+
+        // Repeat AGAIN 5 times in the same session
+        repeat(5) {
+            progress = SuperMemoEngine.calculateSM2(
+                wordId = "abnegat",
+                grade = ReviewGrade.AGAIN,
+                currentProgress = progress
+            )
+        }
+
+        // History must still have exactly 1 entry for today
+        assertEquals(1, progress.history.size)
+        assertEquals(0, progress.history.first().grade)
+
+        // Finally pass the card in the same session
+        progress = SuperMemoEngine.calculateSM2(
+            wordId = "abnegat",
+            grade = ReviewGrade.GOOD,
+            currentProgress = progress
+        )
+
+        assertEquals(1, progress.repetitions)
+        assertEquals(1, progress.history.size)
+        assertEquals(4, progress.history.first().grade)
     }
 
     @Test
