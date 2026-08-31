@@ -49,12 +49,22 @@
     <string name="bonus_session_label">Dodatkowa powtórka</string>
     <string name="action_learn_more_words">Ucz się dalej (+%1$d nowe słowa)</string>
     <string name="action_learn_more_words_with_counter">Kolejna lekcja (+%1$d nowe słowa) · %2$d/%3$d</string>
-    <string name="action_quick_practice">Szybki trening</string>
-    <string name="action_quick_practice_with_count">Szybki trening utrwalający (%1$d słówek)</string>
+    <string name="action_quick_practice">Szybki quiz</string>
+    <string name="action_quick_practice_with_count">Szybki quiz (%1$d słówek)</string>
     <string name="action_practice_hard_words">Powtórz trudne słówka</string>
     <string name="action_practice_hard_words_short">Trudne słówka</string>
-    <string name="daily_limit_reached_title">Dzienny limit nowych słówek osiągnięty</string>
-    <string name="daily_limit_reached_description">Mózg potrzebuje odpoczynku na trwałą konsolidację haseł. Kolejna porcja pojawi się jutro, a teraz możesz utrwalać wiedzę w nielimitowanym treningu.</string>
+    <string name="daily_limit_reached_title">Dzisiejszy cel zaliczony!</string>
+    <string name="daily_limit_reached_description">Nowe słówka odblokują się jutro. Masz ochotę na więcej? Sprawdź się w szybkim quizie lub dopracuj trudniejsze hasła.</string>
+    <string name="daily_lesson_available_banner">Świetnie Ci idzie! Możesz zrobić jeszcze jedną lekcję dzisiaj lub poćwiczyć znane słowa.</string>
+    <string name="settings_pace_title">Tempo nauki</string>
+    <string name="settings_pace_subtitle">Liczba nowych słówek w jednej lekcji</string>
+    <string name="settings_pace_calm">Spokojne</string>
+    <string name="settings_pace_calm_sub">3 słowa</string>
+    <string name="settings_pace_standard">Standard</string>
+    <string name="settings_pace_standard_sub">5 słów</string>
+    <string name="settings_pace_intense">Intensywne</string>
+    <string name="settings_pace_intense_sub">8 słów</string>
+    <string name="settings_pace_hint">Zalecamy 3 lub 5 słów. Mniejsze dawki ułatwiają trwałe zapamiętywanie bez zaległości.</string>
     <string name="all_words_started_label">Odkryto wszystkie słówka!</string>
 
     <!-- Widget Strings -->

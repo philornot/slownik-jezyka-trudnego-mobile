@@ -70,6 +70,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -79,6 +80,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.philornot.slownikjezykatrudnego.BuildConfig
+import com.philornot.slownikjezykatrudnego.R
 import com.philornot.slownikjezykatrudnego.data.model.NotificationTimeSlot
 import com.philornot.slownikjezykatrudnego.data.model.TextSizeLevel
 import com.philornot.slownikjezykatrudnego.data.model.UserSettings
@@ -104,9 +106,6 @@ fun SettingsBottomSheet(
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-
-    // Local state for smooth slider dragging before saving
-    var localLimit by remember(settings.dailyNewWordsLimit) { mutableIntStateOf(settings.dailyNewWordsLimit) }
 
     // Sync notification permission state
     var hasNotificationPermission by remember {
@@ -283,66 +282,75 @@ fun SettingsBottomSheet(
                     ) {
                         Column(
                             modifier = Modifier.padding(14.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                 Text(
-                                    text = "Nowe słowa na dzienną sesję",
+                                    text = stringResource(R.string.settings_pace_title),
                                     fontSize = 13.5.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = colors.textPrimary
                                 )
                                 Text(
-                                    text = "$localLimit",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = colors.textAmberBrand
+                                    text = stringResource(R.string.settings_pace_subtitle),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = colors.textMuted
                                 )
                             }
 
-                            Slider(
-                                value = localLimit.toFloat(),
-                                onValueChange = {
-                                    localLimit = it.roundToInt()
-                                },
-                                onValueChangeFinished = {
-                                    onSaveSettings(settings.copy(dailyNewWordsLimit = localLimit))
-                                },
-                                valueRange = 1f..20f,
-                                steps = 18,
-                                colors = SliderDefaults.colors(
-                                    thumbColor = colors.brandPrimary,
-                                    activeTrackColor = colors.brandPrimary,
-                                    inactiveTrackColor = colors.progressTrack
-                                )
+                            val paceOptions = listOf(
+                                Triple(3, stringResource(R.string.settings_pace_calm), stringResource(R.string.settings_pace_calm_sub)),
+                                Triple(5, stringResource(R.string.settings_pace_standard), stringResource(R.string.settings_pace_standard_sub)),
+                                Triple(8, stringResource(R.string.settings_pace_intense), stringResource(R.string.settings_pace_intense_sub))
                             )
+
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text(
-                                    text = "1 słowo",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = colors.textMuted
-                                )
-                                Text(
-                                    text = "10 słów",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = colors.textMuted
-                                )
-                                Text(
-                                    text = "20 słów",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = colors.textMuted
-                                )
+                                paceOptions.forEach { (limit, title, subtitle) ->
+                                    val isSelected = settings.dailyNewWordsLimit == limit
+                                    Surface(
+                                        onClick = {
+                                            onSaveSettings(settings.copy(dailyNewWordsLimit = limit))
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(10.dp),
+                                        color = if (isSelected) colors.brandPrimary else colors.bgSurface,
+                                        border = BorderStroke(
+                                            2.dp,
+                                            if (isSelected) colors.brandPrimary else colors.borderDefault
+                                        )
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(vertical = 10.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = title,
+                                                fontSize = 12.5.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (isSelected) Color.White else colors.textPrimary
+                                            )
+                                            Text(
+                                                text = subtitle,
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                color = if (isSelected) Color.White.copy(alpha = 0.8f) else colors.textMuted
+                                            )
+                                        }
+                                    }
+                                }
                             }
+
+                            Text(
+                                text = stringResource(R.string.settings_pace_hint),
+                                fontSize = 10.5.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = colors.textMuted,
+                                lineHeight = 14.sp
+                            )
                         }
                     }
 

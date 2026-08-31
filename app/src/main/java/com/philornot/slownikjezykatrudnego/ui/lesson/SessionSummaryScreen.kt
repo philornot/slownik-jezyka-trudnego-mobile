@@ -177,7 +177,7 @@ fun SessionSummaryScreen(
                             }
 
                             Text(
-                                text = "Algorytm powtórek dba o trwałe zapamiętywanie. Najlepsze efekty daje codzienna nauka.",
+                                text = stringResource(R.string.daily_lesson_available_banner),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = colors.textPrimary,
