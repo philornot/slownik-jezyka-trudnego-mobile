@@ -229,7 +229,12 @@ object SessionManager {
     }
 
     /**
-     * Generates 4 options for a multiple choice quiz card.
+     * Generates 4 options for a multiple-choice quiz card.
+     *
+     * Distractors are always drawn from the short definitions of other words in
+     * the dictionary. This makes the quiz genuinely challenging (no artificial
+     * near-synonyms or antonyms that hint at the answer) and educational (the
+     * user encounters real definitions of other words while choosing).
      */
     fun generateOptionsForWord(
         word: DictionaryWord,
@@ -237,19 +242,12 @@ object SessionManager {
         rng: Mulberry32
     ): List<String> {
         val correct = word.shortDefinition
-        val distractors = word.distractors.toMutableList()
+        val pool = allWords
+            .filter { it.id != word.id }
+            .map { it.shortDefinition }
 
-        if (distractors.size < 3) {
-            val fallbackPool = allWords
-                .filter { it.id != word.id }
-                .map { it.shortDefinition }
-                .filter { it !in distractors && it != correct }
-
-            distractors.addAll(shuffleList(fallbackPool, rng).take(3 - distractors.size))
-        }
-
-        val chosenOptions = (distractors.take(3) + correct)
-        return shuffleList(chosenOptions, rng)
+        val distractors = shuffleList(pool, rng).take(3)
+        return shuffleList(distractors + correct, rng)
     }
 
     /**

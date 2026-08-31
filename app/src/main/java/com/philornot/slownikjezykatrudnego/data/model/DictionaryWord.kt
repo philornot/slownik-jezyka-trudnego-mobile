@@ -1,4 +1,4 @@
-﻿package com.philornot.slownikjezykatrudnego.data.model
+package com.philornot.slownikjezykatrudnego.data.model
 
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
@@ -15,7 +15,6 @@ import kotlinx.serialization.Serializable
  * @property examples Contextual example sentences demonstrating correct usage.
  * @property category Thematic category name (e.g., "Filozofia i Pojęcia").
  * @property sjpUrl Direct URL link to the official PWN Polish dictionary entry.
- * @property distractors Plausible incorrect definitions used for multiple-choice quizzes.
  */
 @OptIn(InternalSerializationApi::class)
 @Serializable
@@ -28,6 +27,5 @@ data class DictionaryWord(
     val etymology: String? = null,
     val examples: List<String> = emptyList(),
     val category: String,
-    val sjpUrl: String,
-    val distractors: List<String> = emptyList()
+    val sjpUrl: String
 )

@@ -1,4 +1,4 @@
-package com.philornot.slownikjezykatrudnego.data.datasource
+﻿package com.philornot.slownikjezykatrudnego.data.datasource
 
 import com.philornot.slownikjezykatrudnego.data.model.DictionaryWord
 
@@ -17,7 +17,6 @@ object DictionaryWordsData {
             examples = listOf("O sukcesie tej kampanii zdecydowały nie tylko finanse, lecz przede wszystkim psychologiczne imponderabilia.", "W relacjach międzyludzkich to właśnie imponderabilia często decydują o trwałości więzi."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/imponderabilia.html",
-            distractors = listOf("Przedmioty o ogromnej masie i ciężarze fizycznym.", "Zjawiska pogodowe występujące w strefie równikowej.", "Zbiór przepisów prawnych regulujących finanse państwa.")
         ),
         DictionaryWord(
             id = "abnegat",
@@ -29,7 +28,6 @@ object DictionaryWordsData {
             examples = listOf("Mimo znacznego majątku żył jak abnegat, nie zwracając uwagi na to, co nosi i gdzie mieszka.", "Młody artysta pozował na abnegata, by podkreślić swój dystans do społecznych konwenansów."),
             category = "Osobowość i Postawy",
             sjpUrl = "https://sjp.pwn.pl/szukaj/abnegat.html",
-            distractors = listOf("Człowiek nadmiernie skupiony na gromadzeniu majątku i luksusie.", "Osoba kierująca się bezwzględnym egoizmem i chciwością.", "Wybitny znawca i koneser sztuki oraz dobrego smaku.")
         ),
         DictionaryWord(
             id = "apodyktyczny",
@@ -41,7 +39,6 @@ object DictionaryWordsData {
             examples = listOf("Jego apodyktyczny ton sprawiał, że współpracownicy rzadko odważali się na własną inicjatywę.", "Rządy dyrektora były apodyktyczne, choć w sprawach kluczowych potrafił działać skutecznie."),
             category = "Osobowość i Postawy",
             sjpUrl = "https://sjp.pwn.pl/szukaj/apodyktyczny.html",
-            distractors = listOf("Cechujący się wyjątkową ustępliwością i ulegnością.", "Zmienny w poglądach i wykazujący stałe niezdecydowanie.", "Delikatny i subtelny w wyrażaniu własnych prośb.")
         ),
         DictionaryWord(
             id = "epifania",
@@ -53,7 +50,6 @@ object DictionaryWordsData {
             examples = listOf("Przechadzając się samotnie nad brzegiem morza, doświadczył epifanii, która zmieniła jego podejście do twórczości.", "Książka opisuje epifanię głównego bohatera podczas prozaicznej rozmowy przy porannej kawie."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/epifania.html",
-            distractors = listOf("Długotrwałe przygnębienie wynikające z braku nadziei.", "Stopniowe zapominanie faktów z dzieciństwa.", "Gwałtowna kłótnia oparta na nieporozumieniu.")
         ),
         DictionaryWord(
             id = "sybaryta",
@@ -65,7 +61,6 @@ object DictionaryWordsData {
             examples = listOf("Prawdziwy sybaryta spędzał popołudnia na miękkich otomana, racząc się egzotycznymi owocami.", "Przekształcił swoją rezydencję w samotnię sybaryty, odcinając się od problemów świata."),
             category = "Osobowość i Postawy",
             sjpUrl = "https://sjp.pwn.pl/szukaj/sybaryta.html",
-            distractors = listOf("Pustelnik żyjący w ścisłej ascezie i ubóstwie.", "Żołnierz słynący z surowej dyscypliny i twardego charakteru.", "Pracowity rzemieślnik stroniący od rozrywek.")
         ),
         DictionaryWord(
             id = "efemeryczny",
@@ -77,7 +72,6 @@ object DictionaryWordsData {
             examples = listOf("Popularność tego zespołu okazała się efemeryczna, bo zaledwie po roku mało kto o nim pamiętał.", "Zachwyt zachodem słońca ma w sobie niezwykły, efemeryczny czar."),
             category = "Czas i Zjawiska",
             sjpUrl = "https://sjp.pwn.pl/szukaj/efemeryczny.html",
-            distractors = listOf("Niezniszczalny i trwający wiecznie mimo upływu stuleci.", "Wyjątkowo ciężki i nieporęczny w przenoszeniu.", "Posiadający stałą, niezmienną strukturę chemiczną.")
         ),
         DictionaryWord(
             id = "nomen-omen",
@@ -89,7 +83,6 @@ object DictionaryWordsData {
             examples = listOf("Pan Młotek, nomen omen, od trzydziestu lat prowadził sklep z narzędziami budowlanymi.", "Zatrudnili na stanowisko kierownika osobę o nazwisku Szybki, co nomen omen przełożyło się na tempo prac."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/nomen%20omen.html",
-            distractors = listOf("Błąd ortograficzny w oficjalnym dokumencie urzędowym.", "Sformułowanie oznaczające bezpowrotną utratę majątku.", "Przestarzały nagłówek listu dyplomatycznego.")
         ),
         DictionaryWord(
             id = "konfabulacja",
@@ -101,7 +94,6 @@ object DictionaryWordsData {
             examples = listOf("Staruszek opowiadał niezwykłe historie z młodości, lecz rodzina wiedziała, że to urocza konfabulacja.", "Świadek nie kłamał celowo, jego relacja była wynikiem stresu i konfabulacji."),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/konfabulacja.html",
-            distractors = listOf("Celowe oszustwo finansowe zaplanowane na chłodno.", "Publiczne odczytanie aktu oskarżenia w sądzie.", "Wyraz głębokiego szacunku złożony dostojnikowi.")
         ),
         DictionaryWord(
             id = "kwerenda",
@@ -113,7 +105,6 @@ object DictionaryWordsData {
             examples = listOf("Przed napisaniem powieści historycznej spędziła trzy miesiące na kwerendzie w Archiwum Głównym.", "Kwerenda archiwalna pozwoliła odnaleźć nieznane dotąd listy poety."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/kwerenda.html",
-            distractors = listOf("Gwałtowna dyskusja na forum publicznym.", "Krótka przerwa w podróży służbowej.", "Rodzaj dawnego tańca dworskiego.")
         ),
         DictionaryWord(
             id = "antynomia",
@@ -125,7 +116,6 @@ object DictionaryWordsData {
             examples = listOf("Wątek wolnej woli i determinizmu stanowi klasyczną antynomię filozoficzną.", "Antynomia między potrzebą wolności a pragnieniem bezpieczeństwa towarzyszy ludzkości od zawsze."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/antynomia.html",
-            distractors = listOf("Zgodne porozumienie dwóch zwaśnionych stron.", "Umowa handlowa zawierana na czas nieokreślony.", "Rodzaj minerału o właściwościach magnetycznych.")
         ),
         DictionaryWord(
             id = "resentyment",
@@ -137,7 +127,6 @@ object DictionaryWordsData {
             examples = listOf("Jego wypowiedzi były pełne resentymentu wobec sukcesów dawnych kolegów z uczelni.", "Nietzsche poświęcił wiele uwagi pojęciu resentymentu w swojej analizie moralności."),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/resentyment.html",
-            distractors = listOf("Głębokie uczucie wdzięczności za okazaną pomoc.", "Stan pełnego spokoju i harmonii duchowej.", "Zdolność do szybkiego zapamiętywania liczb.")
         ),
         DictionaryWord(
             id = "immanentny",
@@ -149,7 +138,6 @@ object DictionaryWordsData {
             examples = listOf("Ryzyko jest cechą immanentną każdego przedsięwzięcia biznesowego.", "Poszukiwanie sensu wydaje się immanentną potrzebą ludzkiego umysłu."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/immanentny.html",
-            distractors = listOf("Pochodzący z zewnątrz i narzucony sztucznie.", "Niezwykle rzadki i trudny do zaobserwowania.", "Szkodliwy dla środowiska naturalnego.")
         ),
         DictionaryWord(
             id = "transcendentny",
@@ -161,7 +149,6 @@ object DictionaryWordsData {
             examples = listOf("Muzyka tego kompozytora dotykała spraw transcendentnych, przenosząc słuchaczy w inny wymiar.", "Pytanie o wymiar transcendentny towarzyszy wielkim rozważaniom teologicznym."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/transcendentny.html",
-            distractors = listOf("Całkowicie namacalny i łatwy do zmierzenia miarką.", "Powszechny w codziennym życiu każdego człowieka.", "Opisany precyzyjnie w prostych wzorach fizycznych.")
         ),
         DictionaryWord(
             id = "egzaltacja",
@@ -173,7 +160,6 @@ object DictionaryWordsData {
             examples = listOf("Mówiła z powszechną dla niej egzaltacją, używając samych wielkich i podniosłych słów.", "Unikaj zbędnej egzaltacji w tekście prasowym, stawiaj na chłodne fakty."),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/egzaltacja.html",
-            distractors = listOf("Zimna obojętność i brak jakichkolwiek uczuć.", "Głęboka depresja i milczenie.", "Precyzyjna analiza matematyczna danych.")
         ),
         DictionaryWord(
             id = "serendypnosc",
@@ -188,11 +174,6 @@ object DictionaryWordsData {
             ),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/serendypno%C5%9B%C4%87.html",
-            distractors = listOf(
-                "Ciężka praca fizyczna wykonywana według planu.",
-                "Poczucie winy wynikające z popełnionego błędu.",
-                "Szybkie uleganie pokusom i braki w silnej woli."
-            )
         ),
         DictionaryWord(
             id = "atawizm",
@@ -204,7 +185,6 @@ object DictionaryWordsData {
             examples = listOf("Strach przed ciemnością bywa tłumaczony jako atawizm z czasów prahistorycznych.", "Gwałtowny odruch obronny był typowym atawizmem."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/atawizm.html",
-            distractors = listOf("Nowoczesny wynalazek techniczny.", "Złudzenie optyczne na pustyni.", "Nauka o gwiazdozbiorach.")
         ),
         DictionaryWord(
             id = "behawioralny",
@@ -216,7 +196,6 @@ object DictionaryWordsData {
             examples = listOf("Terapia behawioralna pomaga w zwalczaniu lęków i fobii.", "Zauważono wyraźne zmiany behawioralne u zwierząt przed trzęsieniem ziemi."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/behawioralny.html",
-            distractors = listOf("Związany z budową kości człowieka.", "Odnoszący się do starożytnych języków.", "Dotyczący zmian pogodowych.")
         ),
         DictionaryWord(
             id = "benedyktynski",
@@ -228,7 +207,6 @@ object DictionaryWordsData {
             examples = listOf("Odszyfrowanie starego rękopisu wymagało benedyktyńskiej pracy.", "Włożył benedyktyński trud w uporządkowanie domowego archiwum."),
             category = "Osobowość i Postawy",
             sjpUrl = "https://sjp.pwn.pl/szukaj/benedykty%C5%84ski.html",
-            distractors = listOf("Wykonany szybko i bez dbałości o detale.", "Związany z produkcją bakalii.", "Cechujący się głośnym zachowaniem.")
         ),
         DictionaryWord(
             id = "bigoteria",
@@ -240,7 +218,6 @@ object DictionaryWordsData {
             examples = listOf("Powieść krytykowała obłudę i bigoterię małomiasteczkowego środowiska.", "Jego bigoteria objawiała się w stałym potępianiu sąsiadów."),
             category = "Etyka i Moralność",
             sjpUrl = "https://sjp.pwn.pl/szukaj/bigoteria.html",
-            distractors = listOf("Głębokie zrozumienie innych wyznań.", "Radość z życia w zgodzie z naturą.", "Zbiór przepisów kulinarnych.")
         ),
         DictionaryWord(
             id = "chimeryczny",
@@ -252,7 +229,6 @@ object DictionaryWordsData {
             examples = listOf("Artysta znany był ze swojego chimerycznego usposobienia.", "Jej plany były chimeryczne i niemożliwe do zrealizowania."),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/chimeryczny.html",
-            distractors = listOf("Stały w poglądach i przewidywalny.", "Wykonany z żelaza i stali.", "Spokojny jak skała.")
         ),
         DictionaryWord(
             id = "dekadencja",
@@ -264,7 +240,6 @@ object DictionaryWordsData {
             examples = listOf("Literacki ruch dekadencji z końca XIX wieku przesiąknięty był smutkiem.", "W atmosferze pałacu czuć było wyraźną dekadencję."),
             category = "Sztuka i Literatura",
             sjpUrl = "https://sjp.pwn.pl/szukaj/dekadencja.html",
-            distractors = listOf("Świt nowej ery gospodarczej.", "Młodzieńczy zapał fizyczny.", "Zbiór przepisów prawnych.")
         ),
         DictionaryWord(
             id = "demagogia",
@@ -276,7 +251,6 @@ object DictionaryWordsData {
             examples = listOf("Przemówienie było pełne taniej demagogii politycznej.", "Trudno dyskutować z kimś, kto stosuje bezczelną demagogię."),
             category = "Społeczeństwo i Polityka",
             sjpUrl = "https://sjp.pwn.pl/szukaj/demagogia.html",
-            distractors = listOf("Precyzyjny wywód naukowy.", "Skromne i ciche milczenie.", "Podział majątku spadkowego.")
         ),
         DictionaryWord(
             id = "dyletant",
@@ -288,7 +262,6 @@ object DictionaryWordsData {
             examples = listOf("W kwestiach mechaniki okazał się kompletnym dyletantem.", "Nie słuchaj rad dyletanta w sprawach finansowych."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/dyletant.html",
-            distractors = listOf("Wybitny profesor nauk ścisłych.", "Pracownik z wieloletnim stażem.", "Malarz znany na całym świecie.")
         ),
         DictionaryWord(
             id = "dychotomia",
@@ -300,7 +273,6 @@ object DictionaryWordsData {
             examples = listOf("Jego poglądy cechowała dychotomia: widział świat tylko w barwach czarnych lub białych.", "Dychotomia między teorią a praktyką bywa bolesna."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/dychotomia.html",
-            distractors = listOf("Połączenie trzech elementów w jeden.", "Gładka linia bez załamań.", "Rodzaj dawnego instrumentu.")
         ),
         DictionaryWord(
             id = "eklektyczny",
@@ -312,7 +284,6 @@ object DictionaryWordsData {
             examples = listOf("Wnętrze mieszkania miało charakter eklektyczny - nowoczesne meble stały obok antyków.", "Jego styl muzyczny jest wysoce eklektyczny."),
             category = "Sztuka i Literatura",
             sjpUrl = "https://sjp.pwn.pl/szukaj/eklektyczny.html",
-            distractors = listOf("Ściśle trzymający się jednego stylu.", "Zrobiony wyłącznie z drewna dębowego.", "Prosty i bezbarwny.")
         ),
         DictionaryWord(
             id = "elokwencja",
@@ -324,7 +295,6 @@ object DictionaryWordsData {
             examples = listOf("Błysnął elokwencją podczas dyskusji na uniwersytecie.", "Jej elokwencja zachwyciła sędziów i publiczność."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/elokwencja.html",
-            distractors = listOf("Mylenie słów i jąkanie się.", "Ciche milczenie ze wstydu.", "Pisanie krótko i bezbarwnie.")
         ),
         DictionaryWord(
             id = "erudycja",
@@ -336,7 +306,6 @@ object DictionaryWordsData {
             examples = listOf("Profesor zaimponował wszystkim swoją niezwykłą erudycją.", "Jego książki są owocem wieloletniej erudycji."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/erudycja.html",
-            distractors = listOf("Powierzchowna znajomość faktów z prasy.", "Brak znajomości ortografii.", "Zdolność do szybkiego biegania.")
         ),
         DictionaryWord(
             id = "fatalizm",
@@ -348,7 +317,6 @@ object DictionaryWordsData {
             examples = listOf("Ulegał fatalizmowi, uważając, że cokolwiek zrobi, i tak poniesie klęskę.", "Powieść przepełniona jest duchowym fatalizmem."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/fatalizm.html",
-            distractors = listOf("Wiara we własne siły i pełną wolność.", "Radosne dążenie do sukcesu.", "Planowanie budowy domu.")
         ),
         DictionaryWord(
             id = "hedonizm",
@@ -360,7 +328,6 @@ object DictionaryWordsData {
             examples = listOf("Jego skrajny hedonizm zaprowadził go do utraty zdrowia.", "Literatura współczesna często krytykuje pusty hedonizm."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/hedonizm.html",
-            distractors = listOf("Życie w ubóstwie i ścisłym postach.", "Ciężka praca bez chwili odpoczynku.", "Dążenie do głębokiej pobożności.")
         ),
         DictionaryWord(
             id = "imperatyw",
@@ -372,7 +339,6 @@ object DictionaryWordsData {
             examples = listOf("Pomoc słabszym była dla niego wewnętrznym imperatywem moralnym.", "Imperatyw kategoryczny Kanta jest podstawą etyki."),
             category = "Etyka i Moralność",
             sjpUrl = "https://sjp.pwn.pl/szukaj/imperatyw.html",
-            distractors = listOf("Luźna i niezobowiązująca prośba.", "Zakaz wstępu do lasu.", "Przepis na ciasto drożdżowe.")
         ),
         DictionaryWord(
             id = "impertynencja",
@@ -384,7 +350,6 @@ object DictionaryWordsData {
             examples = listOf("Nie będę tolerował takich impertynencji w moim domu!", "Uraził wszystkich swoją wyjątkową impertynencją."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/impertynencja.html",
-            distractors = listOf("Wyraz głębokiego ukłonu i szacunku.", "Cichi szept zachwytu.", "Podziękowanie za prezent.")
         ),
         DictionaryWord(
             id = "indolencja",
@@ -396,7 +361,6 @@ object DictionaryWordsData {
             examples = listOf("Urzędnicza indolencja opóźniła budowę drogi o rok.", "Zarząd był oburzony indolencją kierownika."),
             category = "Osobowość i Postawy",
             sjpUrl = "https://sjp.pwn.pl/szukaj/indolencja.html",
-            distractors = listOf("Niezwykła pracowitość i zapał.", "Szybkie rozstrzyganie sporu.", "Wysoki kunszt artystyczny.")
         ),
         DictionaryWord(
             id = "indoktrynacja",
@@ -408,7 +372,6 @@ object DictionaryWordsData {
             examples = listOf("Reżim stosował bezwzględną indoktrynację młodzieży w szkołach.", "Trudno uchronić się przed indoktrynacją bez wolnych mediów."),
             category = "Społeczeństwo i Polityka",
             sjpUrl = "https://sjp.pwn.pl/szukaj/indoktrynacja.html",
-            distractors = listOf("Nauka samodzielnego myślenia.", "Wolna dyskusja naukowa.", "Sprzedaż książek przygodowych.")
         ),
         DictionaryWord(
             id = "insynuacja",
@@ -420,7 +383,6 @@ object DictionaryWordsData {
             examples = listOf("Odrzucił te oburzające insynuacje jako czyste kłamstwo.", "Artykuł był pełen niepotwierdzonych insynuacji."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/insynuacja.html",
-            distractors = listOf("Oficjalna pochwała za osiągnięcia.", "Wyraz wdzięczności na piśmie.", "Prawdziwy komplement.")
         ),
         DictionaryWord(
             id = "inwektywa",
@@ -432,7 +394,6 @@ object DictionaryWordsData {
             examples = listOf("W czasie kłótni padły ciężkie inwektywy.", "Debata sprowadziła się do wymiany osobistych inwektyw."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/inwektywa.html",
-            distractors = listOf("Uprzejme powitanie.", "Komplement wygłoszony szczerze.", "Przeprosiny za spóźnienie.")
         ),
         DictionaryWord(
             id = "jowialny",
@@ -444,7 +405,6 @@ object DictionaryWordsData {
             examples = listOf("Wujek był jowialnym starszym panem, który sypał żartami.", "Przywitał go z jowialnym uśmiechem."),
             category = "Osobowość i Postawy",
             sjpUrl = "https://sjp.pwn.pl/szukaj/jowialny.html",
-            distractors = listOf("Ponury, zgorzkniały i milczący.", "Groźny jak burza.", "Bojący się własnego cienia.")
         ),
         DictionaryWord(
             id = "kredybilnosc",
@@ -456,7 +416,6 @@ object DictionaryWordsData {
             examples = listOf("Raport stracił kredybilność z powodu błędów w danych.", "Kredybilność świadka nie budziła wątpliwości sądu."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/kredybilno%C5%9B%C4%87.html",
-            distractors = listOf("Oszukańczy charakter relacji.", "Trudność w czytaniu tekstu.", "Brak pieniędzy na koncie.")
         ),
         DictionaryWord(
             id = "lapsus",
@@ -468,7 +427,6 @@ object DictionaryWordsData {
             examples = listOf("To był zwykły lapsus językowy, nie chciał nikogo urazić.", "Lapsus w tekście zmienił całkowicie sens zdania."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/lapsus.html",
-            distractors = listOf("Zaplanowane oszustwo w umowie.", "Wybitny wiersz poetki.", "Złamanie nogi na lodzie.")
         ),
         DictionaryWord(
             id = "letarg",
@@ -480,7 +438,6 @@ object DictionaryWordsData {
             examples = listOf("Miasto wybudziło się z zimowego letargu z pierwszym słońcem.", "Gospodarka zapadła w długi letarg."),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/letarg.html",
-            distractors = listOf("Gorączkowy bieg po zakupy.", "Głośna zabawa na dyskotece.", "Praca na trzy zmiany.")
         ),
         DictionaryWord(
             id = "lukratywny",
@@ -492,7 +449,6 @@ object DictionaryWordsData {
             examples = listOf("Podpisał niezwykle lukratywny kontrakt handlowy.", "To była lukratywna inwestycja w nieruchomości."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/lukratywny.html",
-            distractors = listOf("Przynoszący same straty.", "Darmowy i wolontariacki.", "Bolesny dla zdrowia.")
         ),
         DictionaryWord(
             id = "mistyfikacja",
@@ -504,7 +460,6 @@ object DictionaryWordsData {
             examples = listOf("Całe odkrycie archiwalne okazało się zręczną mistyfikacją.", "Mistyfikacja trwała przez lata, zanim prawda wyszła na jaw."),
             category = "Społeczeństwo i Polityka",
             sjpUrl = "https://sjp.pwn.pl/szukaj/mistyfikacja.html",
-            distractors = listOf("Oficjalny komunikat rządowy.", "Darmowy koncert na rynku.", "Prawdziwy dokument tożsamości.")
         ),
         DictionaryWord(
             id = "niuans",
@@ -516,7 +471,6 @@ object DictionaryWordsData {
             examples = listOf("Dobry tłumacz potrafi wyłapać każdy niuans wypowiedzi.", "Aktor uchwycił wszystkie niuanse postaci."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/niuans.html",
-            distractors = listOf("Wielki, widoczny z daleka błąd.", "Głośny huk uderzenia.", "Ciężka przeszkoda na drodze.")
         ),
         DictionaryWord(
             id = "obligatoryjny",
@@ -528,7 +482,6 @@ object DictionaryWordsData {
             examples = listOf("Udział w szkoleniu BHP jest obligatoryjny dla każdego pracownika.", "Wprowadzono obligatoryjne maseczki w szpitalach."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/obligatoryjny.html",
-            distractors = listOf("Dobrowolny i nieobowiązkowy.", "Zaplanowany na wakacje.", "Darmowy i dostępny dla każdego.")
         ),
         DictionaryWord(
             id = "ortodoksyjny",
@@ -540,7 +493,6 @@ object DictionaryWordsData {
             examples = listOf("Wyznawał bardzo ortodoksyjne poglądy na temat wychowania dzieci.", "Ortodoksyjne podejście do sztuki uniemożliwiało innowacje."),
             category = "Społeczeństwo i Polityka",
             sjpUrl = "https://sjp.pwn.pl/szukaj/ortodoksyjny.html",
-            distractors = listOf("Nowoczesny i pełen swobody.", "Bardzo zmienny w decyzjach.", "Mylący się na każdym kroku.")
         ),
         DictionaryWord(
             id = "perfidia",
@@ -552,7 +504,6 @@ object DictionaryWordsData {
             examples = listOf("Działał z wyjątkową perfidią, uśmiechając się do ofiary.", "Oburzyła ich perfidia planu oszustwa."),
             category = "Etyka i Moralność",
             sjpUrl = "https://sjp.pwn.pl/szukaj/perfidia.html",
-            distractors = listOf("Szczera i serdeczna pomoc przyjaciołom.", "Niewinna dziecięca zabawa.", "Zdolność do szybkiego liczenia.")
         ),
         DictionaryWord(
             id = "polemika",
@@ -564,7 +515,6 @@ object DictionaryWordsData {
             examples = listOf("Artykuł wywołał falę polemik w prasie naukowej.", "Wdał się w jałową polemikę na forum internetowym."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/polemika.html",
-            distractors = listOf("Zgodne milczenie na zebraniu.", "Instrukcja montażu mebli.", "Taniec ludowy.")
         ),
         DictionaryWord(
             id = "prekursor",
@@ -576,7 +526,6 @@ object DictionaryWordsData {
             examples = listOf("Mikołaj Kopernik był prekursorem nowoczesnej astronomii.", "Uważano go za prekursora ekspresjonizmu w malarstwie."),
             category = "Sztuka i Literatura",
             sjpUrl = "https://sjp.pwn.pl/szukaj/prekursor.html",
-            distractors = listOf("Osoba kopiująca pomysły innych.", "Uczeń powtarzający klasę.", "Kolekcjoner starych monet.")
         ),
         DictionaryWord(
             id = "prelegent",
@@ -588,7 +537,6 @@ object DictionaryWordsData {
             examples = listOf("Prelegent zachwycił słuchaczy głębią swojej wiedzy.", "Po wykładzie publiczność zadawała prelegentowi pytania."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/prelegent.html",
-            distractors = listOf("Osoba słuchająca wykładu.", "Kierowca autobusowy.", "Pracownik szatni w teatrze.")
         ),
         DictionaryWord(
             id = "presumpcja",
@@ -600,7 +548,6 @@ object DictionaryWordsData {
             examples = listOf("Presumpcja niewinności to fundament prawa karnego.", "Kierował się presumpcją, że wszyscy są uczciwi."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/presumpcja.html",
-            distractors = listOf("Złośliwe kłamstwo skazujące.", "Wyrok skazujący na karę.", "Brak dowodów w sprawie.")
         ),
         DictionaryWord(
             id = "prowizoryczny",
@@ -612,7 +559,6 @@ object DictionaryWordsData {
             examples = listOf("Zbudowano prowizoryczny most na czas remontu.", "To było tylko prowizoryczne rozwiązanie problemu."),
             category = "Czas i Zjawiska",
             sjpUrl = "https://sjp.pwn.pl/szukaj/prowizoryczny.html",
-            distractors = listOf("Wykonany z litego kamienia na wieki.", "Oficjalnie zatwierdzony przez sejm.", "Drogi i luksusowy.")
         ),
         DictionaryWord(
             id = "puryzm",
@@ -624,7 +570,6 @@ object DictionaryWordsData {
             examples = listOf("Językowy puryzm autorki uniemożliwiał stosowanie potocznych słów.", "Puryzm architektoniczny zabraniał stosowania ozdób."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/puryzm.html",
-            distractors = listOf("Zasypywanie języka wulgaryzmami.", "Niedbalstwo o wygląd domu.", "Brak czystości na podłodze.")
         ),
         DictionaryWord(
             id = "reminiscencja",
@@ -636,7 +581,6 @@ object DictionaryWordsData {
             examples = listOf("Powieść była pełna autobiograficznych reminiscencji z dzieciństwa.", "W muzyce kompozytora słychać było reminiscencje Chopina."),
             category = "Sztuka i Literatura",
             sjpUrl = "https://sjp.pwn.pl/szukaj/reminiscencja.html",
-            distractors = listOf("Zapomnienie imienia sąsiada.", "Planowanie jutrzejszych zakupów.", "Szybki bieg na 100 metrów.")
         ),
         DictionaryWord(
             id = "rygoryzm",
@@ -648,7 +592,6 @@ object DictionaryWordsData {
             examples = listOf("Rygoryzm moralny ojca utrudniał dzieciom swobodę.", "W szpitalu obowiązywał rygoryzm sanitarny."),
             category = "Etyka i Moralność",
             sjpUrl = "https://sjp.pwn.pl/szukaj/rygoryzm.html",
-            distractors = listOf("Brak jakiejkolwiek dyscypliny.", "Pobłażliwość dla błędów.", "Wesołe spędzanie czasu.")
         ),
         DictionaryWord(
             id = "sceptycyzm",
@@ -660,7 +603,6 @@ object DictionaryWordsData {
             examples = listOf("Odnosił się ze sceptycyzmem do rewelacji prasowych.", "Sceptycyzm naukowy chroni nas przed oszustwami."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/sceptycyzm.html",
-            distractors = listOf("Ślepa wiara w każde słowo.", "Zamiłowanie do podróży.", "Chęć pomagania innym.")
         ),
         DictionaryWord(
             id = "scjentyzm",
@@ -672,7 +614,6 @@ object DictionaryWordsData {
             examples = listOf("Scjentyzm XIX wieku odrzucał wszelką metafizykę.", "Jego poglądy opierały się na głębokim scjentyzmie."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/scjentyzm.html",
-            distractors = listOf("Wiara w wróżby i horoskopy.", "Zamiłowanie do poezji miłosnej.", "Śpiewanie w chórze.")
         ),
         DictionaryWord(
             id = "snobizm",
@@ -684,7 +625,6 @@ object DictionaryWordsData {
             examples = listOf("Kupowanie dzieł sztuki dla snobizmu jest powszechne.", "Jego snobizm objawiał się w używaniu obcych słów."),
             category = "Osobowość i Postawy",
             sjpUrl = "https://sjp.pwn.pl/szukaj/snobizm.html",
-            distractors = listOf("Skromność i unikanie rozgłosu.", "Ciężka praca na roli.", "Pomoc ubogim bez rozgłosu.")
         ),
         DictionaryWord(
             id = "solipsyzm",
@@ -696,7 +636,6 @@ object DictionaryWordsData {
             examples = listOf("Solipsyzm prowadzi do nierozwiązalnych pytań o istnienie innych.", "Swoim zachowaniem zdradzał postawę bliską solipsyzmowi."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/solipsyzm.html",
-            distractors = listOf("Wiara w istnienie duchów.", "Lęk przed samotnością.", "Nauka o minerałach.")
         ),
         DictionaryWord(
             id = "wstrzemiezliwosc",
@@ -708,7 +647,6 @@ object DictionaryWordsData {
             examples = listOf("Wykazał się wstrzemięźliwością w dyskusji i nie dał się sprowokować.", "Wstrzemięźliwość żywieniowa sprzyja zdrowiu."),
             category = "Etyka i Moralność",
             sjpUrl = "https://sjp.pwn.pl/slowniki/wstrzemi%C4%99%C5%BAliwo%C5%9B%C4%87.html",
-            distractors = listOf("Objadanie się bez umiaru.", "Uleganie wszelkim zachciankom.", "Głośny krzyk w miejscu publicznym.")
         ),
         DictionaryWord(
             id = "znikomosc",
@@ -720,7 +658,6 @@ object DictionaryWordsData {
             examples = listOf("Znikomość szkód pozwoliła szybko wznowić ruch.", "Uświadomił sobie znikomość ludzkich problemów wobec kosmosu."),
             category = "Czas i Zjawiska",
             sjpUrl = "https://sjp.pwn.pl/szukaj/znikomo%C5%9B%C4%87.html",
-            distractors = listOf("Ogromna masa skały.", "Wielki majątek w banku.", "Głośny huk gromu.")
         ),
         DictionaryWord(
             id = "ataraksja",
@@ -732,7 +669,6 @@ object DictionaryWordsData {
             examples = listOf("Epikurejczycy widzieli w ataraksji najwyższe spełnienie - życie wolne od bólu i lęku.", "Mimo nagromadzonych nieszczęść zachował ataraksję stoika, nie skarżąc się nikomu."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/ataraksja.html",
-            distractors = listOf("Gwałtowny wybuch gniewu wywołany niesprawiedliwością.", "Stan głębokiego żalu i rozpaczy po stracie.", "Nadmierny lęk przed przyszłymi wydarzeniami.")
         ),
         DictionaryWord(
             id = "hybris",
@@ -744,7 +680,6 @@ object DictionaryWordsData {
             examples = listOf("Hybris Edypa polegała na przekonaniu, że zdoła oszukać wyrocznię i uciec przed przeznaczeniem.", "Wielcy zdobywcy, od Aleksandra do Napoleona, padali ofiarą własnego hybris."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/hybris.html",
-            distractors = listOf("Głęboka pokora i posłuszeństwo wobec autorytetów.", "Naukowe wyjaśnienie przyczyn zjawisk atmosferycznych.", "Umiejętność ustępowania w sporach.")
         ),
         DictionaryWord(
             id = "idiosynkrazja",
@@ -756,7 +691,6 @@ object DictionaryWordsData {
             examples = listOf("Miał głęboko zakorzenioną idiosynkrazję wobec wszelkiej biurokracji.", "U niektórych pacjentów stwierdzono idiosynkrazję na powszechnie stosowane leki."),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/idiosynkrazja.html",
-            distractors = listOf("Niezwykły talent do naśladowania głosów.", "Zdolność do szybkiego uczenia się języków obcych.", "Głęboka miłość do muzyki klasycznej.")
         ),
         DictionaryWord(
             id = "eudajmonia",
@@ -768,7 +702,6 @@ object DictionaryWordsData {
             examples = listOf("Arystoteles uznawał eudajmonię za cel wszelkiej działalności ludzkiej, nie zaś chwilową przyjemność.", "Współczesna psychologia pozytywna nawiązuje do starożytnej idei eudajmonii."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/eudajmonia.html",
-            distractors = listOf("Krótkotrwała zmysłowa rozkosz.", "Dorobek materialny zgromadzony przez lata pracy.", "Stan nieświadomości wywołany lekami.")
         ),
         DictionaryWord(
             id = "metanoia",
@@ -780,7 +713,6 @@ object DictionaryWordsData {
             examples = listOf("Pobyt w więzieniu stał się dla niego metanoją - wyszedł stamtąd zupełnie innym człowiekiem.", "Filozofowie stoiccy opisywali metanoję jako wewnętrzny przewrót, który wyzwala od namiętności."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/metanoja.html",
-            distractors = listOf("Powierzchowna zmiana przyzwyczajeń bez głębszej refleksji.", "Stopniowe zapominanie dawnych przekonań.", "Nagłe pogorszenie stanu zdrowia psychicznego.")
         ),
         DictionaryWord(
             id = "mizantropia",
@@ -792,7 +724,6 @@ object DictionaryWordsData {
             examples = listOf("Molierowski Alcest z Mizantropa był człowiekiem, którego szczerość zrodziła nieuchronną mizantropię.", "Po kolejnym rozczarowaniu przyjacielem zamknął się w chacie i dał się pochłonąć mizantropii."),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/mizantropia.html",
-            distractors = listOf("Głęboka miłość do ludzkości i chęć pomocy innym.", "Towarzyski charakter i potrzeba przebywania w tłumie.", "Nadmierne zaufanie do obcych i naiwna dobroć.")
         ),
         DictionaryWord(
             id = "nihilizm",
@@ -804,7 +735,6 @@ object DictionaryWordsData {
             examples = listOf("Nihilizm Nietzschego nie był ostateczną odpowiedzią, lecz punktem wyjścia do nowych wartości.", "Bohater powieści wpadł w nihilizm po śmierci bliskich - wszystko wydawało mu się bez znaczenia."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/nihilizm.html",
-            distractors = listOf("Głęboka wiara w sens ludzkiego cierpienia.", "Przekonanie, że nauka wyjaśni wszelkie tajemnice.", "Poszukiwanie wartości w tradycji i religii.")
         ),
         DictionaryWord(
             id = "paremia",
@@ -816,7 +746,6 @@ object DictionaryWordsData {
             examples = listOf("Badacz zebrał w swym dziele setki polskich paremiów, od staropolskich przysłów po regionalne sentencje.", "Paremia „Nie ma dymu bez ognia\" okazała się niestety trafna w tej sprawie."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/paremia.html",
-            distractors = listOf("Skomplikowany wywód retoryczny skierowany do uczonych.", "Naukowe opracowanie historii języka.", "Nowatorski slogan reklamowy skierowany do młodzieży.")
         ),
         DictionaryWord(
             id = "paroksyzm",
@@ -828,7 +757,6 @@ object DictionaryWordsData {
             examples = listOf("Wiadomość o śmierci przyjaciela wywołała w niej paroksyzm szlochu.", "Gorączka osiągnęła paroksyzm w środku nocy, po czym gwałtownie opadła."),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/paroksyzm.html",
-            distractors = listOf("Stopniowe, łagodne narastanie niepokoju.", "Spokojne trwanie w harmonii z otoczeniem.", "Powolne słabnięcie objawów choroby.")
         ),
         DictionaryWord(
             id = "predestynacja",
@@ -840,7 +768,6 @@ object DictionaryWordsData {
             examples = listOf("Kalwinizm głosił surową predestynację: los człowieka był przesądzony zanim się urodził.", "Bohater powieści czuł się ofiarą predestynacji - wszystko, co robił, prowadziło do zagłady."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/predestynacja.html",
-            distractors = listOf("Wiara w możliwość zmiany swojego losu przez wolną wolę.", "Nagroda przyznawana za wyjątkowe zasługi w życiu publicznym.", "Filozofia głosząca, że przyszłości nie można przewidzieć.")
         ),
         DictionaryWord(
             id = "reifikacja",
@@ -852,7 +779,6 @@ object DictionaryWordsData {
             examples = listOf("Marks opisywał reifikację jako stan, w którym relacje między ludźmi przybierają pozór stosunków między rzeczami.", "Reklama doprowadza do reifikacji miłości - uczucie staje się produktem do nabycia."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/reifikacja.html",
-            distractors = listOf("Nadawanie duchowego wymiaru przedmiotom materialnym.", "Dosłowna interpretacja tekstów religijnych.", "Naukowe badanie właściwości substancji chemicznych.")
         ),
         DictionaryWord(
             id = "ruminacja",
@@ -864,7 +790,6 @@ object DictionaryWordsData {
             examples = listOf("Terapia poznawcza pomaga przerwać destrukcyjny cykl ruminacji po niepowodzeniu.", "Całą noc spędził na ruminacji nad słowami, które wypowiedział nierozważnie podczas kłótni."),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/ruminacja.html",
-            distractors = listOf("Spokojne, konstruktywne planowanie przyszłości.", "Zdolność do szybkiego zapomnienia o błędach.", "Technika medytacyjna prowadząca do jasności umysłu.")
         ),
         DictionaryWord(
             id = "sofizmat",
@@ -876,7 +801,6 @@ object DictionaryWordsData {
             examples = listOf("Klasycznym sofizmatem jest: „Kłamca mówi, że kłamie - skoro mówi prawdę, jest kłamcą\".", "Polityk posłużył się sofizmatem, by uchylić się od odpowiedzi na pytanie o budżet."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/sofizmat.html",
-            distractors = listOf("Poprawny sylogizm prowadzący do prawdziwego wniosku.", "Intuicyjne przeczucie bez żadnych argumentów.", "Dowód matematyczny oparty na aksjomatach.")
         ),
         DictionaryWord(
             id = "symulakrum",
@@ -888,7 +812,6 @@ object DictionaryWordsData {
             examples = listOf("Parki rozrywki zbudowane na wzór historycznych miejsc są dla Baudrillarda doskonałymi symulakrami.", "Media kreują symulakrum polityki: widzowie oglądają spektakl udający rzeczywistość."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/symulakrum.html",
-            distractors = listOf("Dokładna kopia dzieła sztuki wykonana z tego samego materiału.", "Cyfrowe odwzorowanie realnego budynku dla celów archiwizacji.", "Model naukowy upraszczający złożone procesy.")
         ),
         DictionaryWord(
             id = "synkretyzm",
@@ -900,7 +823,6 @@ object DictionaryWordsData {
             examples = listOf("Wiele kultów starożytnego Bliskiego Wschodu rozwijało się w duchu synkretyzmu.", "Nowe ruchy duchowe opierają się na synkretyzmie: mieszają hinduizm, buddyzm i chrześcijaństwo."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/synkretyzm.html",
-            distractors = listOf("Konsekwentne trzymanie się jednej tradycji religijnej.", "Naukowe porównywanie systemów filozoficznych bez ich łączenia.", "Ruch sprzeciwiający się wszelkiemu wpływowi obcych kultur.")
         ),
         DictionaryWord(
             id = "teodycea",
@@ -912,7 +834,6 @@ object DictionaryWordsData {
             examples = listOf("Leibniz pisał teodycee, by wykazać, że Bóg stworzył najlepszy z możliwych światów.", "Auschwitz stał się dla wielu myślicieli ostatecznym argumentem przeciwko wszelkiej teodycei."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/teodycea.html",
-            distractors = listOf("Naukowe wyjaśnienie ewolucji systemów religijnych.", "Matematyczny dowód istnienia Boga.", "Historyczna analiza prześladowań religijnych.")
         ),
         DictionaryWord(
             id = "wanitatywny",
@@ -924,7 +845,6 @@ object DictionaryWordsData {
             examples = listOf("Martwe natury holenderskie XVII w. nasycone były symboliką wanitatywną: czaszki, zegarki i kwiaty.", "Poeta w swoich ostatnich sonetach przyjął ton głęboko wanitatywny."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/wanitatywny.html",
-            distractors = listOf("Wyrażający radość z chwili teraźniejszej i afirmację życia.", "Skupiony na technicznej doskonałości formy.", "Opisujący relacje między postaciami w dramacie.")
         ),
         DictionaryWord(
             id = "wiwisekcja",
@@ -936,7 +856,6 @@ object DictionaryWordsData {
             examples = listOf("Powieść była literacką wiwisekcją małżeństwa: bezlitośnie obnażała jego mechanizmy.", "Krytyk dokonał wiwisekcji scenariusza, wykazując każdy logiczny błąd fabuły."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/wiwisekcja.html",
-            distractors = listOf("Ostrożna, powierzchowna analiza pomijająca szczegóły.", "Ceremonia poświęcona leczeniu chorych zwierząt.", "Popularnonaukowy opis budowy organizmów żywych.")
         ),
         DictionaryWord(
             id = "kabotynizm",
@@ -948,7 +867,6 @@ object DictionaryWordsData {
             examples = listOf("Krytyk zarzucił aktorowi kabotynizm - zamiast gry, widz dostawał jedynie popis egocentryzmu.", "Polityk wpadł w pułapkę kabotynizmu: każde przemówienie było bardziej teatrem niż treścią."),
             category = "Sztuka i Literatura",
             sjpUrl = "https://sjp.pwn.pl/szukaj/kabotynizm.html",
-            distractors = listOf("Wirtuozeria wynikająca z wieloletniego ćwiczenia.", "Skromna, skupiona gra pozbawiona efektów specjalnych.", "Zdolność do zapamiętywania długich tekstów na pamięć.")
         ),
         DictionaryWord(
             id = "kazuistyka",
@@ -960,7 +878,6 @@ object DictionaryWordsData {
             examples = listOf("Jezuicka kazuistyka pozwalała na niezwykle elastyczną interpretację zasad moralnych.", "Prawnicy uciekali się do kazuistyki, by uniknąć prostego rozstrzygnięcia."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/kazuistyka.html",
-            distractors = listOf("Podejście intuicyjne oparte na przeczuciu.", "Proste stosowanie jednakowej reguły do wszystkich przypadków.", "Rezygnacja z wszelkich zasad moralnych.")
         ),
         DictionaryWord(
             id = "makiawelizm",
@@ -972,7 +889,6 @@ object DictionaryWordsData {
             examples = listOf("Dyrektor stosował czysty makiawelizm: manipulował zarówno sojusznikami, jak i wrogami.", "Historyk oskarżył ministra o makiawelizm - wszystkie obietnice składał z pełną świadomością, że ich nie dotrzyma."),
             category = "Etyka i Moralność",
             sjpUrl = "https://sjp.pwn.pl/szukaj/makiawelizm.html",
-            distractors = listOf("Postawa szlachetna, opierająca się na zasadach honoru.", "Filozofia uznająca dobro wspólne za najwyższy cel.", "Nauka o budowaniu trwałych sojuszy dyplomatycznych.")
         ),
         DictionaryWord(
             id = "manicheizm",
@@ -984,7 +900,6 @@ object DictionaryWordsData {
             examples = listOf("Jego ocena polityków była naiwnie manicheistyczna - wszyscy byli albo aniołami, albo demonami.", "Manicheizm wpłynął na wczesnochrześcijańskie spory o naturę zła."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/manicheizm.html",
-            distractors = listOf("Filozofia uznająca materię za jedyne istniejące tworzywo.", "Nauka o etapach rozwoju duszy po śmierci.", "Monoteistyczna wiara w jedynego i wszechwładnego Boga.")
         ),
         DictionaryWord(
             id = "marazm",
@@ -996,7 +911,6 @@ object DictionaryWordsData {
             examples = listOf("Po latach koniunktury branżę ogarnął marazm - nowych projektów nie było, stare się wlokły.", "Kraj wychodził powoli z wieloletniego marazmu ekonomicznego i politycznego."),
             category = "Czas i Zjawiska",
             sjpUrl = "https://sjp.pwn.pl/szukaj/marazm.html",
-            distractors = listOf("Gwałtowny rozkwit kulturalny i ekonomiczny.", "Stan wyjątkowej aktywności twórczej.", "Nagłe ożywienie społeczne po długim kryzysie.")
         ),
         DictionaryWord(
             id = "palinodia",
@@ -1008,7 +922,6 @@ object DictionaryWordsData {
             examples = listOf("Poeta napisał palinodię, odwołując swoje wcześniejsze uwielbienie dla władcy.", "Filozof opublikował palinodię po tym, jak nowe dowody obaliły jego wcześniejszą teorię."),
             category = "Sztuka i Literatura",
             sjpUrl = "https://sjp.pwn.pl/szukaj/palinodia.html",
-            distractors = listOf("Utwór pochwalny sławiący zasługi bohatera.", "Zbiór epigramów na tematy polityczne.", "Powieść autobiograficzna opisująca lata młodości.")
         ),
         DictionaryWord(
             id = "oniryczny",
@@ -1020,7 +933,6 @@ object DictionaryWordsData {
             examples = listOf("Proza poetki miała oniryczny charakter: obrazy przenikały się jak we śnie, bez przyczynowego porządku.", "Film zbudowany był z sekwencji onirycznych - granica między jawą a snem zacierała się celowo."),
             category = "Sztuka i Literatura",
             sjpUrl = "https://sjp.pwn.pl/szukaj/oniryczny.html",
-            distractors = listOf("Oparty na ścisłych danych empirycznych.", "Brutalnie realistyczny i pozbawiony metafory.", "Niezwykle dynamiczny i oparty na akcji.")
         ),
         DictionaryWord(
             id = "subsydiarnosc",
@@ -1032,7 +944,6 @@ object DictionaryWordsData {
             examples = listOf("Traktat z Maastricht uczynił subsydiarność jedną z fundamentalnych zasad Unii Europejskiej.", "Reforma samorządowa opierała się na subsydiarności: gmina decyduje o tym, czego centrum nie umie lepiej."),
             category = "Społeczeństwo i Polityka",
             sjpUrl = "https://sjp.pwn.pl/szukaj/subsydiarno%C5%9B%C4%87.html",
-            distractors = listOf("Zasada centralizacji władzy w rękach jednego organu.", "Przepis o obowiązkowym finansowaniu organizacji pozarządowych.", "Prawo zakazujące tworzenia partii regionalnych.")
         ),
         DictionaryWord(
             id = "proweniencja",
@@ -1044,7 +955,6 @@ object DictionaryWordsData {
             examples = listOf("Dom aukcyjny nie mógł wystawić obrazu, bo proweniencja wskazywała na rabunek wojenny.", "Biblioteka pieczołowicie dokumentuje proweniencję każdego rękopisu z XV wieku."),
             category = "Sztuka i Literatura",
             sjpUrl = "https://sjp.pwn.pl/szukaj/proweniencja.html",
-            distractors = listOf("Cena rynkowa dzieła sztuki w danym roku.", "Technika malarska zastosowana przez twórcę.", "Tematyka religijna obrazu lub rzeźby.")
         ),
         DictionaryWord(
             id = "logomachia",
@@ -1056,7 +966,6 @@ object DictionaryWordsData {
             examples = listOf("Konferencja zamieniła się w logomachię - filozofowie przez dwie godziny spierali się o definicję słowa świadomość.", "Unikaj logomachii w negocjacjach: lepiej uzgodnić znaczenie pojęć na początku."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/logomachia.html",
-            distractors = listOf("Precyzyjne rozróżnienie między pojęciami bliskoznacznymi.", "Wielojęzyczna konferencja naukowa.", "Szczera i owocna wymiana argumentów.")
         ),
         DictionaryWord(
             id = "inercja",
@@ -1068,7 +977,6 @@ object DictionaryWordsData {
             examples = listOf("Instytucje rządowe wyróżniają się szczególną inercją - każda zmiana napotyka opór biurokracji.", "Długoletnia inercja polityczna sprawiła, że kraj stracił dekady możliwego rozwoju."),
             category = "Czas i Zjawiska",
             sjpUrl = "https://sjp.pwn.pl/szukaj/inercja.html",
-            distractors = listOf("Gwałtowna aktywność i chęć do działania.", "Przyspieszenie pociągu po opuszczeniu stacji.", "Zdolność do szybkiego uczenia się nowych umiejętności.")
         ),
         DictionaryWord(
             id = "pleonazm",
@@ -1080,7 +988,6 @@ object DictionaryWordsData {
             examples = listOf("Wyrażenie masło maślane jest klasycznym przykładem pleonazmu.", "Redaktor wykreślił z tekstu wszystkie pleonazmy, takie jak cofnąć się z powrotem."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/pleonazm.html",
-            distractors = listOf("Celowe pominięcie ważnego słowa dla większego efektu.", "Użycie słowa obcego zamiast polskiego odpowiednika.", "Sposób tworzenia nowych wyrazów przez złożenie dwóch rdzeni.")
         ),
         DictionaryWord(
             id = "interregnum",
@@ -1092,7 +999,6 @@ object DictionaryWordsData {
             examples = listOf("Polska republika szlachecka słynęła z burzliwych interregnów, gdy magnaci rywalizowali o wpływ.", "Po upadku rządu kraj przez miesiąc trwał w politycznym interregnum."),
             category = "Społeczeństwo i Polityka",
             sjpUrl = "https://sjp.pwn.pl/szukaj/interregnum.html",
-            distractors = listOf("Uroczysta koronacja nowego władcy.", "Wieloletni okres stabilnych rządów jednej dynastii.", "Dokument nadający prawa obywatelskie.")
         ),
         DictionaryWord(
             id = "katharsis",
@@ -1104,7 +1010,6 @@ object DictionaryWordsData {
             examples = listOf("Finał spektaklu przyniósł widzom prawdziwe katharsis.", "Płacz okazał się dla niej oczyszczającym katharsis po miesiącach tłumionych emocji."),
             category = "Sztuka i Literatura",
             sjpUrl = "https://sjp.pwn.pl/szukaj/katharsis.html",
-            distractors = listOf("Głębokie poczucie winy bez możliwości ulgi.", "Zatrucie pokarmowe wywołane zjedzeniem zepsutej żywności.", "Rozpad budowli z cegły na skutek działania mrozu.")
         ),
         DictionaryWord(
             id = "hipochondria",
@@ -1119,11 +1024,6 @@ object DictionaryWordsData {
             ),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/hipochondria.html",
-            distractors = listOf(
-                "Rzeczywista, potwierdzona badaniami choroba przewlekła.",
-                "Nadmierna dbałość o higienę otoczenia.",
-                "Lęk przed przebywaniem w zamkniętych pomieszczeniach."
-            )
         ),
         DictionaryWord(
             id = "prokrastynacja",
@@ -1135,7 +1035,6 @@ object DictionaryWordsData {
             examples = listOf("Prokrastynacja sprawiła, że skończył projekt dopiero w ostatniej chwili, choć miał na to cały miesiąc.", "Psycholodzy wskazują, że prokrastynacja wynika często z lęku przed porażką, a nie z lenistwa."),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/prokrastynacja.html",
-            distractors = listOf("Umiejętność sprawnego zarządzania własnym czasem.", "Skłonność do wykonywania zadań z wyprzedzeniem.", "Perfekcjonistyczne dążenie do jak najszybszego ukończenia pracy.")
         ),
         DictionaryWord(
             id = "afirmacja",
@@ -1147,7 +1046,6 @@ object DictionaryWordsData {
             examples = listOf("Jej radosna afirmacja życia kontrastowała z pesymizmem reszty grupy.", "Filozofia stoicka zawiera w sobie afirmację losu, który przypadł człowiekowi w udziale."),
             category = "Filozofia i Pojęcia",
             sjpUrl = "https://sjp.pwn.pl/szukaj/afirmacja.html",
-            distractors = listOf("Kategoryczne odrzucenie i negacja danego stanu rzeczy.", "Obojętność wobec wydarzeń i dystans emocjonalny.", "Krytyczna analiza wad i uchybień.")
         ),
         DictionaryWord(
             id = "afront",
@@ -1159,7 +1057,6 @@ object DictionaryWordsData {
             examples = listOf("Pominięcie go na uroczystości odebrano jako celowy afront.", "Odmowa podania ręki na oczach całego towarzystwa była dla niego bolesnym afrontem."),
             category = "Społeczeństwo i Polityka",
             sjpUrl = "https://sjp.pwn.pl/szukaj/afront.html",
-            distractors = listOf("Wyjątkowy gest szacunku i wyróżnienia.", "Spontaniczne, niezamierzone przeoczenie.", "Oficjalna pochwała wygłoszona publicznie.")
         ),
         DictionaryWord(
             id = "arbitraz",
@@ -1171,7 +1068,6 @@ object DictionaryWordsData {
             examples = listOf("Strony konfliktu zgodziły się poddać sprawę arbitrażowi i uniknąć długotrwałego procesu sądowego.", "Międzynarodowy arbitraż handlowy pozwala rozstrzygać spory między firmami z różnych krajów."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/arbitra%C5%BC.html",
-            distractors = listOf("Jednostronna decyzja władzy bez możliwości odwołania.", "Dobrowolna mediacja prowadzona przez prawnika jednej ze stron.", "Publiczny proces sądowy z udziałem ławy przysięgłych.")
         ),
         DictionaryWord(
             id = "eksplikacja",
@@ -1183,7 +1079,6 @@ object DictionaryWordsData {
             examples = listOf("Filozof podjął się eksplikacji pojęcia wolności, które różne szkoły rozumiały zupełnie inaczej.", "Eksplikacja terminu sprawiedliwość zajęła autorowi całe rozdziały."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/eksplikacja.html",
-            distractors = listOf("Celowe zaciemnianie znaczenia słów, by utrudnić rozumienie.", "Krótkie hasło słownikowe podane bez uzasadnienia.", "Wyszukiwanie błędów gramatycznych w tekście.")
         ),
         DictionaryWord(
             id = "elaborat",
@@ -1195,7 +1090,6 @@ object DictionaryWordsData {
             examples = listOf("Zamiast krótkiej notatki, przygotował dwudziestostronicowy elaborat.", "Komisja z westchnieniem przyjrzała się elaboratowi, który miał streszczać projekt w kilku zdaniach."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/elaborat.html",
-            distractors = listOf("Lakoniczne streszczenie skrócone do jednego akapitu.", "Ustna wypowiedź wygłoszona bez przygotowania.", "Krótki komunikat mailowy wysłany do zespołu.")
         ),
         DictionaryWord(
             id = "frywolnosc",
@@ -1207,7 +1101,6 @@ object DictionaryWordsData {
             examples = listOf("Frywolność jego komentarzy na poważnej konferencji wprawiła wszystkich w zakłopotanie.", "Powieść epatowała frywolnością obyczajową, co oburzyło konserwatywnych krytyków."),
             category = "Osobowość i Postawy",
             sjpUrl = "https://sjp.pwn.pl/szukaj/frywolno%C5%9B%C4%87.html",
-            distractors = listOf("Surowa, przesadna powaga w każdej sytuacji.", "Głęboka refleksja moralna nad każdym czynem.", "Ścisłe przestrzeganie zasad przyzwoitości.")
         ),
         DictionaryWord(
             id = "inklinacja",
@@ -1219,7 +1112,6 @@ object DictionaryWordsData {
             examples = listOf("Od dziecka miał wyraźną inklinację ku muzyce, chociaż w domu nikt nie grał.", "Inklinacje polityczne pracowników rzadko wpływają na ich wydajność zawodową."),
             category = "Osobowość i Postawy",
             sjpUrl = "https://sjp.pwn.pl/szukaj/inklinacja.html",
-            distractors = listOf("Awersja i głęboka niechęć do danej dziedziny.", "Wyuczona umiejętność bez emocjonalnego zaangażowania.", "Losowo przydzielone zadanie bez związku z predyspozycjami.")
         ),
         DictionaryWord(
             id = "interlokutor",
@@ -1231,7 +1123,6 @@ object DictionaryWordsData {
             examples = listOf("Sokrates dobierał interlokutorów tak, by przez zadawanie pytań prowadzić ich do samodzielnych odkryć.", "Był wymagającym interlokutorem: każde stwierdzenie natychmiast poddawał krytycznej analizie."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/interlokutor.html",
-            distractors = listOf("Osoba słuchająca wykładu bez prawa głosu.", "Autor monologu wygłaszanego bez publiczności.", "Moderator czuwający nad regulaminem debaty.")
         ),
         DictionaryWord(
             id = "konkluzja",
@@ -1243,7 +1134,6 @@ object DictionaryWordsData {
             examples = listOf("Po długiej analizie historycznych faktów prelegent wygłosił zaskakującą konkluzję.", "Konkluzja jego rozumowania była prosta: bez edukacji nie ma trwałego rozwoju."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/konkluzja.html",
-            distractors = listOf("Wstępne założenie przyjmowane przed zbadaniem faktów.", "Luźna dygresja niemająca związku z tematem.", "Zbiór danych surowych bez żadnej interpretacji.")
         ),
         DictionaryWord(
             id = "kuriozum",
@@ -1255,7 +1145,6 @@ object DictionaryWordsData {
             examples = listOf("To prawdziwe kuriozum: słownik opublikowany bez ani jednego przykładu użycia.", "Rękopis z XIII wieku, pisany od prawej do lewej, był kuriozum przyciągającym badaczy z całego świata."),
             category = "Czas i Zjawiska",
             sjpUrl = "https://sjp.pwn.pl/szukaj/kuriozum.html",
-            distractors = listOf("Zjawisko całkowicie przewidywalne i typowe.", "Przedmiot produkowany seryjnie bez żadnych osobliwości.", "Norma prawna powszechnie stosowana w całym kraju.")
         ),
         DictionaryWord(
             id = "miraz",
@@ -1267,7 +1156,6 @@ object DictionaryWordsData {
             examples = listOf("To, co brali za oazę, okazało się mirażem wywołanym upałem pustyni.", "Jego nadzieje na szybką karierę okazały się mirażem po pierwszych miesiącach w korporacji."),
             category = "Czas i Zjawiska",
             sjpUrl = "https://sjp.pwn.pl/szukaj/mira%C5%BC.html",
-            distractors = listOf("Rzeczywisty przedmiot dotknięty ręką i potwierdzony zmysłami.", "Spełnione życzenie wynikające z ciężkiej pracy.", "Precyzyjny pomiar wykonany za pomocą instrumentów.")
         ),
         DictionaryWord(
             id = "pejoratywny",
@@ -1279,7 +1167,6 @@ object DictionaryWordsData {
             examples = listOf("Słowo \"biurokrata\" nabrało z czasem wyraźnie pejoratywnego znaczenia.", "Komentarz był pozornie neutralny, lecz ton głosu nadawał mu pejoratywny wydźwięk."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/pejoratywny.html",
-            distractors = listOf("Wyrażający pochlebną i pozytywną ocenę osoby lub rzeczy.", "Całkowicie neutralny i pozbawiony oceny emocjonalnej.", "Stosowany wyłącznie w tekstach naukowych bez zabarwienia.")
         ),
         DictionaryWord(
             id = "przechrzta",
@@ -1291,7 +1178,6 @@ object DictionaryWordsData {
             examples = listOf("Krytycy nazywali go polityczną przechrzą, gdy zmienił partię po wyborczej klęsce.", "Historyczne przechrzty często stawały przed trudnym wyborem między wiarą a przeżyciem."),
             category = "Społeczeństwo i Polityka",
             sjpUrl = "https://sjp.pwn.pl/szukaj/przechrzta.html",
-            distractors = listOf("Osoba wiernie trzymająca się swoich przekonań przez całe życie.", "Wyznawca religii od pokoleń kultywujący tradycję.", "Działacz społeczny konsekwentny w głoszonych poglądach.")
         ),
         DictionaryWord(
             id = "relewantny",
@@ -1303,7 +1189,6 @@ object DictionaryWordsData {
             examples = listOf("W tym kontekście relewantne są jedynie te fakty, które dotyczą okresu przed podpisaniem umowy.", "Pytanie o jego wiek nie jest relewantne dla oceny kompetencji."),
             category = "Nauka i Logika",
             sjpUrl = "https://sjp.pwn.pl/szukaj/relewantny.html",
-            distractors = listOf("Przypadkowy i niemający żadnego związku z tematem.", "Zbędny dodatek zaciemniający obraz sytuacji.", "Przestarzały i nieaktualny w danym kontekście.")
         ),
         DictionaryWord(
             id = "spuneryzm",
@@ -1315,7 +1200,6 @@ object DictionaryWordsData {
             examples = listOf("Klasyczny spuneryzm to zamiana \"prosimy o ciszę\" na \"coszimy o priszę\".", "Polityk przez spuneryzm wywołał salwę śmiechu na konferencji prasowej."),
             category = "Język i Mowa",
             sjpUrl = "https://sjp.pwn.pl/szukaj/spuneryzm.html",
-            distractors = listOf("Celowe użycie metafory dla upiększenia wypowiedzi.", "Świadome powtórzenie wyrazu dla wzmocnienia efektu retorycznego.", "Dialektalna forma wymowy charakterystyczna dla danego regionu.")
         ),
         DictionaryWord(
             id = "wyalienowany",
@@ -1327,7 +1211,6 @@ object DictionaryWordsData {
             examples = listOf("Bohater powieści jest wyalienowanym intelektualistą, który nie potrafi odnaleźć się w prowincjonalnym miasteczku.", "Nowoczesne miasto potrafi paradoksalnie sprawić, że człowiek czuje się wyalienowany wśród milionów ludzi."),
             category = "Psychologia i Emocje",
             sjpUrl = "https://sjp.pwn.pl/szukaj/wyalienowany.html",
-            distractors = listOf("Głęboko zakorzeniony w lokalnej wspólnocie i tradycji.", "Cieszący się powszechną sympatią i akceptacją grupy.", "Aktywnie zaangażowany w życie towarzyskie i społeczne.")
         )
     )
 }
