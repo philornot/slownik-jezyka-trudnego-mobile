@@ -52,6 +52,8 @@ import com.philornot.slownikjezykatrudnego.ui.components.SjtCard
 import com.philornot.slownikjezykatrudnego.ui.components.SjtInteractiveCard
 import com.philornot.slownikjezykatrudnego.ui.theme.SerifFontFamily
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
+import java.text.Collator
+import java.util.Locale
 
 /**
  * Catalog Screen displaying dictionary vocabulary divided into unlocked and locked entries.
@@ -67,16 +69,28 @@ fun CatalogScreen(
     var selectedWordForDetail by remember { mutableStateOf<DictionaryWord?>(null) }
 
     val colors = SjtTheme.colors
-    val categories = remember(words) {
-        listOf("Wszystkie") + words.map { it.category }.distinct().filter { it.isNotBlank() }
+    val polishCollator = remember {
+        Collator.getInstance(Locale.forLanguageTag("pl-PL"))
     }
 
-    val unlockedWords = remember(words, progressMap) {
-        words.filter { it.id in progressMap }
+    val categories = remember(words, polishCollator) {
+        listOf("Wszystkie") + words
+            .map { it.category }
+            .distinct()
+            .filter { it.isNotBlank() }
+            .sortedWith { a, b -> polishCollator.compare(a, b) }
     }
 
-    val lockedWords = remember(words, progressMap) {
-        words.filter { it.id !in progressMap }
+    val unlockedWords = remember(words, progressMap, polishCollator) {
+        words
+            .filter { it.id in progressMap }
+            .sortedWith { a, b -> polishCollator.compare(a.word, b.word) }
+    }
+
+    val lockedWords = remember(words, progressMap, polishCollator) {
+        words
+            .filter { it.id !in progressMap }
+            .sortedWith { a, b -> polishCollator.compare(a.word, b.word) }
     }
 
     val filteredUnlocked = remember(unlockedWords, searchQuery, selectedCategory) {
