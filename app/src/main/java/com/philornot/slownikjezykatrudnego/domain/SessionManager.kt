@@ -403,6 +403,85 @@ object SessionManager {
         }
     }
 
+    /**
+     * Maximum number of new-word lessons recommended per day.
+     * Prevents memory overload and future review backlogs.
+     */
+    const val MAX_DAILY_NEW_LESSONS = 2
+
+    /**
+     * Calculates remaining new-word lessons available for the user today.
+     *
+     * @param progressMap Current user progress map.
+     * @param dailyNewWordsLimit Daily new words limit preference.
+     * @param maxLessons Maximum lessons allowed per day (defaults to [MAX_DAILY_NEW_LESSONS]).
+     * @param todayStr Date string YYYY-MM-DD.
+     * @return Number of remaining new lessons (0, 1, or 2).
+     */
+    fun getRemainingNewLessonsToday(
+        progressMap: Map<String, UserWordProgress>,
+        dailyNewWordsLimit: Int,
+        maxLessons: Int = MAX_DAILY_NEW_LESSONS,
+        todayStr: String = SuperMemoEngine.getTodayDateString(),
+    ): Int {
+        val startedToday = getWordsStartedTodayCount(progressMap, todayStr)
+        val maxNewWordsAllowed = dailyNewWordsLimit * maxLessons
+        val remainingBudget = (maxNewWordsAllowed - startedToday).coerceAtLeast(0)
+        return (remainingBudget + dailyNewWordsLimit - 1) / maxOf(1, dailyNewWordsLimit)
+    }
+
+    /**
+     * Checks whether the user can start another new-word lesson today.
+     *
+     * @param progressMap Current user progress map.
+     * @param dailyNewWordsLimit Daily new words limit preference.
+     * @param allWords Full dictionary list.
+     * @param maxLessons Maximum lessons allowed per day.
+     * @param todayStr Date string YYYY-MM-DD.
+     * @return True if remaining budget > 0 and unstarted words exist.
+     */
+    fun canStartNewLessonToday(
+        progressMap: Map<String, UserWordProgress>,
+        dailyNewWordsLimit: Int,
+        allWords: List<DictionaryWord>,
+        maxLessons: Int = MAX_DAILY_NEW_LESSONS,
+        todayStr: String = SuperMemoEngine.getTodayDateString(),
+    ): Boolean {
+        if (!hasUnstartedWords(progressMap, allWords)) return false
+        return getRemainingNewLessonsToday(progressMap, dailyNewWordsLimit, maxLessons, todayStr) > 0
+    }
+
+    /**
+     * Creates an on-demand general practice session from previously learned words.
+     *
+     * @param progressMap Current user progress map.
+     * @param allWords Complete dictionary list.
+     * @param count Number of cards in practice session (default 5).
+     * @param seed Seed string for deterministic card shuffling.
+     * @return List of practice [SessionCard]s.
+     */
+    fun createQuickPracticeSession(
+        progressMap: Map<String, UserWordProgress>,
+        allWords: List<DictionaryWord>,
+        count: Int = 5,
+        seed: String = System.currentTimeMillis().toString(),
+    ): List<SessionCard> {
+        val wordMap = allWords.associateBy { it.id }
+        val startedWords = progressMap.keys.mapNotNull { wordMap[it] }
+        if (startedWords.isEmpty()) return emptyList()
+
+        val rng = Mulberry32("sjt-quick-$seed")
+        val selectedWords = shuffleList(startedWords, rng).take(count)
+        return selectedWords.map { word ->
+            SessionCard(
+                word = word,
+                isNew = false,
+                userProgress = progressMap[word.id],
+                options = generateOptionsForWord(word, allWords, rng)
+            )
+        }
+    }
+
     /** Checks if there are any unstarted words remaining in the dictionary. */
     fun hasUnstartedWords(
         progressMap: Map<String, UserWordProgress>,

@@ -200,4 +200,78 @@ class SessionManagerTest {
             SessionManager.hasWordsToPractice(allStarted)
         )
     }
+
+    @Test
+    fun testDailyLessonLimit_calculatesRemainingLessonsCorrectly() {
+        val today = "2026-08-09"
+        val words = DictionaryWordsData.WORDS
+
+        // No words started today -> 2 lessons remaining with limit 3 (max 2 * 3 = 6 words)
+        val remaining0 = SessionManager.getRemainingNewLessonsToday(
+            progressMap = emptyMap(),
+            dailyNewWordsLimit = 3,
+            maxLessons = 2,
+            todayStr = today
+        )
+        assertEquals(2, remaining0)
+        assertTrue(SessionManager.canStartNewLessonToday(emptyMap(), 3, words, 2, today))
+
+        // 3 words started today -> 1 lesson remaining
+        val started3 = (1..3).associate { idx ->
+            "w$idx" to createTestProgress(
+                wordId = "w$idx",
+                repetitions = 1,
+                lastReviewedAt = today,
+                nextReviewDate = "2026-08-10"
+            ).copy(history = listOf(ReviewHistoryItem(today, 4)))
+        }
+        val remaining1 = SessionManager.getRemainingNewLessonsToday(
+            progressMap = started3,
+            dailyNewWordsLimit = 3,
+            maxLessons = 2,
+            todayStr = today
+        )
+        assertEquals(1, remaining1)
+        assertTrue(SessionManager.canStartNewLessonToday(started3, 3, words, 2, today))
+
+        // 6 words started today -> 0 lessons remaining
+        val started6 = (1..6).associate { idx ->
+            "w$idx" to createTestProgress(
+                wordId = "w$idx",
+                repetitions = 1,
+                lastReviewedAt = today,
+                nextReviewDate = "2026-08-10"
+            ).copy(history = listOf(ReviewHistoryItem(today, 4)))
+        }
+        val remaining2 = SessionManager.getRemainingNewLessonsToday(
+            progressMap = started6,
+            dailyNewWordsLimit = 3,
+            maxLessons = 2,
+            todayStr = today
+        )
+        assertEquals(0, remaining2)
+        assertTrue(!SessionManager.canStartNewLessonToday(started6, 3, words, 2, today))
+    }
+
+    @Test
+    fun testCreateQuickPracticeSession_returnsLearnedWordsForPractice() {
+        val words = DictionaryWordsData.WORDS
+        val startedMap = mapOf(
+            words[0].id to createTestProgress(wordId = words[0].id),
+            words[1].id to createTestProgress(wordId = words[1].id),
+            words[2].id to createTestProgress(wordId = words[2].id)
+        )
+
+        val quickCards = SessionManager.createQuickPracticeSession(
+            progressMap = startedMap,
+            allWords = words,
+            count = 2,
+            seed = "test-quick"
+        )
+
+        assertEquals(2, quickCards.size)
+        assertTrue(quickCards.all { !it.isNew })
+        assertTrue(quickCards.all { it.word.id in startedMap.keys })
+        assertTrue(quickCards.all { it.options.size == 4 })
+    }
 }

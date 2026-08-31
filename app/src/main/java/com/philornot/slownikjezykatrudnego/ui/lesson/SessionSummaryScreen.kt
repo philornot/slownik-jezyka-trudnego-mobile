@@ -18,8 +18,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -51,6 +53,9 @@ import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
  *    icon instead of the regular completion message.
  * @param newWordsBatchSize The batch size of new words configured by the
  *    user.
+ * @param canStartNewLessonToday True if daily limit of new-word lessons is not yet reached.
+ * @param remainingNewLessonsToday Number of remaining new-word lessons today.
+ * @param maxDailyNewLessons Maximum recommended lessons per day.
  * @param hasUnstartedWords True if there are remaining unstarted words in
  *    dictionary.
  * @param hasWordsToPractice True if user has any words in progress to
@@ -58,6 +63,7 @@ import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
  * @param onStartExtraLesson Callback to start an extra lesson immediately.
  * @param onStartReviewPractice Callback to start a practice session for
  *    difficult words.
+ * @param onStartQuickPractice Callback to start a quick general practice session.
  */
 @Composable
 fun SessionSummaryScreen(
@@ -66,10 +72,14 @@ fun SessionSummaryScreen(
     completionMessage: SessionManager.CompletionMessageType,
     isBonusSession: Boolean,
     newWordsBatchSize: Int = 3,
+    canStartNewLessonToday: Boolean = true,
+    remainingNewLessonsToday: Int = 2,
+    maxDailyNewLessons: Int = SessionManager.MAX_DAILY_NEW_LESSONS,
     hasUnstartedWords: Boolean = true,
     hasWordsToPractice: Boolean = true,
     onStartExtraLesson: () -> Unit = {},
     onStartReviewPractice: () -> Unit = {},
+    onStartQuickPractice: () -> Unit = {},
     onNavigateCatalog: () -> Unit,
     onNavigateStats: () -> Unit,
     modifier: Modifier = Modifier,
@@ -138,40 +148,87 @@ fun SessionSummaryScreen(
                     )
                 }
 
-                // SRS Educational Banner
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = colors.badgeEmeraldBg.copy(alpha = 0.5f),
-                    border = BorderStroke(1.dp, colors.badgeEmeraldBorder.copy(alpha = 0.7f)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                // SRS Educational / Daily Limit Banner
+                if (canStartNewLessonToday) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = colors.badgeEmeraldBg.copy(alpha = 0.5f),
+                        border = BorderStroke(1.dp, colors.badgeEmeraldBorder.copy(alpha = 0.7f)),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = colors.brandPrimary.copy(alpha = 0.2f),
-                            modifier = Modifier.size(32.dp)
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = Icons.Default.AutoAwesome,
-                                    contentDescription = null,
-                                    tint = colors.brandPrimary,
-                                    modifier = Modifier.size(16.dp)
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = colors.brandPrimary.copy(alpha = 0.2f),
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        imageVector = Icons.Default.AutoAwesome,
+                                        contentDescription = null,
+                                        tint = colors.brandPrimary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+
+                            Text(
+                                text = "Algorytm powtórek dba o trwałe zapamiętywanie. Najlepsze efekty daje codzienna nauka.",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = colors.textPrimary,
+                                lineHeight = 16.sp
+                            )
+                        }
+                    }
+                } else {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = colors.badgeAmberBg,
+                        border = BorderStroke(1.dp, colors.badgeAmberBorder),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.Top,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = colors.brandPrimary.copy(alpha = 0.2f),
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        imageVector = Icons.Default.Psychology,
+                                        contentDescription = null,
+                                        tint = colors.brandPrimary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(R.string.daily_limit_reached_title),
+                                    fontSize = 12.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textPrimary
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = stringResource(R.string.daily_limit_reached_description),
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = colors.textMuted,
+                                    lineHeight = 15.sp
                                 )
                             }
                         }
-
-                        Text(
-                            text = "Algorytm powtórek dba o trwałe zapamiętywanie. Najlepsze efekty daje codzienna nauka.",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = colors.textPrimary,
-                            lineHeight = 16.sp
-                        )
                     }
                 }
 
@@ -237,11 +294,13 @@ fun SessionSummaryScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    if (hasUnstartedWords) {
+                    if (canStartNewLessonToday) {
                         SjtTouchButton(
                             text = stringResource(
-                                R.string.action_learn_more_words,
-                                newWordsBatchSize
+                                R.string.action_learn_more_words_with_counter,
+                                newWordsBatchSize,
+                                maxDailyNewLessons - remainingNewLessonsToday + 1,
+                                maxDailyNewLessons
                             ),
                             onClick = onStartExtraLesson,
                             leadingIcon = {
@@ -253,22 +312,73 @@ fun SessionSummaryScreen(
                                 )
                             }
                         )
-                    }
-
-                    if (hasWordsToPractice) {
-                        SjtSecondaryButton(
-                            text = stringResource(R.string.action_practice_hard_words),
-                            onClick = onStartReviewPractice,
-                            modifier = Modifier.fillMaxWidth(),
+                    } else if (hasWordsToPractice) {
+                        SjtTouchButton(
+                            text = stringResource(
+                                R.string.action_quick_practice_with_count,
+                                5
+                            ),
+                            onClick = onStartQuickPractice,
                             leadingIcon = {
                                 Icon(
-                                    imageVector = Icons.Default.Refresh,
+                                    imageVector = Icons.Default.Bolt,
                                     contentDescription = null,
-                                    tint = colors.textPrimary,
-                                    modifier = Modifier.size(18.dp)
+                                    tint = colors.btnPrimaryText,
+                                    modifier = Modifier.size(20.dp)
                                 )
                             }
                         )
+                    }
+
+                    if (hasWordsToPractice) {
+                        if (canStartNewLessonToday) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                SjtSecondaryButton(
+                                    text = stringResource(R.string.action_quick_practice),
+                                    onClick = onStartQuickPractice,
+                                    modifier = Modifier.weight(1f),
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Bolt,
+                                            contentDescription = null,
+                                            tint = colors.brandPrimary,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                )
+
+                                SjtSecondaryButton(
+                                    text = stringResource(R.string.action_practice_hard_words_short),
+                                    onClick = onStartReviewPractice,
+                                    modifier = Modifier.weight(1f),
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Refresh,
+                                            contentDescription = null,
+                                            tint = colors.brandPrimary,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                )
+                            }
+                        } else {
+                            SjtSecondaryButton(
+                                text = stringResource(R.string.action_practice_hard_words),
+                                onClick = onStartReviewPractice,
+                                modifier = Modifier.fillMaxWidth(),
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Refresh,
+                                        contentDescription = null,
+                                        tint = colors.brandPrimary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            )
+                        }
                     }
 
                     Row(

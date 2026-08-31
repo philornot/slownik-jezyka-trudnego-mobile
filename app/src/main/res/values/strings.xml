@@ -48,7 +48,13 @@
     <!-- UI Labels -->
     <string name="bonus_session_label">Dodatkowa powtórka</string>
     <string name="action_learn_more_words">Ucz się dalej (+%1$d nowe słowa)</string>
+    <string name="action_learn_more_words_with_counter">Kolejna lekcja (+%1$d nowe słowa) · %2$d/%3$d</string>
+    <string name="action_quick_practice">Szybki trening</string>
+    <string name="action_quick_practice_with_count">Szybki trening utrwalający (%1$d słówek)</string>
     <string name="action_practice_hard_words">Powtórz trudne słówka</string>
+    <string name="action_practice_hard_words_short">Trudne słówka</string>
+    <string name="daily_limit_reached_title">Dzienny limit nowych słówek osiągnięty</string>
+    <string name="daily_limit_reached_description">Mózg potrzebuje odpoczynku na trwałą konsolidację haseł. Kolejna porcja pojawi się jutro, a teraz możesz utrwalać wiedzę w nielimitowanym treningu.</string>
     <string name="all_words_started_label">Odkryto wszystkie słówka!</string>
 
     <!-- Widget Strings -->

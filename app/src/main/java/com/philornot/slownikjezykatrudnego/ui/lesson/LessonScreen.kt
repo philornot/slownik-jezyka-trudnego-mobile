@@ -53,10 +53,13 @@ fun LessonScreen(
     completionMessage: SessionManager.CompletionMessageType,
     isBonusSession: Boolean,
     newWordsBatchSize: Int = 3,
+    canStartNewLessonToday: Boolean = true,
+    remainingNewLessonsToday: Int = 2,
     hasUnstartedWords: Boolean = true,
     hasWordsToPractice: Boolean = true,
     onStartExtraLesson: () -> Unit = {},
     onStartReviewPractice: () -> Unit = {},
+    onStartQuickPractice: () -> Unit = {},
     onFinishShowcase: () -> Unit,
     onGradeCard: (ReviewGrade) -> Unit,
     onNavigateCatalog: () -> Unit,
@@ -100,32 +103,35 @@ fun LessonScreen(
                                         imageVector = Icons.Default.AutoAwesome,
                                         contentDescription = null,
                                         tint = colors.textAmberBrand,
-                                        modifier = Modifier.size(11.dp)
+                                        modifier = Modifier.size(13.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = stringResource(R.string.bonus_session_label),
                                         color = colors.textAmberBrand,
-                                        fontSize = 10.5.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        letterSpacing = 0.3.sp
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
                             }
                         }
 
+                        // Progress bar with fraction and percentage
+                        val totalCards = sessionCards.size
+                        val currentCardNum = (currentCardIndex + 1).coerceAtMost(totalCards)
+                        val progressFraction =
+                            if (totalCards > 0) currentCardNum.toFloat() / totalCards.toFloat() else 0f
+
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "Faza 2: ${currentCardIndex + 1}/${sessionCards.size}",
+                                text = "Faza 2 · $currentCardNum/$totalCards",
                                 color = colors.brandPrimary,
                                 fontSize = 11.5.sp,
                                 fontWeight = FontWeight.ExtraBold
                             )
-
-                            val progressFraction = ((currentCardIndex + 1).toFloat() / sessionCards.size.toFloat()).coerceIn(0f, 1f)
 
                             LinearProgressIndicator(
                                 progress = { progressFraction },
@@ -163,10 +169,13 @@ fun LessonScreen(
                 completionMessage = completionMessage,
                 isBonusSession = isBonusSession,
                 newWordsBatchSize = newWordsBatchSize,
+                canStartNewLessonToday = canStartNewLessonToday,
+                remainingNewLessonsToday = remainingNewLessonsToday,
                 hasUnstartedWords = hasUnstartedWords,
                 hasWordsToPractice = hasWordsToPractice,
                 onStartExtraLesson = onStartExtraLesson,
                 onStartReviewPractice = onStartReviewPractice,
+                onStartQuickPractice = onStartQuickPractice,
                 onNavigateCatalog = onNavigateCatalog,
                 onNavigateStats = onNavigateStats
             )

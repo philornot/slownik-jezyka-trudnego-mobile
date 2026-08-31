@@ -542,6 +542,41 @@ class SjtViewModel(
     }
 
     /**
+     * Starts an on-demand general practice session with previously learned words.
+     *
+     * @param count Number of cards to practice (default 5).
+     */
+    fun startQuickPractice(count: Int = 5) {
+        val practiceCards = SessionManager.createQuickPracticeSession(
+            progressMap = progressMap.value,
+            allWords = allWords,
+            count = count
+        )
+        if (practiceCards.isEmpty()) return
+
+        _sessionCards.value = practiceCards
+        _newWordsToLearn.value = emptyList()
+        _currentCardIndex.value = 0
+        _sessionPhase.value = SessionPhase.QUIZ
+        _sessionCompleted.value = false
+        _isBonusSession.value = true
+        persistActiveSessionState()
+    }
+
+    /** Checks whether a new-word lesson can be started today within the daily limit. */
+    fun canStartNewLessonToday(): Boolean = SessionManager.canStartNewLessonToday(
+        progressMap = progressMap.value,
+        dailyNewWordsLimit = settings.value.dailyNewWordsLimit,
+        allWords = allWords
+    )
+
+    /** Returns the number of remaining new-word lessons allowed today. */
+    fun getRemainingNewLessonsToday(): Int = SessionManager.getRemainingNewLessonsToday(
+        progressMap = progressMap.value,
+        dailyNewWordsLimit = settings.value.dailyNewWordsLimit
+    )
+
+    /**
      * Grades the current flashcard and advances the session. Triggers a
      * debounced cloud sync if the user is logged in.
      *
