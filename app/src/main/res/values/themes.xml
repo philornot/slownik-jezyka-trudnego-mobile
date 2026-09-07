@@ -3,11 +3,11 @@
     <!--
         DayNight parent prevents aggressive force-dark by Android OS.
         forceDarkAllowed="false" is also set in manifest.
-        Status bar and Navigation bar colors are controlled dynamically via Compose.
+        Status bar and navigation bar colors are managed dynamically via enableEdgeToEdge()
+        in MainActivity and Compose WindowInsets — not set statically here (deprecated in API 35+).
+        windowLightStatusBar / windowLightNavigationBar control icon tint before Compose draws.
     -->
     <style name="Theme.SlownikJezykaTrudnego" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <item name="android:statusBarColor">@color/sjt_light_bg_app</item>
-        <item name="android:navigationBarColor">@color/sjt_light_bg_surface</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
         <item name="android:forceDarkAllowed">false</item>
