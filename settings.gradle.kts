@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SlownikJezykaTrudnego"
 include(":app")
+include(":wear")

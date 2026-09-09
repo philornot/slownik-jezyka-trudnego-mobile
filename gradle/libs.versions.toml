@@ -23,6 +23,8 @@ googleid = "1.2.0"
 workRuntimeKtx = "2.10.5"
 playAppUpdate = "2.1.0"
 glance = "1.1.1"
+wearCompose = "1.4.1"
+wear = "1.3.0"
 
 [libraries]
 androidx-glance = { group = "androidx.glance", name = "glance", version.ref = "glance" }
@@ -55,6 +57,12 @@ androidx-credentials-play-services-auth = { group = "androidx.credentials", name
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 play-app-update-ktx = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "playAppUpdate" }
+
+# Wear OS
+androidx-wear = { group = "androidx.wear", name = "wear", version.ref = "wear" }
+androidx-wear-compose-foundation = { group = "androidx.wear.compose", name = "compose-foundation", version.ref = "wearCompose" }
+androidx-wear-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "wearCompose" }
+androidx-wear-compose-navigation = { group = "androidx.wear.compose", name = "compose-navigation", version.ref = "wearCompose" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

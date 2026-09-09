@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Sage Green Light Palette -->
+    <color name="sjt_light_bg_app">#F2F5F3</color>
+    <color name="sjt_light_bg_surface">#FFFFFF</color>
+    <color name="sjt_light_brand_primary">#2E4D3E</color>
+
+    <!-- Sage Green Dark Palette -->
+    <color name="sjt_dark_bg_app">#0E1411</color>
+    <color name="sjt_dark_bg_surface">#16201B</color>
+    <color name="sjt_dark_brand_primary">#52997A</color>
+
+    <!-- Streak Widget Day Theme Colors -->
+    <color name="widget_bg_completed">#E8F5EB</color>
+    <color name="widget_badge_bg_completed">#DCFCE7</color>
+    <color name="widget_badge_text_completed">#166534</color>
+
+    <color name="widget_bg_urgent">#FFF1F2</color>
+    <color name="widget_badge_bg_urgent">#FEE2E2</color>
+    <color name="widget_badge_text_urgent">#991B1B</color>
+
+    <color name="widget_bg_pending">#F2F5F3</color>
+    <color name="widget_badge_bg_pending">#E2ECE5</color>
+    <color name="widget_badge_text_pending">#2E4D3E</color>
+
+    <color name="widget_text_primary">#18261E</color>
+    <color name="widget_text_secondary">#4E6355</color>
+</resources>
