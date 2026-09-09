@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -68,117 +69,126 @@ fun LessonScreen(
 ) {
     val colors = SjtTheme.colors
 
-    Box(modifier = modifier.fillMaxSize()) {
-        if (!sessionCompleted) {
-            if (sessionPhase == SessionPhase.SHOWCASE && newWordsToLearn.isNotEmpty()) {
-                NewWordsShowcase(
-                    words = newWordsToLearn,
-                    onFinishShowcase = onFinishShowcase
-                )
-            } else if (sessionCards.isNotEmpty() && currentCardIndex in sessionCards.indices) {
-                val currentCard = sessionCards[currentCardIndex]
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .widthIn(max = 720.dp)
+        ) {
+            if (!sessionCompleted) {
+                if (sessionPhase == SessionPhase.SHOWCASE && newWordsToLearn.isNotEmpty()) {
+                    NewWordsShowcase(
+                        words = newWordsToLearn,
+                        onFinishShowcase = onFinishShowcase
+                    )
+                } else if (sessionCards.isNotEmpty() && currentCardIndex in sessionCards.indices) {
+                    val currentCard = sessionCards[currentCardIndex]
 
-                Column(modifier = Modifier.fillMaxSize()) {
-                    // Top Progress Bar for Phase 2 Quiz
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 6.dp)
-                    ) {
-                        // Bonus session label chip
-                        if (isBonusSession) {
-                            Surface(
-                                shape = RoundedCornerShape(20.dp),
-                                color = colors.textAmberBrand.copy(alpha = 0.15f),
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(
-                                        horizontal = 10.dp,
-                                        vertical = 3.dp
-                                    ),
-                                    verticalAlignment = Alignment.CenterVertically
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // Top Progress Bar for Phase 2 Quiz
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 6.dp)
+                        ) {
+                            // Bonus session label chip
+                            if (isBonusSession) {
+                                Surface(
+                                    shape = RoundedCornerShape(20.dp),
+                                    color = colors.textAmberBrand.copy(alpha = 0.15f),
+                                    modifier = Modifier.padding(bottom = 4.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.AutoAwesome,
-                                        contentDescription = null,
-                                        tint = colors.textAmberBrand,
-                                        modifier = Modifier.size(13.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = stringResource(R.string.bonus_session_label),
-                                        color = colors.textAmberBrand,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            horizontal = 10.dp,
+                                            vertical = 3.dp
+                                        ),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.AutoAwesome,
+                                            contentDescription = null,
+                                            tint = colors.textAmberBrand,
+                                            modifier = Modifier.size(13.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = stringResource(R.string.bonus_session_label),
+                                            color = colors.textAmberBrand,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
                                 }
+                            }
+
+                            // Progress bar with fraction and percentage
+                            val totalCards = sessionCards.size
+                            val currentCardNum = (currentCardIndex + 1).coerceAtMost(totalCards)
+                            val progressFraction =
+                                if (totalCards > 0) currentCardNum.toFloat() / totalCards.toFloat() else 0f
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "Faza 2 · $currentCardNum/$totalCards",
+                                    color = colors.brandPrimary,
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
+
+                                LinearProgressIndicator(
+                                    progress = { progressFraction },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(horizontal = 10.dp)
+                                        .height(8.dp)
+                                        .clip(RoundedCornerShape(4.dp)),
+                                    color = colors.brandPrimary,
+                                    trackColor = colors.progressTrack
+                                )
+
+                                Text(
+                                    text = "${(progressFraction * 100).toInt()}%",
+                                    color = colors.textMuted,
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
                             }
                         }
 
-                        // Progress bar with fraction and percentage
-                        val totalCards = sessionCards.size
-                        val currentCardNum = (currentCardIndex + 1).coerceAtMost(totalCards)
-                        val progressFraction =
-                            if (totalCards > 0) currentCardNum.toFloat() / totalCards.toFloat() else 0f
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "Faza 2 · $currentCardNum/$totalCards",
-                                color = colors.brandPrimary,
-                                fontSize = 11.5.sp,
-                                fontWeight = FontWeight.ExtraBold
-                            )
-
-                            LinearProgressIndicator(
-                                progress = { progressFraction },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(horizontal = 10.dp)
-                                    .height(8.dp)
-                                    .clip(RoundedCornerShape(4.dp)),
-                                color = colors.brandPrimary,
-                                trackColor = colors.progressTrack
-                            )
-
-                            Text(
-                                text = "${(progressFraction * 100).toInt()}%",
-                                color = colors.textMuted,
-                                fontSize = 11.5.sp,
-                                fontWeight = FontWeight.ExtraBold
+                        key(currentCardIndex) {
+                            HybridQuizCard(
+                                card = currentCard,
+                                onGrade = onGradeCard,
+                                modifier = Modifier.weight(1f)
                             )
                         }
                     }
-
-                    key(currentCardIndex) {
-                        HybridQuizCard(
-                            card = currentCard,
-                            onGrade = onGradeCard,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
                 }
+            } else {
+                SessionSummaryScreen(
+                    cardsReviewedCount = cardsReviewedCount,
+                    streakDays = streakDays,
+                    completionMessage = completionMessage,
+                    isBonusSession = isBonusSession,
+                    newWordsBatchSize = newWordsBatchSize,
+                    canStartNewLessonToday = canStartNewLessonToday,
+                    remainingNewLessonsToday = remainingNewLessonsToday,
+                    hasUnstartedWords = hasUnstartedWords,
+                    hasWordsToPractice = hasWordsToPractice,
+                    onStartExtraLesson = onStartExtraLesson,
+                    onStartReviewPractice = onStartReviewPractice,
+                    onStartQuickPractice = onStartQuickPractice,
+                    onNavigateCatalog = onNavigateCatalog,
+                    onNavigateStats = onNavigateStats
+                )
             }
-        } else {
-            SessionSummaryScreen(
-                cardsReviewedCount = cardsReviewedCount,
-                streakDays = streakDays,
-                completionMessage = completionMessage,
-                isBonusSession = isBonusSession,
-                newWordsBatchSize = newWordsBatchSize,
-                canStartNewLessonToday = canStartNewLessonToday,
-                remainingNewLessonsToday = remainingNewLessonsToday,
-                hasUnstartedWords = hasUnstartedWords,
-                hasWordsToPractice = hasWordsToPractice,
-                onStartExtraLesson = onStartExtraLesson,
-                onStartReviewPractice = onStartReviewPractice,
-                onStartQuickPractice = onStartQuickPractice,
-                onNavigateCatalog = onNavigateCatalog,
-                onNavigateStats = onNavigateStats
-            )
         }
     }
 }

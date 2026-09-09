@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 
 /**
@@ -53,7 +55,7 @@ fun SjtInteractiveCard(
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.pointerHoverIcon(PointerIcon.Hand),
         shape = RoundedCornerShape(cornerRadius),
         color = backgroundColor,
         border = BorderStroke(1.dp, borderColor),

@@ -787,6 +787,40 @@ fun SettingsBottomSheet(
                                     )
                                 )
                             }
+
+                            HorizontalDivider(color = colors.borderDefault)
+
+                            // E-Ink Reader Mode Toggle
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Tryb czytnika (E-Ink)",
+                                        fontSize = 13.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colors.textPrimary
+                                    )
+                                    Text(
+                                        text = "Maksymalny czarno-biały kontrast, brak rozmyć i animacji",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = colors.textMuted
+                                    )
+                                }
+                                Switch(
+                                    checked = settings.eInkMode,
+                                    onCheckedChange = { checked ->
+                                        onSaveSettings(settings.copy(eInkMode = checked))
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedThumbColor = Color.White,
+                                        checkedTrackColor = colors.brandPrimary
+                                    )
+                                )
+                            }
                         }
                     }
                 }

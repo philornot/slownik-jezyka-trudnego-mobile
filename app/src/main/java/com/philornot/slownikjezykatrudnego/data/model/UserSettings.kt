@@ -58,4 +58,5 @@ data class UserSettings(
     val highContrast: Boolean = false,
     val reducedMotion: Boolean = false,
     val textSize: TextSizeLevel = TextSizeLevel.SMALL,
+    val eInkMode: Boolean = false,
 )

@@ -33,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,15 +49,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.focusable
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import com.philornot.slownikjezykatrudnego.data.model.DictionaryWord
 import com.philornot.slownikjezykatrudnego.ui.components.BadgeVariant
 import com.philornot.slownikjezykatrudnego.ui.components.SjtBadge
 import com.philornot.slownikjezykatrudnego.ui.components.SjtCard
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTouchButton
+import com.philornot.slownikjezykatrudnego.ui.theme.LocalUserSettings
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 
 /**
- * Phase 1: Interactive showcase introducing new vocabulary with tap-to-reveal definitions.
+ * Phase 1: Interactive showcase introducing new vocabulary with tap-to-reveal definitions,
+ * full physical keyboard support (Space/Enter/Right Arrow), and E-Ink mode compatibility.
  */
 @Composable
 fun NewWordsShowcase(
@@ -71,11 +85,16 @@ fun NewWordsShowcase(
 
     val currentWord = words[currentIndex]
     val colors = SjtTheme.colors
+    val userSettings = LocalUserSettings.current
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val focusRequester = remember { FocusRequester() }
 
     fun handleNext() {
-        if (!isRevealed) return
+        if (!isRevealed) {
+            isRevealed = true
+            return
+        }
         if (currentIndex + 1 < words.size) {
             currentIndex++
             isRevealed = false
@@ -84,10 +103,34 @@ fun NewWordsShowcase(
         }
     }
 
+    LaunchedEffect(currentIndex) {
+        try {
+            focusRequester.requestFocus()
+        } catch (_: Exception) {}
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 14.dp, vertical = 8.dp)
+            .focusRequester(focusRequester)
+            .focusable()
+            .onKeyEvent { keyEvent ->
+                if (keyEvent.type != KeyEventType.KeyDown) return@onKeyEvent false
+                when (keyEvent.key) {
+                    Key.Spacebar, Key.Enter -> {
+                        handleNext()
+                        true
+                    }
+                    Key.DirectionRight -> {
+                        if (isRevealed) {
+                            handleNext()
+                            true
+                        } else false
+                    }
+                    else -> false
+                }
+            }
     ) {
         // Main Showcase Card
         SjtCard(
@@ -225,6 +268,7 @@ fun NewWordsShowcase(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 90.dp)
+                            .pointerHoverIcon(PointerIcon.Hand)
                     ) {
                         Box(
                             modifier = Modifier
@@ -232,6 +276,7 @@ fun NewWordsShowcase(
                                 .padding(14.dp),
                             contentAlignment = Alignment.Center
                         ) {
+                            val isEInk = userSettings.eInkMode
                             Text(
                                 text = currentWord.fullDefinition,
                                 style = MaterialTheme.typography.bodyLarge,
@@ -240,7 +285,9 @@ fun NewWordsShowcase(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .then(
-                                        if (!isRevealed) Modifier.blur(8.dp) else Modifier
+                                        if (!isRevealed) {
+                                            if (isEInk) Modifier.alpha(0f) else Modifier.blur(8.dp)
+                                        } else Modifier
                                     )
                             )
 
@@ -352,6 +399,7 @@ fun NewWordsShowcase(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .pointerHoverIcon(PointerIcon.Hand)
                             .clickable {
                                 try {
                                     val intent =
@@ -385,14 +433,16 @@ fun NewWordsShowcase(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Sticky Bottom Action Button
+        // Sticky Bottom Action Button with shortcut hints
+        val nextActionText = when {
+            !isRevealed -> "Odsłoń definicję [Spacja]"
+            currentIndex + 1 < words.size -> "Następne słowo [Spacja]"
+            else -> "Przejdź do testu wiedzy [Enter]"
+        }
+
         SjtTouchButton(
-            text = when {
-                !isRevealed -> "Najpierw odsłoń definicję"
-                currentIndex + 1 < words.size -> "Następne słowo"
-                else -> "Przejdź do testu wiedzy"
-            },
-            enabled = isRevealed,
+            text = nextActionText,
+            enabled = true,
             onClick = { handleNext() },
             trailingIcon = {
                 Icon(

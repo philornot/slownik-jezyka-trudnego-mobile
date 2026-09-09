@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -127,119 +128,152 @@ fun StatsScreen(
         }.sortedBy { it.second.easeFactor }.take(6)
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val isWideStats = configuration.screenWidthDp >= 680
+
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
     ) {
-        // Summary Metrics 2x2 Grid
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .widthIn(max = 840.dp)
+                .verticalScroll(scrollState)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Card 1: Seria nauki
-            SjtCard(modifier = Modifier.weight(1f)) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+            @Composable
+            fun StreakCard(cardModifier: Modifier) {
+                SjtCard(modifier = cardModifier) {
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "SERIA NAUKI",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = colors.textMuted
+                            )
+                            Icon(
+                                imageVector = Icons.Default.LocalFireDepartment,
+                                contentDescription = null,
+                                tint = colors.badgeAmberText,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "SERIA NAUKI",
+                            text = "$streakDays dni",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = colors.textAmberBrand
+                        )
+                    }
+                }
+            }
+
+            @Composable
+            fun LearnedCard(cardModifier: Modifier) {
+                SjtCard(modifier = cardModifier) {
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "OPANOWANE",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = colors.textMuted
+                            )
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = colors.badgeEmeraldText,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = "$learnedCount / ${words.size}",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = colors.brandPrimary
+                        )
+                    }
+                }
+            }
+
+            @Composable
+            fun InProgressCard(cardModifier: Modifier) {
+                SjtCard(modifier = cardModifier) {
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Text(
+                            text = "W TRAKCIE NAUKI",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = colors.textMuted
                         )
-                        Icon(
-                            imageVector = Icons.Default.LocalFireDepartment,
-                            contentDescription = null,
-                            tint = colors.badgeAmberText,
-                            modifier = Modifier.size(16.dp)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = "$inProgressCount",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = colors.textPrimary
                         )
                     }
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = "$streakDays dni",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = colors.textAmberBrand
-                    )
                 }
             }
 
-            // Card 2: Opanowane słowa
-            SjtCard(modifier = Modifier.weight(1f)) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+            @Composable
+            fun TotalReviewsCard(cardModifier: Modifier) {
+                SjtCard(modifier = cardModifier) {
+                    Column(modifier = Modifier.padding(14.dp)) {
                         Text(
-                            text = "OPANOWANE",
+                            text = "WYKONANE POWTÓRKI",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = colors.textMuted
                         )
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = colors.badgeEmeraldText,
-                            modifier = Modifier.size(16.dp)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = "$totalReviews",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = colors.textPrimary
                         )
                     }
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = "$learnedCount / ${words.size}",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = colors.brandPrimary
-                    )
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            // Card 3: W trakcie nauki
-            SjtCard(modifier = Modifier.weight(1f)) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    Text(
-                        text = "W TRAKCIE NAUKI",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = colors.textMuted
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = "$inProgressCount",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = colors.textPrimary
-                    )
                 }
             }
 
-            // Card 4: Wszystkie powtórki
-            SjtCard(modifier = Modifier.weight(1f)) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    Text(
-                        text = "WYKONANE POWTÓRKI",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = colors.textMuted
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = "$totalReviews",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = colors.textPrimary
-                    )
+            // Summary Metrics Grid (4 in a row on wide/tablet, 2x2 on phone)
+            if (isWideStats) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    StreakCard(Modifier.weight(1f))
+                    LearnedCard(Modifier.weight(1f))
+                    InProgressCard(Modifier.weight(1f))
+                    TotalReviewsCard(Modifier.weight(1f))
+                }
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    StreakCard(Modifier.weight(1f))
+                    LearnedCard(Modifier.weight(1f))
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    InProgressCard(Modifier.weight(1f))
+                    TotalReviewsCard(Modifier.weight(1f))
                 }
             }
-        }
 
         // 7-Day Activity Bar Chart
         SjtCard(modifier = Modifier.fillMaxWidth()) {
@@ -440,6 +474,7 @@ fun StatsScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+        }
     }
 
     // Modal Details Bottom Sheet

@@ -43,7 +43,7 @@ object SjtTheme {
     val skipAnimations: Boolean
         @Composable
         @ReadOnlyComposable
-        get() = LocalUserSettings.current.reducedMotion || LocalMotionDurationScale.current == 0f
+        get() = LocalUserSettings.current.reducedMotion || LocalUserSettings.current.eInkMode || LocalMotionDurationScale.current == 0f
 }
 
 /**
@@ -52,6 +52,7 @@ object SjtTheme {
  * Handles:
  * - Dark/light mode with proper AppCompatDelegate sync (fixes Pixel flicker bug)
  * - High contrast mode
+ * - E-Ink / E-Paper mode (pure monochrome, maximum contrast, zero animations)
  * - reducedMotion via LocalMotionDurationScale
  * - System status/navigation bar colours
  *
@@ -67,27 +68,59 @@ fun SlownikJezykaTrudnegoTheme(
     val isDark = settings.isDarkTheme ?: isSystemDark
     val baseColors = if (isDark) SageDarkColors else SageLightColors
 
-    val colors = if (settings.highContrast) {
-        if (isDark) {
-            baseColors.copy(
-                bgSurface = androidx.compose.ui.graphics.Color(0xFF0A0F0D),
-                bgSurfaceElevated = androidx.compose.ui.graphics.Color(0xFF131C18),
-                borderDefault = androidx.compose.ui.graphics.Color(0xFF52997A),
-                textPrimary = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
-                textSerifTitle = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
-                brandPrimary = androidx.compose.ui.graphics.Color(0xFF68B090)
-            )
-        } else {
-            baseColors.copy(
-                bgSurfaceElevated = androidx.compose.ui.graphics.Color(0xFFD4E0D7),
-                borderDefault = androidx.compose.ui.graphics.Color(0xFF4E6355),
-                textPrimary = androidx.compose.ui.graphics.Color(0xFF000000),
-                textSerifTitle = androidx.compose.ui.graphics.Color(0xFF000000),
-                brandPrimary = androidx.compose.ui.graphics.Color(0xFF12241B)
-            )
+    val colors = when {
+        settings.eInkMode -> {
+            if (isDark) {
+                baseColors.copy(
+                    bgApp = androidx.compose.ui.graphics.Color(0xFF000000),
+                    bgSurface = androidx.compose.ui.graphics.Color(0xFF000000),
+                    bgSurfaceElevated = androidx.compose.ui.graphics.Color(0xFF101010),
+                    borderDefault = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
+                    textPrimary = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
+                    textSecondary = androidx.compose.ui.graphics.Color(0xFFE0E0E0),
+                    textMuted = androidx.compose.ui.graphics.Color(0xFFCCCCCC),
+                    textSerifTitle = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
+                    brandPrimary = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
+                    brandPrimaryHover = androidx.compose.ui.graphics.Color(0xFFEEEEEE),
+                    btnPrimaryText = androidx.compose.ui.graphics.Color(0xFF000000)
+                )
+            } else {
+                baseColors.copy(
+                    bgApp = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
+                    bgSurface = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
+                    bgSurfaceElevated = androidx.compose.ui.graphics.Color(0xFFF7F7F7),
+                    borderDefault = androidx.compose.ui.graphics.Color(0xFF000000),
+                    textPrimary = androidx.compose.ui.graphics.Color(0xFF000000),
+                    textSecondary = androidx.compose.ui.graphics.Color(0xFF222222),
+                    textMuted = androidx.compose.ui.graphics.Color(0xFF444444),
+                    textSerifTitle = androidx.compose.ui.graphics.Color(0xFF000000),
+                    brandPrimary = androidx.compose.ui.graphics.Color(0xFF000000),
+                    brandPrimaryHover = androidx.compose.ui.graphics.Color(0xFF222222),
+                    btnPrimaryText = androidx.compose.ui.graphics.Color(0xFFFFFFFF)
+                )
+            }
         }
-    } else {
-        baseColors
+        settings.highContrast -> {
+            if (isDark) {
+                baseColors.copy(
+                    bgSurface = androidx.compose.ui.graphics.Color(0xFF0A0F0D),
+                    bgSurfaceElevated = androidx.compose.ui.graphics.Color(0xFF131C18),
+                    borderDefault = androidx.compose.ui.graphics.Color(0xFF52997A),
+                    textPrimary = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
+                    textSerifTitle = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
+                    brandPrimary = androidx.compose.ui.graphics.Color(0xFF68B090)
+                )
+            } else {
+                baseColors.copy(
+                    bgSurfaceElevated = androidx.compose.ui.graphics.Color(0xFFD4E0D7),
+                    borderDefault = androidx.compose.ui.graphics.Color(0xFF4E6355),
+                    textPrimary = androidx.compose.ui.graphics.Color(0xFF000000),
+                    textSerifTitle = androidx.compose.ui.graphics.Color(0xFF000000),
+                    brandPrimary = androidx.compose.ui.graphics.Color(0xFF12241B)
+                )
+            }
+        }
+        else -> baseColors
     }
 
     val currentDensity = LocalDensity.current
@@ -132,8 +165,8 @@ fun SlownikJezykaTrudnegoTheme(
         )
     }
 
-    // Motion duration scale: 0f = no animations (reduced motion), 1f = normal animations.
-    val motionDurationScale = if (settings.reducedMotion) 0f else 1f
+    // Motion duration scale: 0f = no animations (reduced motion or e-ink mode), 1f = normal animations.
+    val motionDurationScale = if (settings.reducedMotion || settings.eInkMode) 0f else 1f
 
     val view = LocalView.current
     if (!view.isInEditMode) {

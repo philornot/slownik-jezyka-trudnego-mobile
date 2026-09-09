@@ -49,6 +49,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.focusable
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import com.philornot.slownikjezykatrudnego.data.model.ReviewGrade
 import com.philornot.slownikjezykatrudnego.data.model.SessionCard
 import com.philornot.slownikjezykatrudnego.ui.components.BadgeVariant
@@ -58,7 +68,8 @@ import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 
 /**
  * Phase 2: Hybrid Quiz card with active recall choice, full context
- * revelation, and thumb-friendly self-grading.
+ * revelation, thumb-friendly self-grading, and physical keyboard support
+ * (keys 1-4, A-D, Space/Enter) for Chromebooks, tablets, and desktop modes.
  *
  * Layout:
  * - Non-scrollable header: badges (category + new/review)
@@ -80,15 +91,89 @@ fun HybridQuizCard(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val haptic = LocalHapticFeedback.current
+    val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(card.word.id, isAnswered) {
         scrollState.scrollTo(0)
+    }
+
+    LaunchedEffect(card.word.id) {
+        try {
+            focusRequester.requestFocus()
+        } catch (_: Exception) {}
     }
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 14.dp, vertical = 6.dp)
+            .focusRequester(focusRequester)
+            .focusable()
+            .onKeyEvent { keyEvent ->
+                if (keyEvent.type != KeyEventType.KeyDown) return@onKeyEvent false
+                if (!isAnswered) {
+                    when (keyEvent.key) {
+                        Key.A, Key.One, Key.NumPad1 -> {
+                            if (card.options.isNotEmpty()) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                selectedOption = card.options[0]
+                                true
+                            } else false
+                        }
+                        Key.B, Key.Two, Key.NumPad2 -> {
+                            if (card.options.size > 1) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                selectedOption = card.options[1]
+                                true
+                            } else false
+                        }
+                        Key.C, Key.Three, Key.NumPad3 -> {
+                            if (card.options.size > 2) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                selectedOption = card.options[2]
+                                true
+                            } else false
+                        }
+                        Key.D, Key.Four, Key.NumPad4 -> {
+                            if (card.options.size > 3) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                selectedOption = card.options[3]
+                                true
+                            } else false
+                        }
+                        else -> false
+                    }
+                } else {
+                    when (keyEvent.key) {
+                        Key.One, Key.NumPad1 -> {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onGrade(ReviewGrade.AGAIN)
+                            true
+                        }
+                        Key.Two, Key.NumPad2 -> {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onGrade(ReviewGrade.HARD)
+                            true
+                        }
+                        Key.Three, Key.NumPad3 -> {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onGrade(ReviewGrade.GOOD)
+                            true
+                        }
+                        Key.Four, Key.NumPad4 -> {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onGrade(ReviewGrade.EASY)
+                            true
+                        }
+                        Key.Spacebar, Key.Enter -> {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onGrade(if (isCorrect) ReviewGrade.GOOD else ReviewGrade.AGAIN)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            }
     ) {
         // ─── Main Card Container ───
         SjtCard(
@@ -403,7 +488,9 @@ fun HybridQuizCard(
                                 color = colors.bgSurfaceElevated,
                                 border = BorderStroke(1.dp, colors.borderDefault),
                                 shadowElevation = 1.dp,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .pointerHoverIcon(PointerIcon.Hand)
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 13.dp),
@@ -434,6 +521,21 @@ fun HybridQuizCard(
                                         lineHeight = 20.sp,
                                         modifier = Modifier.weight(1f)
                                     )
+
+                                    // Subtle keyboard shortcut hint
+                                    Surface(
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = colors.bgSurface,
+                                        border = BorderStroke(1.dp, colors.borderDefault.copy(alpha = 0.6f))
+                                    ) {
+                                        Text(
+                                            text = "${index + 1}",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = colors.textMuted,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -459,7 +561,7 @@ fun HybridQuizCard(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Oceń, jak dobrze pamiętasz to słówko",
+                        text = "Oceń, jak dobrze pamiętasz to słówko [1-4]",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = colors.textPrimary
@@ -477,7 +579,8 @@ fun HybridQuizCard(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(72.dp),
+                                .height(72.dp)
+                                .pointerHoverIcon(PointerIcon.Hand),
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade0Bg,
                             border = BorderStroke(1.dp, colors.grade0Border)
@@ -493,16 +596,22 @@ fun HybridQuizCard(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = null,
                                     tint = colors.grade0Text,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(22.dp)
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = "Bardzo słabo",
                                     color = colors.grade0Text,
-                                    fontSize = 11.5.sp,
+                                    fontSize = 11.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     textAlign = TextAlign.Center,
                                     maxLines = 1
+                                )
+                                Text(
+                                    text = "[1]",
+                                    color = colors.grade0Text.copy(alpha = 0.7f),
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                         }
@@ -515,7 +624,8 @@ fun HybridQuizCard(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(72.dp),
+                                .height(72.dp)
+                                .pointerHoverIcon(PointerIcon.Hand),
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade3Bg,
                             border = BorderStroke(1.dp, colors.grade3Border)
@@ -531,16 +641,22 @@ fun HybridQuizCard(
                                     imageVector = Icons.Default.RemoveCircle,
                                     contentDescription = null,
                                     tint = colors.grade3Text,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(22.dp)
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = "Słabo",
                                     color = colors.grade3Text,
-                                    fontSize = 11.5.sp,
+                                    fontSize = 11.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     textAlign = TextAlign.Center,
                                     maxLines = 1
+                                )
+                                Text(
+                                    text = "[2]",
+                                    color = colors.grade3Text.copy(alpha = 0.7f),
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                         }
@@ -553,7 +669,8 @@ fun HybridQuizCard(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(72.dp),
+                                .height(72.dp)
+                                .pointerHoverIcon(PointerIcon.Hand),
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade4Bg,
                             border = BorderStroke(1.dp, colors.grade4Border)
@@ -569,16 +686,22 @@ fun HybridQuizCard(
                                     imageVector = Icons.Default.CheckCircle,
                                     contentDescription = null,
                                     tint = colors.grade4Text,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(22.dp)
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = "Dobrze",
                                     color = colors.grade4Text,
-                                    fontSize = 11.5.sp,
+                                    fontSize = 11.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     textAlign = TextAlign.Center,
                                     maxLines = 1
+                                )
+                                Text(
+                                    text = "[3]",
+                                    color = colors.grade4Text.copy(alpha = 0.7f),
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                         }
@@ -591,7 +714,8 @@ fun HybridQuizCard(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(72.dp),
+                                .height(72.dp)
+                                .pointerHoverIcon(PointerIcon.Hand),
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade5Bg,
                             border = BorderStroke(1.dp, colors.grade5Border)
@@ -607,16 +731,22 @@ fun HybridQuizCard(
                                     imageVector = Icons.Default.Star,
                                     contentDescription = null,
                                     tint = colors.grade5Text,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(22.dp)
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = "Bardzo dobrze",
                                     color = colors.grade5Text,
-                                    fontSize = 11.5.sp,
+                                    fontSize = 11.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     textAlign = TextAlign.Center,
                                     maxLines = 1
+                                )
+                                Text(
+                                    text = "[4]",
+                                    color = colors.grade5Text.copy(alpha = 0.7f),
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                         }

@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import com.philornot.slownikjezykatrudnego.ui.theme.SjtTheme
 
 /**
@@ -36,7 +38,8 @@ fun SjtTouchButton(
         enabled = enabled,
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 52.dp),
+            .heightIn(min = 52.dp)
+            .pointerHoverIcon(if (enabled) PointerIcon.Hand else PointerIcon.Default),
         shape = RoundedCornerShape(14.dp),
         color = if (enabled) colors.brandPrimary else colors.brandPrimary.copy(alpha = 0.5f),
         contentColor = colors.btnPrimaryText,
@@ -86,7 +89,9 @@ fun SjtSecondaryButton(
     Surface(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.heightIn(min = 46.dp),
+        modifier = modifier
+            .heightIn(min = 46.dp)
+            .pointerHoverIcon(if (enabled) PointerIcon.Hand else PointerIcon.Default),
         shape = RoundedCornerShape(12.dp),
         color = colors.bgSurfaceElevated,
         contentColor = colors.textPrimary,

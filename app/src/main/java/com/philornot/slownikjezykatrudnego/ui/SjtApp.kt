@@ -20,12 +20,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
+import android.content.res.Configuration
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isAltPressed
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalConfiguration
 import com.philornot.slownikjezykatrudnego.R
 import com.philornot.slownikjezykatrudnego.domain.SuperMemoEngine
 import com.philornot.slownikjezykatrudnego.ui.account.AccountBottomSheet
 import com.philornot.slownikjezykatrudnego.ui.account.AuthBottomSheet
 import com.philornot.slownikjezykatrudnego.ui.catalog.CatalogScreen
 import com.philornot.slownikjezykatrudnego.ui.components.SjtBottomNavBar
+import com.philornot.slownikjezykatrudnego.ui.components.SjtNavigationRail
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTab
 import com.philornot.slownikjezykatrudnego.ui.components.SjtTopBar
 import com.philornot.slownikjezykatrudnego.ui.lesson.LessonScreen
@@ -181,70 +193,147 @@ private fun SjtAppScaffold(
     val colors = SjtTheme.colors
     val googleWebClientId = stringResource(id = R.string.default_web_client_id)
 
-    Scaffold(
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isWideLayout = configuration.screenWidthDp >= 600 || (isLandscape && configuration.screenWidthDp >= 480)
+
+    @Composable
+    fun ScreenContent() {
+        when (activeTab) {
+            SjtTab.LESSON -> {
+                LessonScreen(
+                    sessionCompleted = sessionCompleted,
+                    sessionPhase = sessionPhase,
+                    newWordsToLearn = newWordsToLearn,
+                    sessionCards = sessionCards,
+                    currentCardIndex = currentCardIndex,
+                    cardsReviewedCount = cardsReviewedCount,
+                    streakDays = streakDays,
+                    completionMessage = completionMessage,
+                    isBonusSession = isBonusSession,
+                    newWordsBatchSize = settings.dailyNewWordsLimit,
+                    canStartNewLessonToday = viewModel.canStartNewLessonToday(),
+                    remainingNewLessonsToday = viewModel.getRemainingNewLessonsToday(),
+                    hasUnstartedWords = viewModel.hasUnstartedWords(),
+                    hasWordsToPractice = viewModel.hasWordsToPractice(),
+                    onStartExtraLesson = { viewModel.startExtraLesson() },
+                    onStartReviewPractice = { viewModel.startReviewPractice() },
+                    onStartQuickPractice = { viewModel.startQuickPractice() },
+                    onFinishShowcase = { viewModel.finishShowcase() },
+                    onGradeCard = { viewModel.gradeCard(it) },
+                    onNavigateCatalog = { viewModel.setActiveTab(SjtTab.CATALOG) },
+                    onNavigateStats = { viewModel.setActiveTab(SjtTab.STATS) }
+                )
+            }
+            SjtTab.CATALOG -> {
+                CatalogScreen(
+                    words = viewModel.allWords,
+                    progressMap = progressMap
+                )
+            }
+            SjtTab.STATS -> {
+                StatsScreen(
+                    words = viewModel.allWords,
+                    progressMap = progressMap,
+                    streakDays = streakDays
+                )
+            }
+        }
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.bgApp),
-        containerColor = colors.bgApp,
-        topBar = {
-            SjtTopBar(
-                streakDays = streakDays,
-                isDarkTheme = colors.isDark,
-                onOpenSettings = { viewModel.openSettings() },
-                onOpenAccount = { viewModel.openAccount() }
-            )
-        },
-        bottomBar = {
-            SjtBottomNavBar(
-                currentTab = activeTab,
-                onTabSelected = { viewModel.setActiveTab(it) }
-            )
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(colors.bgApp)
-        ) {
-            when (activeTab) {
-                SjtTab.LESSON -> {
-                    LessonScreen(
-                        sessionCompleted = sessionCompleted,
-                        sessionPhase = sessionPhase,
-                        newWordsToLearn = newWordsToLearn,
-                        sessionCards = sessionCards,
-                        currentCardIndex = currentCardIndex,
-                        cardsReviewedCount = cardsReviewedCount,
+            .background(colors.bgApp)
+            .onPreviewKeyEvent { event ->
+                if (event.type == KeyEventType.KeyDown) {
+                    when {
+                        event.key == Key.Escape -> {
+                            when {
+                                isSettingsOpen -> {
+                                    viewModel.closeSettings()
+                                    true
+                                }
+                                isAccountOpen -> {
+                                    viewModel.closeAccount()
+                                    true
+                                }
+                                isAuthOpen -> {
+                                    viewModel.closeAuth()
+                                    true
+                                }
+                                else -> false
+                            }
+                        }
+                        (event.isCtrlPressed || event.isAltPressed) && event.key == Key.One -> {
+                            viewModel.setActiveTab(SjtTab.LESSON)
+                            true
+                        }
+                        (event.isCtrlPressed || event.isAltPressed) && event.key == Key.Two -> {
+                            viewModel.setActiveTab(SjtTab.CATALOG)
+                            true
+                        }
+                        (event.isCtrlPressed || event.isAltPressed) && event.key == Key.Three -> {
+                            viewModel.setActiveTab(SjtTab.STATS)
+                            true
+                        }
+                        else -> false
+                    }
+                } else false
+            }
+    ) {
+        if (isWideLayout) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colors.bgApp)
+            ) {
+                SjtNavigationRail(
+                    currentTab = activeTab,
+                    onTabSelected = { viewModel.setActiveTab(it) },
+                    streakDays = streakDays,
+                    isDarkTheme = colors.isDark,
+                    onOpenSettings = { viewModel.openSettings() },
+                    onOpenAccount = { viewModel.openAccount() }
+                )
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .background(colors.bgApp)
+                ) {
+                    ScreenContent()
+                }
+            }
+        } else {
+            Scaffold(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colors.bgApp),
+                containerColor = colors.bgApp,
+                topBar = {
+                    SjtTopBar(
                         streakDays = streakDays,
-                        completionMessage = completionMessage,
-                        isBonusSession = isBonusSession,
-                        newWordsBatchSize = settings.dailyNewWordsLimit,
-                        canStartNewLessonToday = viewModel.canStartNewLessonToday(),
-                        remainingNewLessonsToday = viewModel.getRemainingNewLessonsToday(),
-                        hasUnstartedWords = viewModel.hasUnstartedWords(),
-                        hasWordsToPractice = viewModel.hasWordsToPractice(),
-                        onStartExtraLesson = { viewModel.startExtraLesson() },
-                        onStartReviewPractice = { viewModel.startReviewPractice() },
-                        onStartQuickPractice = { viewModel.startQuickPractice() },
-                        onFinishShowcase = { viewModel.finishShowcase() },
-                        onGradeCard = { viewModel.gradeCard(it) },
-                        onNavigateCatalog = { viewModel.setActiveTab(SjtTab.CATALOG) },
-                        onNavigateStats = { viewModel.setActiveTab(SjtTab.STATS) }
+                        isDarkTheme = colors.isDark,
+                        onOpenSettings = { viewModel.openSettings() },
+                        onOpenAccount = { viewModel.openAccount() }
+                    )
+                },
+                bottomBar = {
+                    SjtBottomNavBar(
+                        currentTab = activeTab,
+                        onTabSelected = { viewModel.setActiveTab(it) }
                     )
                 }
-                SjtTab.CATALOG -> {
-                    CatalogScreen(
-                        words = viewModel.allWords,
-                        progressMap = progressMap
-                    )
-                }
-                SjtTab.STATS -> {
-                    StatsScreen(
-                        words = viewModel.allWords,
-                        progressMap = progressMap,
-                        streakDays = streakDays
-                    )
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .background(colors.bgApp)
+                ) {
+                    ScreenContent()
                 }
             }
         }
