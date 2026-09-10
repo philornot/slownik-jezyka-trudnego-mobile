@@ -1,16 +1,31 @@
 package com.philornot.slownikjezykatrudnego
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.philornot.slownikjezykatrudnego.notifications.NotificationHelper
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
 /**
  * Unit tests verifying dynamic notification text generation and
  * pluralization rules.
  */
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [33], application = android.app.Application::class)
 class NotificationHelperTest {
+
+    private lateinit var context: Context
+
+    @Before
+    fun setup() {
+        context = ApplicationProvider.getApplicationContext()
+    }
 
     @Test
     fun testFormatWordCountPlural_correctInflections() {
@@ -29,6 +44,7 @@ class NotificationHelperTest {
     fun testGenerateReminderText_withStreakZero_neverEmpty() {
         for (i in 0 until 50) {
             val message = NotificationHelper.generateReminderText(
+                context = context,
                 streak = 0,
                 sessionWords = emptyList(),
                 reviewDueCount = 0,
@@ -45,6 +61,7 @@ class NotificationHelperTest {
 
         for (i in 0 until 200) {
             val message = NotificationHelper.generateReminderText(
+                context = context,
                 streak = 2,
                 sessionWords = listOf(word),
                 reviewDueCount = 1,
@@ -68,7 +85,7 @@ class NotificationHelperTest {
             "Czas na słówka!"
         )
         for (i in 0 until 50) {
-            val title = NotificationHelper.generateReminderTitle()
+            val title = NotificationHelper.generateReminderTitle(context)
             assertTrue(expectedTitles.contains(title))
         }
     }
@@ -77,6 +94,7 @@ class NotificationHelperTest {
     fun testGenerateReminderText_withoutSessionWords_neverMentionsWordTemplate() {
         for (i in 0 until 100) {
             val message = NotificationHelper.generateReminderText(
+                context = context,
                 streak = 3,
                 sessionWords = emptyList(),
                 reviewDueCount = 0,
@@ -96,6 +114,7 @@ class NotificationHelperTest {
 
         for (i in 0 until 200) {
             val message = NotificationHelper.generateReminderText(
+                context = context,
                 streak = 5,
                 sessionWords = emptyList(),
                 reviewDueCount = 0,
@@ -114,6 +133,7 @@ class NotificationHelperTest {
     fun testGenerateReminderText_withoutUsername_neverMentionsNullOrPlaceholder() {
         for (i in 0 until 100) {
             val message = NotificationHelper.generateReminderText(
+                context = context,
                 streak = 10,
                 sessionWords = listOf("imponderabilia"),
                 reviewDueCount = 3,
@@ -131,6 +151,7 @@ class NotificationHelperTest {
 
         for (i in 0 until 300) {
             val message = NotificationHelper.generateReminderText(
+                context = context,
                 streak = 15,
                 sessionWords = emptyList(),
                 reviewDueCount = 0,
@@ -153,7 +174,7 @@ class NotificationHelperTest {
             "Szybka lekcja przed końcem dnia?"
         )
         for (i in 0 until 50) {
-            val title = NotificationHelper.generateStreakSaverTitle()
+            val title = NotificationHelper.generateStreakSaverTitle(context)
             assertTrue(expectedTitles.contains(title))
         }
     }
@@ -161,7 +182,7 @@ class NotificationHelperTest {
     @Test
     fun testGenerateStreakSaverText_containsStreakCount() {
         for (i in 0 until 50) {
-            val message = NotificationHelper.generateStreakSaverText(streak = 7, username = null)
+            val message = NotificationHelper.generateStreakSaverText(context = context, streak = 7, username = null)
             assertTrue(message.contains("7 dni"))
             assertFalse(message.contains("–")) // Verify em dash rule
         }
@@ -173,7 +194,7 @@ class NotificationHelperTest {
         var foundUser = false
 
         for (i in 0 until 100) {
-            val message = NotificationHelper.generateStreakSaverText(streak = 12, username = username)
+            val message = NotificationHelper.generateStreakSaverText(context = context, streak = 12, username = username)
             if (message.contains(username)) {
                 foundUser = true
                 break
@@ -187,6 +208,7 @@ class NotificationHelperTest {
     fun testGenerateReminderText_neverContainsEmDash() {
         for (i in 0 until 200) {
             val message = NotificationHelper.generateReminderText(
+                context = context,
                 streak = i % 10,
                 sessionWords = listOf("konfabulacja", "imponderabilia"),
                 reviewDueCount = i % 5,

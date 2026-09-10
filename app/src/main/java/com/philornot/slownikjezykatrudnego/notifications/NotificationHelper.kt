@@ -43,53 +43,44 @@ object NotificationHelper {
     /**
      * Generates a random friendly notification title for daily reminders.
      *
+     * @param context Application context.
      * @return Selected notification title.
      */
-    fun generateReminderTitle(): String {
-        val titles = listOf(
-            "Pora na lekcję!",
-            "Słownik Języka Trudnego",
-            "Twoja codzienna lekcja",
-            "Czas na słówka!"
-        )
+    fun generateReminderTitle(context: Context): String {
+        val titles = context.resources.getStringArray(R.array.notification_reminder_titles)
         return titles.random()
     }
 
     /**
      * Generates a random friendly notification title for streak saver reminders.
      *
+     * @param context Application context.
      * @return Selected notification title.
      */
-    fun generateStreakSaverTitle(): String {
-        val titles = listOf(
-            "Uratuj swoją serię!",
-            "Twoja seria jest zagrożona!",
-            "Nie trać serii!",
-            "Szybka lekcja przed końcem dnia?"
-        )
+    fun generateStreakSaverTitle(context: Context): String {
+        val titles = context.resources.getStringArray(R.array.notification_streak_saver_titles)
         return titles.random()
     }
 
     /**
      * Generates an urgent yet friendly streak protection notification text.
      *
+     * @param context Application context.
      * @param streak Current study streak in consecutive days.
      * @param username Display name of the user if set.
      * @return Selected streak saver notification text.
      */
-    fun generateStreakSaverText(streak: Int, username: String?): String {
-        val candidates = mutableListOf<String>()
-
-        candidates.add("Masz serię $streak dni! Zrób szybką lekcję przed północą, żeby jej nie stracić.")
-        candidates.add("Szkoda byłoby przerwać passę $streak dni. Wpadnij na 2 minuty przed końcem dnia!")
-        candidates.add("Dzień powoli się kończy, a Twoja seria ($streak dni) czeka na podtrzymanie.")
-        candidates.add("Zostało jeszcze trochę czasu. Krótka powtórka i Twoja seria $streak dni jest bezpieczna!")
-        candidates.add("Tylko jedna krótka lekcja dzieli Cię od uratowania serii $streak dni!")
-
+    fun generateStreakSaverText(context: Context, streak: Int, username: String?): String {
         val cleanName = username?.trim()
-        if (!cleanName.isNullOrBlank()) {
-            candidates.add("$cleanName, Twoja seria $streak dni czeka na uratowanie! Wystarczą 2 minuty.")
-            candidates.add("Hej $cleanName! Nie pozwól przepaść serii $streak dni. Zrób szybką powtórkę.")
+        val hasName = !cleanName.isNullOrBlank()
+        
+        val candidates = mutableListOf<String>()
+        val noNameTexts = context.resources.getStringArray(R.array.notification_streak_saver_texts_no_name)
+        noNameTexts.forEach { candidates.add(String.format(it, streak)) }
+
+        if (hasName) {
+            val withNameTexts = context.resources.getStringArray(R.array.notification_streak_saver_texts_with_name)
+            withNameTexts.forEach { candidates.add(String.format(it, streak, cleanName)) }
         }
 
         return candidates.random()
@@ -134,14 +125,7 @@ object NotificationHelper {
      * Generates a contextual reminder notification message from a pool of
      * dynamic templates.
      *
-     * Selects from templates targeting:
-     * 1. Active words currently in study or scheduled in today's lesson
-     * 2. Number of review items due in today's session
-     * 3. Streak counts (zero days, small streaks 1-6 days, mastery streaks 7+
-     *    days)
-     * 4. Personalized username greeting (when available)
-     * 5. General erudition and rhetoric motivation
-     *
+     * @param context Application context.
      * @param streak Current study streak in consecutive days.
      * @param sessionWords Words appearing in the upcoming daily lesson cards.
      * @param reviewDueCount Number of words remaining in the session.
@@ -149,6 +133,7 @@ object NotificationHelper {
      * @return Selected notification text.
      */
     fun generateReminderText(
+        context: Context,
         streak: Int,
         sessionWords: List<String>,
         reviewDueCount: Int,
@@ -156,60 +141,47 @@ object NotificationHelper {
     ): String {
         val candidates = mutableListOf<String>()
 
-        // 1. Actively learned word recall (strictly from words appearing in today's lesson)
+        // 1. Actively learned word recall
         val validSessionWords = sessionWords.filter { it.isNotBlank() }.distinct()
         if (validSessionWords.isNotEmpty()) {
             val randomWord = validSessionWords.random()
-            candidates.add("Co dokładnie znaczy „$randomWord”? Otwórz lekcję i przypomnij sobie!")
-            candidates.add("„$randomWord” - użyjesz tego słowa w rozmowie? Sprawdź w dzisiejszej lekcji.")
-            candidates.add("Dziś w lekcji pojawi się „$randomWord”. Pamiętasz, co to znaczy?")
-            candidates.add("„$randomWord” wraca w dzisiejszej lekcji. Idealna okazja, żeby je utrwalić.")
+            val wordTexts = context.resources.getStringArray(R.array.notification_reminder_texts_words)
+            wordTexts.forEach { candidates.add(String.format(it, randomWord)) }
         }
 
-        // 2. Upcoming review count in today's session queue
+        // 2. Upcoming review count
         if (reviewDueCount > 0) {
             val countFormatted = formatWordCountPlural(reviewDueCount)
-            candidates.add("$countFormatted na dziś. Szybka lekcja i masz to z głowy!")
-            candidates.add("Tylko $countFormatted do powtórki. Wpadnij na szybką lekcję!")
-            candidates.add("Dzisiejsza lekcja: $countFormatted. Dasz radę w kilka minut!")
+            val reviewTexts = context.resources.getStringArray(R.array.notification_reminder_texts_review_count)
+            reviewTexts.forEach { candidates.add(String.format(it, countFormatted)) }
         }
 
         // 3. Streak-based motivational messages
         when {
             streak <= 0 -> {
-                candidates.add("Czas zacząć nową serię! Jedna lekcja to wszystko, czego potrzebujesz.")
-                candidates.add("Idealny moment na szybką lekcję. Zacznij serię od dziś!")
-                candidates.add("Nowe słówka czekają. Otwórz lekcję i zacznij budować serię!")
+                val texts = context.resources.getStringArray(R.array.notification_reminder_texts_streak_0)
+                texts.forEach { candidates.add(it) }
             }
-
             streak in 1..6 -> {
-                candidates.add("Już $streak dni z rzędu! Otwórz lekcję i przedłuż swoją serię.")
-                candidates.add("$streak dni serii, tak trzymaj! Dzisiejsza lekcja podtrzyma Twoje tempo.")
-                candidates.add("Twoja seria: $streak dni! Szybka lekcja i leci dalej.")
+                val texts = context.resources.getStringArray(R.array.notification_reminder_texts_streak_1_6)
+                texts.forEach { candidates.add(String.format(it, streak)) }
             }
-
             else -> { // streak >= 7
-                candidates.add("$streak dni z rzędu, brawo! Nie zatrzymuj się teraz.")
-                candidates.add("Seria $streak dni! To robi wrażenie. Otwórz dzisiejszą lekcję!")
-                candidates.add("Wow, $streak dni bez przerwy! Dzisiejsza lekcja już na Ciebie czeka.")
+                val texts = context.resources.getStringArray(R.array.notification_reminder_texts_streak_7)
+                texts.forEach { candidates.add(String.format(it, streak)) }
             }
         }
 
         // 4. Personalized username greetings
         val cleanName = username?.trim()
         if (!cleanName.isNullOrBlank()) {
-            candidates.add("Hej $cleanName! Twoja dzisiejsza lekcja jest gotowa.")
-            candidates.add("$cleanName, masz dziś nowe słówka do odkrycia!")
-            candidates.add("Cześć $cleanName! Wpadnij na szybką lekcję?")
+            val nameTexts = context.resources.getStringArray(R.array.notification_reminder_texts_username)
+            nameTexts.forEach { candidates.add(String.format(it, cleanName)) }
         }
 
-        // 5. General encouragement and habit motivation (always available)
-        candidates.add("Masz minutę? Twoja lekcja jest gotowa.")
-        candidates.add("Nowe słówka do nauki. Otwórz lekcję, kiedy masz chwilę!")
-        candidates.add("Krótka lekcja teraz to mniejsza powtórka jutro!")
-        candidates.add("Codziennie trochę, za miesiąc dużo. Czas na lekcję!")
-        candidates.add("Twoje słówka na dziś są przygotowane. Wpadnij na lekcję!")
-        candidates.add("Szybka lekcja przed dalszym dniem?")
+        // 5. General encouragement
+        val generalTexts = context.resources.getStringArray(R.array.notification_reminder_texts_general)
+        generalTexts.forEach { candidates.add(it) }
 
         return candidates.random()
     }
@@ -273,8 +245,9 @@ object NotificationHelper {
             null
         }
 
-        val title = generateReminderTitle()
+        val title = generateReminderTitle(context)
         val body = generateReminderText(
+            context = context,
             streak = streak,
             sessionWords = sessionWords,
             reviewDueCount = remainingCards.size,
@@ -333,8 +306,8 @@ object NotificationHelper {
             null
         }
 
-        val title = generateStreakSaverTitle()
-        val body = generateStreakSaverText(streak = streak, username = username)
+        val title = generateStreakSaverTitle(context)
+        val body = generateStreakSaverText(context = context, streak = streak, username = username)
 
         val openAppIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
