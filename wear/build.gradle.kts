@@ -1,7 +1,15 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.kotlin.compose)
+}
+
+// Load signing properties from local.properties (never committed to git)
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.reader())
 }
 
 android {
@@ -12,11 +20,22 @@ android {
         applicationId = "com.philornot.slownikjezykatrudnego"
         minSdk = 30
         targetSdk = 37
-        versionCode = 37
-        versionName = "1.8.0"
+        versionCode = 40
+        versionName = "1.8.3"
 
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            if (localProps.containsKey("KEYSTORE_PATH")) {
+                storeFile = file(localProps["KEYSTORE_PATH"] as String)
+                storePassword = localProps["KEYSTORE_PASSWORD"] as String
+                keyAlias = localProps["KEY_ALIAS"] as String
+                keyPassword = localProps["KEY_PASSWORD"] as String
+            }
         }
     }
 
@@ -24,10 +43,16 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            if (localProps.containsKey("KEYSTORE_PATH")) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
     }
 
