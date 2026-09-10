@@ -4,7 +4,7 @@
     <string-array name="notification_reminder_titles">
         <item>Słownik Języka Trudnego</item>
         <item>Twoja codzienna lekcja</item>
-        <item>Czas na słówka</item>
+        <item>Czas na trudne słówka!</item>
         <item>Lekcja na dziś</item>
     </string-array>
 
@@ -18,46 +18,46 @@
     <!-- Teksty: Seria Zagrożona -->
     <string-array name="notification_streak_saver_texts_no_name">
         <item>Masz serię %1$d dni. Wystarczy krótka lekcja przed północą, żeby ją utrzymać.</item>
-        <item>Seria %1$d dni przepadnie, jeśli dziś nie zrobisz lekcji. Dwie minuty wystarczą.</item>
+        <item>Szkoda byłoby stracić serię %1$d dni! Dwie minuty na lekcję i po kłopocie.</item>
         <item>Dzień się kończy, a Twoja seria %1$d dni jeszcze czeka na dzisiejszą lekcję.</item>
-        <item>Zostało trochę czasu, żeby utrzymać serię %1$d dni. Jedna lekcja wystarczy.</item>
+        <item>Jeszcze zdążysz utrzymać serię %1$d dni! Jedna krótka lekcja i gotowe.</item>
         <item>Brakuje jednej lekcji, żeby seria %1$d dni przetrwała do jutra.</item>
     </string-array>
 
     <string-array name="notification_streak_saver_texts_with_name">
-        <item>%2$s, seria %1$d dni jeszcze do uratowania. Wystarczy krótka lekcja.</item>
-        <item>%2$s, zostało trochę czasu na lekcję. Seria %1$d dni czeka.</item>
+        <item>%2$s, seria %1$d dni jeszcze do uratowania! Krótka lekcja i po sprawie.</item>
+        <item>%2$s, jeszcze zdążysz na dzisiejszą lekcję. Seria %1$d dni czeka!</item>
     </string-array>
 
     <!-- Teksty: Codzienne Przypomnienia -->
     <string-array name="notification_reminder_texts_words">
         <item>Pamiętasz, co znaczy „%1$s"? Sprawdź w dzisiejszej lekcji.</item>
-        <item>„%1$s" pojawia się w dzisiejszej lekcji. Warto odświeżyć.</item>
-        <item>Dziś w lekcji m.in. „%1$s". Pamiętasz to słowo?</item>
-        <item>„%1$s" wraca w dzisiejszej lekcji. Dobra okazja, żeby je utrwalić.</item>
+        <item>„%1$s" pojawia się w dzisiejszej lekcji. Pamiętasz, co dokładnie oznacza?</item>
+        <item>Dziś w lekcji m.in. „%1$s". Wpadnij na chwilę i odśwież pamięć!</item>
+        <item>„%1$s" wraca w dzisiejszej lekcji. Dobra okazja, żeby to utrwalić!</item>
     </string-array>
 
     <string-array name="notification_reminder_texts_review_count">
-        <item>Na dziś: %1$s. Zajmie to kilka minut.</item>
-        <item>%1$s do powtórki. Krótka sprawa.</item>
-        <item>Dzisiejsza lekcja to %1$s. Spokojnie się zmieścisz w kilka minut.</item>
+        <item>Na dziś: %1$s. Kilka minut i masz to z głowy!</item>
+        <item>Tylko %1$s do powtórki. Szybka lekcja na kilka minut!</item>
+        <item>Dzisiejsza lekcja to %1$s. Spokojnie ogarniesz to w parę minut!</item>
     </string-array>
 
     <string-array name="notification_reminder_texts_streak_0">
-        <item>Dobry moment, żeby zacząć nową serię. Jedna lekcja wystarczy.</item>
-        <item>Wpadnij na lekcję i zacznij nową serię.</item>
-        <item>Nowe słówka czekają. Może czas zacząć serię?</item>
+        <item>Dobry moment na nową serię! Jedna lekcja i licznik rusza.</item>
+        <item>Wpadnij na szybką lekcję i zacznij nową serię!</item>
+        <item>Nowe słówka czekają. Czas zacząć nową serię!</item>
     </string-array>
 
     <string-array name="notification_reminder_texts_streak_1_6">
-        <item>%1$d dni z rzędu. Lekcja na dziś jest gotowa.</item>
-        <item>Seria %1$d dni. Dzisiejsza lekcja ją przedłuży.</item>
-        <item>Masz %1$d dni serii. Wpadnij na dzisiejszą lekcję.</item>
+        <item>Już %1$d dni z rzędu! Lekcja na dziś jest gotowa.</item>
+        <item>Seria %1$d dni! Dzisiejsza lekcja przedłuży Twój wynik.</item>
+        <item>Masz już %1$d dni serii! Krótka powtórka i lecimy dalej.</item>
     </string-array>
 
     <string-array name="notification_reminder_texts_streak_7">
-        <item>%1$d dni z rzędu, niezły wynik. Lekcja na dziś jest gotowa.</item>
-        <item>Seria %1$d dni. Dzisiejsza lekcja już czeka.</item>
+        <item>%1$d dni z rzędu, solidny wynik! Dzisiejsza lekcja już czeka.</item>
+        <item>Seria %1$d dni, piękna sprawa! Nie zatrzymuj się teraz.</item>
         <item>%1$d dni bez przerwy. Nie ma powodu się zatrzymywać.</item>
     </string-array>
 
@@ -69,10 +69,10 @@
 
     <string-array name="notification_reminder_texts_general">
         <item>Masz chwilę? Lekcja na dziś jest gotowa.</item>
-        <item>Nowe słówka do powtórki, kiedy znajdziesz chwilę.</item>
+        <item>Nowe słówka do powtórki. Wpadnij, kiedy znajdziesz wolną chwilę!</item>
         <item>Krótka lekcja teraz to mniejsza powtórka jutro.</item>
         <item>Słówka na dziś są przygotowane.</item>
-        <item>Lekcja na dziś czeka, kiedy będziesz mieć chwilę.</item>
+        <item>Twoja lekcja na dziś jest gotowa. Wpadnij na parę minut!</item>
     </string-array>
 </resources>
 
