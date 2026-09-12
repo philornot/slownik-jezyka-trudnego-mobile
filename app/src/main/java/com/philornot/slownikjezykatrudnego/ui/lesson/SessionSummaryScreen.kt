@@ -124,7 +124,7 @@ fun SessionSummaryScreen(
                     Icon(
                         imageVector = if (isBonusSession) Icons.Default.AutoAwesome else Icons.Default.EmojiEvents,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = colors.btnPrimaryText,
                         modifier = Modifier.size(44.dp)
                     )
                 }

@@ -433,11 +433,12 @@ fun NewWordsShowcase(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Sticky Bottom Action Button with shortcut hints
+                // Sticky Bottom Action Button with shortcut hints (only show keyboard hints if physical keyboard is connected)
+        val hasPhysicalKeyboard = SjtTheme.hasPhysicalKeyboard
         val nextActionText = when {
-            !isRevealed -> "Odsłoń definicję [Spacja]"
-            currentIndex + 1 < words.size -> "Następne słowo [Spacja]"
-            else -> "Przejdź do testu wiedzy [Enter]"
+            !isRevealed -> if (hasPhysicalKeyboard) "Odsłoń definicję [Spacja]" else "Odsłoń definicję"
+            currentIndex + 1 < words.size -> if (hasPhysicalKeyboard) "Następne słowo [Spacja]" else "Następne słowo"
+            else -> if (hasPhysicalKeyboard) "Przejdź do testu wiedzy [Enter]" else "Przejdź do testu wiedzy"
         }
 
         SjtTouchButton(

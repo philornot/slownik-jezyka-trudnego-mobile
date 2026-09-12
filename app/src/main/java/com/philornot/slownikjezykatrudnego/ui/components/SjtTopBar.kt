@@ -19,6 +19,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -69,6 +71,7 @@ fun SjtTopBar(
                 Image(
                     painter = painterResource(id = logoRes),
                     contentDescription = "Słownik Języka Trudnego Logo",
+                    colorFilter = if (SjtTheme.isEInk) ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) else null,
                     modifier = Modifier.size(36.dp)
                 )
 

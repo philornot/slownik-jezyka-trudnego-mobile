@@ -1,6 +1,9 @@
-package com.philornot.slownikjezykatrudnego.ui.theme
+﻿package com.philornot.slownikjezykatrudnego.ui.theme
 
 import android.app.Activity
+import android.content.Context
+import android.content.res.Configuration
+import android.view.InputDevice
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -10,8 +13,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Density
@@ -23,10 +28,41 @@ val LocalSjtColors = staticCompositionLocalOf { SageLightColors }
 val LocalUserSettings = staticCompositionLocalOf { UserSettings() }
 
 /**
+ * Composition local indicating whether a physical/hardware keyboard is currently attached.
+ * False on standard smartphones without an external keyboard attached.
+ */
+val LocalHasPhysicalKeyboard = staticCompositionLocalOf { false }
+
+/**
  * Composition local providing the motion duration scale (0f = no animations, 1f = full animations).
  * Controlled by the user's reducedMotion preference.
  */
 val LocalMotionDurationScale = compositionLocalOf { 1f }
+
+/**
+ * Detects whether a physical/hardware keyboard is currently attached and available.
+ * Returns false on standard touch-only phones without an external keyboard.
+ * Returns true on Chromebooks, tablets with keyboard dock, and devices with connected BT/USB keyboard.
+ */
+fun checkHasPhysicalKeyboard(context: Context): Boolean {
+    val config = context.resources.configuration
+    if (config.keyboard == Configuration.KEYBOARD_QWERTY &&
+        config.hardKeyboardHidden != Configuration.HARDKEYBOARDHIDDEN_YES
+    ) {
+        return true
+    }
+    return try {
+        InputDevice.getDeviceIds().any { id ->
+            val device = InputDevice.getDevice(id)
+            device != null &&
+                !device.isVirtual &&
+                (device.sources and InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD &&
+                device.keyboardType == InputDevice.KEYBOARD_TYPE_ALPHABETIC
+        }
+    } catch (_: Exception) {
+        false
+    }
+}
 
 object SjtTheme {
     val colors: SjtColors
@@ -44,6 +80,18 @@ object SjtTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalUserSettings.current.reducedMotion || LocalUserSettings.current.eInkMode || LocalMotionDurationScale.current == 0f
+
+    /** Returns true if high-contrast monochrome E-Ink reader mode is active. */
+    val isEInk: Boolean
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalUserSettings.current.eInkMode
+
+    /** Returns true if a physical keyboard is attached and available. */
+    val hasPhysicalKeyboard: Boolean
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalHasPhysicalKeyboard.current
 }
 
 /**
@@ -69,37 +117,7 @@ fun SlownikJezykaTrudnegoTheme(
     val baseColors = if (isDark) SageDarkColors else SageLightColors
 
     val colors = when {
-        settings.eInkMode -> {
-            if (isDark) {
-                baseColors.copy(
-                    bgApp = androidx.compose.ui.graphics.Color(0xFF000000),
-                    bgSurface = androidx.compose.ui.graphics.Color(0xFF000000),
-                    bgSurfaceElevated = androidx.compose.ui.graphics.Color(0xFF101010),
-                    borderDefault = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
-                    textPrimary = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
-                    textSecondary = androidx.compose.ui.graphics.Color(0xFFE0E0E0),
-                    textMuted = androidx.compose.ui.graphics.Color(0xFFCCCCCC),
-                    textSerifTitle = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
-                    brandPrimary = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
-                    brandPrimaryHover = androidx.compose.ui.graphics.Color(0xFFEEEEEE),
-                    btnPrimaryText = androidx.compose.ui.graphics.Color(0xFF000000)
-                )
-            } else {
-                baseColors.copy(
-                    bgApp = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
-                    bgSurface = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
-                    bgSurfaceElevated = androidx.compose.ui.graphics.Color(0xFFF7F7F7),
-                    borderDefault = androidx.compose.ui.graphics.Color(0xFF000000),
-                    textPrimary = androidx.compose.ui.graphics.Color(0xFF000000),
-                    textSecondary = androidx.compose.ui.graphics.Color(0xFF222222),
-                    textMuted = androidx.compose.ui.graphics.Color(0xFF444444),
-                    textSerifTitle = androidx.compose.ui.graphics.Color(0xFF000000),
-                    brandPrimary = androidx.compose.ui.graphics.Color(0xFF000000),
-                    brandPrimaryHover = androidx.compose.ui.graphics.Color(0xFF222222),
-                    btnPrimaryText = androidx.compose.ui.graphics.Color(0xFFFFFFFF)
-                )
-            }
-        }
+        settings.eInkMode -> if (isDark) EInkDarkColors else EInkLightColors
         settings.highContrast -> {
             if (isDark) {
                 baseColors.copy(
@@ -123,8 +141,14 @@ fun SlownikJezykaTrudnegoTheme(
         else -> baseColors
     }
 
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val hasPhysicalKeyboard = remember(configuration) {
+        checkHasPhysicalKeyboard(context)
+    }
+
     val currentDensity = LocalDensity.current
-    val systemFontScale = LocalConfiguration.current.fontScale
+    val systemFontScale = configuration.fontScale
     val fontScaleMultiplier = when (settings.textSize) {
         TextSizeLevel.SMALL -> 1.0f
         TextSizeLevel.MEDIUM -> 1.20f
@@ -139,7 +163,7 @@ fun SlownikJezykaTrudnegoTheme(
     SideEffect {
         android.util.Log.d(
             "SjtTheme",
-            "[THEME] SlownikJezykaTrudnegoTheme composing: textSize=${settings.textSize}, systemFontScale=$systemFontScale, multiplier=$fontScaleMultiplier, effectiveFontScale=$effectiveFontScale"
+            "[THEME] SlownikJezykaTrudnegoTheme composing: textSize=${settings.textSize}, systemFontScale=$systemFontScale, multiplier=$fontScaleMultiplier, effectiveFontScale=$effectiveFontScale, hasPhysicalKeyboard=$hasPhysicalKeyboard, eInkMode=${settings.eInkMode}"
         )
     }
 
@@ -186,6 +210,7 @@ fun SlownikJezykaTrudnegoTheme(
     CompositionLocalProvider(
         LocalSjtColors provides colors,
         LocalUserSettings provides settings,
+        LocalHasPhysicalKeyboard provides hasPhysicalKeyboard,
         LocalMotionDurationScale provides motionDurationScale,
         LocalDensity provides scaledDensity
     ) {

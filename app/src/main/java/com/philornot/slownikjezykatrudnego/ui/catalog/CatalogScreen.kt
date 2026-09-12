@@ -155,9 +155,10 @@ fun CatalogScreen(
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        placeholder = {
+                                                placeholder = {
+                            val hasPhysicalKeyboard = SjtTheme.hasPhysicalKeyboard
                             Text(
-                                text = "Szukaj w słówkach... (skrót: /)",
+                                text = if (hasPhysicalKeyboard) "Szukaj w słówkach... (skrót: /)" else "Szukaj w słówkach...",
                                 fontSize = 13.sp,
                                 color = colors.textMuted
                             )

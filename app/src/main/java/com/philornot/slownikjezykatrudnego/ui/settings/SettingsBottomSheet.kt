@@ -102,6 +102,13 @@ fun SettingsBottomSheet(
     onDismiss: () -> Unit
 ) {
     val colors = SjtTheme.colors
+    val switchColors = SwitchDefaults.colors(
+        checkedThumbColor = if (SjtTheme.isEInk) colors.btnPrimaryText else Color.White,
+        checkedTrackColor = colors.brandPrimary,
+        uncheckedThumbColor = colors.textMuted,
+        uncheckedTrackColor = colors.bgSurface,
+        uncheckedBorderColor = colors.borderDefault
+    )
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -331,13 +338,13 @@ fun SettingsBottomSheet(
                                                 text = title,
                                                 fontSize = 12.5.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = if (isSelected) Color.White else colors.textPrimary
+                                                color = if (isSelected) colors.btnPrimaryText else colors.textPrimary
                                             )
                                             Text(
                                                 text = subtitle,
                                                 fontSize = 10.sp,
                                                 fontWeight = FontWeight.Medium,
-                                                color = if (isSelected) Color.White.copy(alpha = 0.8f) else colors.textMuted
+                                                color = if (isSelected) colors.btnPrimaryText.copy(alpha = 0.85f) else colors.textMuted
                                             )
                                         }
                                     }
@@ -400,10 +407,7 @@ fun SettingsBottomSheet(
                                     onSaveSettings(settings.copy(notificationsEnabled = checked))
                                 }
                             },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = colors.brandPrimary
-                            )
+                            colors = switchColors
                         )
                     }
 
@@ -596,7 +600,7 @@ fun SettingsBottomSheet(
                                     Icon(
                                         imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
                                         contentDescription = "Przełącz motyw",
-                                        tint = Color.White,
+                                        tint = colors.btnPrimaryText,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -664,10 +668,7 @@ fun SettingsBottomSheet(
                                     onCheckedChange = { checked ->
                                         onSaveSettings(settings.copy(highContrast = checked))
                                     },
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = Color.White,
-                                        checkedTrackColor = colors.brandPrimary
-                                    )
+                                    colors = switchColors
                                 )
                             }
 
@@ -738,13 +739,13 @@ fun SettingsBottomSheet(
                                                         TextSizeLevel.LARGE -> 16.sp
                                                     },
                                                     fontWeight = FontWeight.ExtraBold,
-                                                    color = if (isSelected) Color.White else colors.textMuted
+                                                    color = if (isSelected) colors.btnPrimaryText else colors.textMuted
                                                 )
                                                 Text(
                                                     text = subLabel,
                                                     fontSize = 9.sp,
                                                     fontWeight = FontWeight.Bold,
-                                                    color = if (isSelected) Color.White.copy(alpha = 0.75f) else colors.textMuted.copy(
+                                                    color = if (isSelected) colors.btnPrimaryText.copy(alpha = 0.85f) else colors.textMuted.copy(
                                                         alpha = 0.75f
                                                     )
                                                 )
@@ -781,10 +782,7 @@ fun SettingsBottomSheet(
                                     onCheckedChange = { checked ->
                                         onSaveSettings(settings.copy(reducedMotion = checked))
                                     },
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = Color.White,
-                                        checkedTrackColor = colors.brandPrimary
-                                    )
+                                    colors = switchColors
                                 )
                             }
 
@@ -815,10 +813,7 @@ fun SettingsBottomSheet(
                                     onCheckedChange = { checked ->
                                         onSaveSettings(settings.copy(eInkMode = checked))
                                     },
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = Color.White,
-                                        checkedTrackColor = colors.brandPrimary
-                                    )
+                                    colors = switchColors
                                 )
                             }
                         }
@@ -905,7 +900,7 @@ fun SettingsBottomSheet(
                                             modifier = Modifier.weight(1f),
                                             shape = RoundedCornerShape(10.dp),
                                             color = if (resetCountdown == 0) colors.grade0Text else colors.badgeRoseBg,
-                                            contentColor = if (resetCountdown == 0) Color.White else colors.badgeRoseText,
+                                            contentColor = if (resetCountdown == 0) (if (colors.grade0Text == Color.White) Color.Black else Color.White) else colors.badgeRoseText,
                                             border = if (resetCountdown != 0) BorderStroke(
                                                 1.dp,
                                                 colors.badgeRoseBorder
@@ -972,7 +967,7 @@ fun SettingsBottomSheet(
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = "Autor logo",
-                            tint = Color(0xFFE11D48).copy(alpha = 0.7f),
+                            tint = if (SjtTheme.isEInk) colors.textMuted else Color(0xFFE11D48).copy(alpha = 0.7f),
                             modifier = Modifier
                                 .size(14.dp)
                                 .clickable { showCreditDialog = true }

@@ -87,14 +87,17 @@ fun HybridQuizCard(
     val isAnswered = selectedOption != null
     val isCorrect = selectedOption == card.word.shortDefinition
 
-    val colors = SjtTheme.colors
+        val colors = SjtTheme.colors
+    val hasPhysicalKeyboard = SjtTheme.hasPhysicalKeyboard
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val quizScrollState = rememberScrollState()
     val haptic = LocalHapticFeedback.current
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(card.word.id, isAnswered) {
         scrollState.scrollTo(0)
+        quizScrollState.scrollTo(0)
     }
 
     LaunchedEffect(card.word.id) {
@@ -417,33 +420,29 @@ fun HybridQuizCard(
                     }
                 }
             } else {
-                // ─── ETAP 1: Active Recall Quiz Options (Harmonious 2-Zone Layout) ───
+                // ─── ETAP 1: Active Recall Quiz Options (Guaranteed Header + Scrollable Options) ───
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    // Strefa 1: Górna część - Wyeksponowane słowo i fonetyka
+                    // Strefa 1: Górna część - ZAWSZE widoczne, wyeksponowane słowo i fonetyka (nie przesłaniane przez opcje)
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = card.word.word,
-                            fontSize = 32.sp,
+                            fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = MaterialTheme.typography.headlineLarge.fontFamily,
                             color = colors.textSerifTitle,
                             textAlign = TextAlign.Center,
-                            lineHeight = 38.sp
+                            lineHeight = 34.sp
                         )
 
                         if (!card.word.phonetic.isNullOrBlank()) {
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
                                 color = colors.bgSurfaceElevated,
@@ -451,30 +450,35 @@ fun HybridQuizCard(
                             ) {
                                 Text(
                                     text = card.word.phonetic,
-                                    fontSize = 13.5.sp,
+                                    fontSize = 12.5.sp,
                                     fontStyle = FontStyle.Italic,
                                     fontWeight = FontWeight.SemiBold,
                                     color = colors.textMuted,
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "WYBIERZ WŁAŚCIWE ZNACZENIE",
                             color = colors.brandPrimary,
-                            fontSize = 11.5.sp,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.ExtraBold,
                             textAlign = TextAlign.Center,
                             letterSpacing = 0.8.sp
                         )
                     }
 
-                    // Strefa 2: Dolna część - Wygodne, duże przyciski opcji w strefie kciuka
+                    // Strefa 2: Dolna część - Wygodne przyciski opcji, z bezpiecznym przewijaniem na mniejszych ekranach
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .verticalScroll(quizScrollState)
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         card.options.forEachIndexed { index, option ->
                             val letter = ('A' + index).toString()
@@ -493,20 +497,20 @@ fun HybridQuizCard(
                                     .pointerHoverIcon(PointerIcon.Hand)
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 13.dp),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
                                     Surface(
-                                        shape = RoundedCornerShape(9.dp),
+                                        shape = RoundedCornerShape(8.dp),
                                         color = colors.bgSurface,
                                         border = BorderStroke(1.dp, colors.borderDefault),
-                                        modifier = Modifier.size(30.dp)
+                                        modifier = Modifier.size(28.dp)
                                     ) {
                                         Box(contentAlignment = Alignment.Center) {
                                             Text(
                                                 text = letter,
-                                                fontSize = 13.sp,
+                                                fontSize = 12.5.sp,
                                                 fontWeight = FontWeight.ExtraBold,
                                                 color = colors.brandPrimary
                                             )
@@ -516,25 +520,27 @@ fun HybridQuizCard(
                                     Text(
                                         text = option,
                                         style = MaterialTheme.typography.bodyLarge,
-                                        fontSize = 14.5.sp,
+                                        fontSize = 14.sp,
                                         color = colors.textPrimary,
-                                        lineHeight = 20.sp,
+                                        lineHeight = 19.sp,
                                         modifier = Modifier.weight(1f)
                                     )
 
-                                    // Subtle keyboard shortcut hint
-                                    Surface(
-                                        shape = RoundedCornerShape(6.dp),
-                                        color = colors.bgSurface,
-                                        border = BorderStroke(1.dp, colors.borderDefault.copy(alpha = 0.6f))
-                                    ) {
-                                        Text(
-                                            text = "${index + 1}",
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = colors.textMuted,
-                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                        )
+                                    // Subtle keyboard shortcut hint (only when hardware keyboard attached)
+                                    if (hasPhysicalKeyboard) {
+                                        Surface(
+                                            shape = RoundedCornerShape(6.dp),
+                                            color = colors.bgSurface,
+                                            border = BorderStroke(1.dp, colors.borderDefault.copy(alpha = 0.6f))
+                                        ) {
+                                            Text(
+                                                text = "${index + 1}",
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.textMuted,
+                                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -561,7 +567,7 @@ fun HybridQuizCard(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Oceń, jak dobrze pamiętasz to słówko [1-4]",
+                        text = if (hasPhysicalKeyboard) "Oceń, jak dobrze pamiętasz to słówko [1-4]" else "Oceń, jak dobrze pamiętasz to słówko",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = colors.textPrimary
@@ -579,7 +585,7 @@ fun HybridQuizCard(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(72.dp)
+                                .height(if (hasPhysicalKeyboard) 72.dp else 64.dp)
                                 .pointerHoverIcon(PointerIcon.Hand),
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade0Bg,
@@ -607,12 +613,14 @@ fun HybridQuizCard(
                                     textAlign = TextAlign.Center,
                                     maxLines = 1
                                 )
-                                Text(
-                                    text = "[1]",
-                                    color = colors.grade0Text.copy(alpha = 0.7f),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                if (hasPhysicalKeyboard) {
+                                    Text(
+                                        text = "[1]",
+                                        color = colors.grade0Text.copy(alpha = 0.7f),
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
 
@@ -624,7 +632,7 @@ fun HybridQuizCard(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(72.dp)
+                                .height(if (hasPhysicalKeyboard) 72.dp else 64.dp)
                                 .pointerHoverIcon(PointerIcon.Hand),
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade3Bg,
@@ -652,12 +660,14 @@ fun HybridQuizCard(
                                     textAlign = TextAlign.Center,
                                     maxLines = 1
                                 )
-                                Text(
-                                    text = "[2]",
-                                    color = colors.grade3Text.copy(alpha = 0.7f),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                if (hasPhysicalKeyboard) {
+                                    Text(
+                                        text = "[2]",
+                                        color = colors.grade3Text.copy(alpha = 0.7f),
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
 
@@ -669,7 +679,7 @@ fun HybridQuizCard(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(72.dp)
+                                .height(if (hasPhysicalKeyboard) 72.dp else 64.dp)
                                 .pointerHoverIcon(PointerIcon.Hand),
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade4Bg,
@@ -697,12 +707,14 @@ fun HybridQuizCard(
                                     textAlign = TextAlign.Center,
                                     maxLines = 1
                                 )
-                                Text(
-                                    text = "[3]",
-                                    color = colors.grade4Text.copy(alpha = 0.7f),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                if (hasPhysicalKeyboard) {
+                                    Text(
+                                        text = "[3]",
+                                        color = colors.grade4Text.copy(alpha = 0.7f),
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
 
@@ -714,7 +726,7 @@ fun HybridQuizCard(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(72.dp)
+                                .height(if (hasPhysicalKeyboard) 72.dp else 64.dp)
                                 .pointerHoverIcon(PointerIcon.Hand),
                             shape = RoundedCornerShape(10.dp),
                             color = colors.grade5Bg,
@@ -742,12 +754,14 @@ fun HybridQuizCard(
                                     textAlign = TextAlign.Center,
                                     maxLines = 1
                                 )
-                                Text(
-                                    text = "[4]",
-                                    color = colors.grade5Text.copy(alpha = 0.7f),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                if (hasPhysicalKeyboard) {
+                                    Text(
+                                        text = "[4]",
+                                        color = colors.grade5Text.copy(alpha = 0.7f),
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
                     }

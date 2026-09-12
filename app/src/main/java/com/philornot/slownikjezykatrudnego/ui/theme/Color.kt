@@ -150,3 +150,105 @@ val SageDarkColors = SjtColors(
     barInactive = Color(0xFF1C2C23),
     isDark = true
 )
+
+/**
+ * High-contrast pure monochrome palette for E-Ink / E-Paper screens in Dark mode.
+ * Zero green/amber/rose color tint — strictly black, white, and high-contrast grayscale.
+ */
+val EInkDarkColors = SjtColors(
+    bgApp = Color(0xFF000000),
+    bgSurface = Color(0xFF000000),
+    bgSurfaceElevated = Color(0xFF141414),
+    bgSurfaceMuted = Color(0xFF222222),
+    borderDefault = Color(0xFFFFFFFF),
+    borderMuted = Color(0xFF777777),
+    brandPrimary = Color(0xFFFFFFFF),
+    brandPrimaryHover = Color(0xFFE0E0E0),
+    btnPrimaryText = Color(0xFF000000),
+    textPrimary = Color(0xFFFFFFFF),
+    textSecondary = Color(0xFFE0E0E0),
+    textMuted = Color(0xFFAAAAAA),
+    textSerifTitle = Color(0xFFFFFFFF),
+    textAmberBrand = Color(0xFFFFFFFF),
+
+    badgeAmberBg = Color(0xFF1A1A1A),
+    badgeAmberText = Color(0xFFFFFFFF),
+    badgeAmberBorder = Color(0xFF888888),
+    badgeEmeraldBg = Color(0xFF1A1A1A),
+    badgeEmeraldText = Color(0xFFFFFFFF),
+    badgeEmeraldBorder = Color(0xFF888888),
+    badgeRoseBg = Color(0xFF1A1A1A),
+    badgeRoseText = Color(0xFFFFFFFF),
+    badgeRoseBorder = Color(0xFF888888),
+
+    grade0Bg = Color(0xFF141414),
+    grade0Border = Color(0xFF888888),
+    grade0Text = Color(0xFFFFFFFF),
+    grade3Bg = Color(0xFF1E1E1E),
+    grade3Border = Color(0xFFAAAAAA),
+    grade3Text = Color(0xFFFFFFFF),
+    grade4Bg = Color(0xFF2A2A2A),
+    grade4Border = Color(0xFFCCCCCC),
+    grade4Text = Color(0xFFFFFFFF),
+    grade5Bg = Color(0xFF383838),
+    grade5Border = Color(0xFFFFFFFF),
+    grade5Text = Color(0xFFFFFFFF),
+
+    blockquoteBg = Color(0xFF141414),
+    progressTrack = Color(0xFF333333),
+    progressBorder = Color(0xFFFFFFFF),
+    barActive = Color(0xFFFFFFFF),
+    barInactive = Color(0xFF2B2B2B),
+    isDark = true
+)
+
+/**
+ * High-contrast pure monochrome palette for E-Ink / E-Paper screens in Light mode.
+ * Zero green/amber/rose color tint — strictly white, black, and high-contrast grayscale.
+ */
+val EInkLightColors = SjtColors(
+    bgApp = Color(0xFFFFFFFF),
+    bgSurface = Color(0xFFFFFFFF),
+    bgSurfaceElevated = Color(0xFFF4F4F4),
+    bgSurfaceMuted = Color(0xFFE6E6E6),
+    borderDefault = Color(0xFF000000),
+    borderMuted = Color(0xFF888888),
+    brandPrimary = Color(0xFF000000),
+    brandPrimaryHover = Color(0xFF222222),
+    btnPrimaryText = Color(0xFFFFFFFF),
+    textPrimary = Color(0xFF000000),
+    textSecondary = Color(0xFF222222),
+    textMuted = Color(0xFF555555),
+    textSerifTitle = Color(0xFF000000),
+    textAmberBrand = Color(0xFF000000),
+
+    badgeAmberBg = Color(0xFFEFEFEF),
+    badgeAmberText = Color(0xFF000000),
+    badgeAmberBorder = Color(0xFF888888),
+    badgeEmeraldBg = Color(0xFFEFEFEF),
+    badgeEmeraldText = Color(0xFF000000),
+    badgeEmeraldBorder = Color(0xFF888888),
+    badgeRoseBg = Color(0xFFEFEFEF),
+    badgeRoseText = Color(0xFF000000),
+    badgeRoseBorder = Color(0xFF888888),
+
+    grade0Bg = Color(0xFFFFFFFF),
+    grade0Border = Color(0xFF888888),
+    grade0Text = Color(0xFF000000),
+    grade3Bg = Color(0xFFF2F2F2),
+    grade3Border = Color(0xFF666666),
+    grade3Text = Color(0xFF000000),
+    grade4Bg = Color(0xFFE4E4E4),
+    grade4Border = Color(0xFF333333),
+    grade4Text = Color(0xFF000000),
+    grade5Bg = Color(0xFFD6D6D6),
+    grade5Border = Color(0xFF000000),
+    grade5Text = Color(0xFF000000),
+
+    blockquoteBg = Color(0xFFF2F2F2),
+    progressTrack = Color(0xFFDDDDDD),
+    progressBorder = Color(0xFF000000),
+    barActive = Color(0xFF000000),
+    barInactive = Color(0xFFCCCCCC),
+    isDark = false
+)
