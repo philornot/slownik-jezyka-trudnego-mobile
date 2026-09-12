@@ -424,58 +424,67 @@ fun HybridQuizCard(
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    // Strefa 1: Górna część - ZAWSZE widoczne, wyeksponowane słowo i fonetyka (nie przesłaniane przez opcje)
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 10.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = card.word.word,
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = MaterialTheme.typography.headlineLarge.fontFamily,
-                            color = colors.textSerifTitle,
-                            textAlign = TextAlign.Center,
-                            lineHeight = 34.sp
-                        )
-
-                        if (!card.word.phonetic.isNullOrBlank()) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = colors.bgSurfaceElevated,
-                                border = BorderStroke(1.dp, colors.borderDefault)
-                            ) {
-                                Text(
-                                    text = card.word.phonetic,
-                                    fontSize = 12.5.sp,
-                                    fontStyle = FontStyle.Italic,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = colors.textMuted,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "WYBIERZ WŁAŚCIWE ZNACZENIE",
-                            color = colors.brandPrimary,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 0.8.sp
-                        )
-                    }
-
-                    // Strefa 2: Dolna część - Wygodne przyciski opcji zakotwiczone na dole (strefa kciuka / ergonomia jednej ręki)
-                    // z bezpiecznym przewijaniem na mniejszych ekranach
+                    // Strefa 1: Górna/środkowa część - słowo i fonetyka wyśrodkowane w dostępnej przestrzeni nad opcjami,
+                    // dzięki czemu słówko nie jest przyklejone do samej góry, a układ jest harmonijny.
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = card.word.word,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = MaterialTheme.typography.headlineLarge.fontFamily,
+                                color = colors.textSerifTitle,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 34.sp
+                            )
+
+                            if (!card.word.phonetic.isNullOrBlank()) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = colors.bgSurfaceElevated,
+                                    border = BorderStroke(1.dp, colors.borderDefault)
+                                ) {
+                                    Text(
+                                        text = card.word.phonetic,
+                                        fontSize = 12.5.sp,
+                                        fontStyle = FontStyle.Italic,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = colors.textMuted,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "WYBIERZ WŁAŚCIWE ZNACZENIE",
+                                color = colors.brandPrimary,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                textAlign = TextAlign.Center,
+                                letterSpacing = 0.8.sp
+                            )
+                        }
+                    }
+
+                    // Strefa 2: Dolna część - Wygodne przyciski opcji zakotwiczone na dole (strefa kciuka / ergonomia jednej ręki)
+                    // z bezpiecznym przewijaniem na mniejszych ekranach. fill = false zapobiega wypychaniu słówka na wysokich ekranach,
+                    // a osobny podział w Column gwarantuje, że opcje ABCD nigdy nie zasłonią słówka.
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(weight = 1.4f, fill = false),
                         contentAlignment = Alignment.BottomCenter
                     ) {
                         Column(

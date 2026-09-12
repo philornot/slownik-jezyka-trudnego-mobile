@@ -119,42 +119,111 @@ fun SettingsBottomSheet(
         skipPartiallyExpanded = true,
         confirmValueChange = { targetValue ->
             if (targetValue == SheetValue.Hidden) {
-                // Prevent accidental dismiss during initial opening animation / immediate touch interactions (< 500ms).
-                // After this grace period, user can freely dismiss by scrolling up to the top and swiping down.
-                System.currentTimeMillis() - openedTime > 500L
+                // Prevent accidental dismiss during initial opening animation / immediate touch interactions (< 300ms).
+                // After this grace period, user can freely dismiss by scrolling.
+                System.currentTimeMillis() - openedTime > 300L
             } else {
                 true
             }
         }
     )
     val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
-    // Prevent accidental sheet dismissal during initial opening animation and immediate touch interactions
+    var accumulatedOverscrollTop by remember { mutableStateOf(0f) }
+    var accumulatedOverscrollBottom by remember { mutableStateOf(0f) }
+
+    fun triggerDismiss() {
+        coroutineScope.launch {
+            try {
+                sheetState.hide()
+            } finally {
+                onDismiss()
+            }
+        }
+    }
+
+    // Allows closing settings by scrolling up (either pulling past the top of the list or pulling up past the bottom)
     val contentNestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(
                 available: Offset,
                 source: NestedScrollSource
             ): Offset {
-                // During the first 500ms after opening, consume downward drag so immediate
-                // touch/scroll gestures do not interrupt or accidentally dismiss the sheet.
-                // After 500ms, the user can freely scroll up to the top and swipe down to dismiss.
-                if (System.currentTimeMillis() - openedTime < 500L && available.y > 0f) {
+                // During the first 300ms after opening, consume downward drag so immediate
+                // touch/scroll gestures do not interrupt opening animation
+                if (System.currentTimeMillis() - openedTime < 300L && available.y > 0f) {
                     return Offset(0f, available.y)
                 }
                 return Offset.Zero
             }
 
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                if (System.currentTimeMillis() - openedTime < 300L) return Offset.Zero
+
+                // Reset overscroll accumulators when list is actively consuming scroll
+                if (consumed.y != 0f) {
+                    accumulatedOverscrollTop = 0f
+                    accumulatedOverscrollBottom = 0f
+                    return Offset.Zero
+                }
+
+                // 1) Scrolling towards top of settings and pulling down past top (scrollState.value == 0)
+                if (scrollState.value == 0 && available.y > 0f) {
+                    accumulatedOverscrollTop += available.y
+                    if (accumulatedOverscrollTop > 80f) {
+                        triggerDismiss()
+                        return Offset(0f, available.y)
+                    }
+                } else if (available.y < 0f) {
+                    accumulatedOverscrollTop = 0f
+                }
+
+                // 2) Scrolling towards bottom and pulling up past bottom
+                if (!scrollState.canScrollForward && available.y < 0f) {
+                    accumulatedOverscrollBottom += available.y
+                    if (accumulatedOverscrollBottom < -100f) {
+                        triggerDismiss()
+                        return Offset(0f, available.y)
+                    }
+                } else if (available.y > 0f) {
+                    accumulatedOverscrollBottom = 0f
+                }
+
+                return Offset.Zero
+            }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                if (System.currentTimeMillis() - openedTime < 300L) return Velocity.Zero
+
+                // Fast downward flick at top
+                if (scrollState.value == 0 && available.y > 400f) {
+                    triggerDismiss()
+                    return Velocity(0f, available.y)
+                }
+
+                // Fast upward flick at bottom
+                if (!scrollState.canScrollForward && available.y < -400f) {
+                    triggerDismiss()
+                    return Velocity(0f, available.y)
+                }
+
+                return Velocity.Zero
+            }
+
             override suspend fun onPreFling(available: Velocity): Velocity {
-                if (System.currentTimeMillis() - openedTime < 500L && available.y > 0f) {
+                if (System.currentTimeMillis() - openedTime < 300L && available.y > 0f) {
                     return Velocity(0f, available.y)
                 }
                 return Velocity.Zero
             }
         }
     }
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     // Sync notification permission state
     var hasNotificationPermission by remember {

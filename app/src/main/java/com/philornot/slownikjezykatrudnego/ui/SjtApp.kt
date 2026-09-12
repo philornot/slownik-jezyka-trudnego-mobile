@@ -22,7 +22,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isAltPressed
@@ -302,6 +305,9 @@ private fun SjtAppScaffold(
                         .weight(1f)
                         .fillMaxHeight()
                         .background(colors.bgApp)
+                        .statusBarsPadding()
+                        .displayCutoutPadding()
+                        .navigationBarsPadding()
                 ) {
                     ScreenContent()
                 }
