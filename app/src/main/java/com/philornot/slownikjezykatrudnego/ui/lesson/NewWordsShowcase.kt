@@ -41,6 +41,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -268,15 +273,29 @@ fun NewWordsShowcase(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 90.dp)
+                            .clip(RoundedCornerShape(12.dp))
                             .pointerHoverIcon(PointerIcon.Hand)
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(14.dp),
+                                .padding(horizontal = 18.dp, vertical = 14.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            val isEInk = userSettings.eInkMode
+                            val isEInk = userSettings.eInkMode || SjtTheme.isEInk
+                            val skipAnimations = SjtTheme.skipAnimations
+
+                            val blurRadius by animateDpAsState(
+                                targetValue = if (isRevealed) 0.dp else 16.dp,
+                                animationSpec = if (skipAnimations) snap() else tween(durationMillis = 300),
+                                label = "definitionBlur"
+                            )
+                            val textAlpha by animateFloatAsState(
+                                targetValue = if (isRevealed) 1f else 0.5f,
+                                animationSpec = if (skipAnimations) snap() else tween(durationMillis = 300),
+                                label = "definitionAlpha"
+                            )
+
                             Text(
                                 text = currentWord.fullDefinition,
                                 style = MaterialTheme.typography.bodyLarge,
@@ -285,9 +304,22 @@ fun NewWordsShowcase(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .then(
-                                        if (!isRevealed) {
-                                            if (isEInk) Modifier.alpha(0f) else Modifier.blur(8.dp)
-                                        } else Modifier
+                                        if (isEInk) {
+                                            if (!isRevealed) Modifier.alpha(0f) else Modifier
+                                        } else {
+                                            Modifier
+                                                .alpha(textAlpha)
+                                                .then(
+                                                    if (blurRadius > 0.dp) {
+                                                        Modifier.blur(
+                                                            radius = blurRadius,
+                                                            edgeTreatment = BlurredEdgeTreatment.Unbounded
+                                                        )
+                                                    } else {
+                                                        Modifier
+                                                    }
+                                                )
+                                        }
                                     )
                             )
 
