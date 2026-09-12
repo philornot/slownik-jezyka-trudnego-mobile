@@ -53,7 +53,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -112,20 +114,42 @@ fun SettingsBottomSheet(
         uncheckedTrackColor = colors.bgSurface,
         uncheckedBorderColor = colors.borderDefault
     )
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val openedTime = remember { System.currentTimeMillis() }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { targetValue ->
+            if (targetValue == SheetValue.Hidden) {
+                // Prevent accidental dismiss during initial opening animation / immediate touch interactions (< 500ms).
+                // After this grace period, user can freely dismiss by scrolling up to the top and swiping down.
+                System.currentTimeMillis() - openedTime > 500L
+            } else {
+                true
+            }
+        }
+    )
     val scrollState = rememberScrollState()
 
-    // Prevent accidental sheet dismissal when touching or scrolling inside settings content
+    // Prevent accidental sheet dismissal during initial opening animation and immediate touch interactions
     val contentNestedScrollConnection = remember {
         object : NestedScrollConnection {
-            override fun onPostScroll(
-                consumed: Offset,
+            override fun onPreScroll(
                 available: Offset,
                 source: NestedScrollSource
             ): Offset {
-                // Consume unconsumed vertical drag delta so flicking/dragging downwards
-                // inside settings never leaks to ModalBottomSheet to accidentally dismiss it.
-                return if (available.y != 0f) Offset(0f, available.y) else Offset.Zero
+                // During the first 500ms after opening, consume downward drag so immediate
+                // touch/scroll gestures do not interrupt or accidentally dismiss the sheet.
+                // After 500ms, the user can freely scroll up to the top and swipe down to dismiss.
+                if (System.currentTimeMillis() - openedTime < 500L && available.y > 0f) {
+                    return Offset(0f, available.y)
+                }
+                return Offset.Zero
+            }
+
+            override suspend fun onPreFling(available: Velocity): Velocity {
+                if (System.currentTimeMillis() - openedTime < 500L && available.y > 0f) {
+                    return Velocity(0f, available.y)
+                }
+                return Velocity.Zero
             }
         }
     }
