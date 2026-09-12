@@ -29,6 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -73,12 +75,25 @@ fun GoogleSignInButton(
     enabled: Boolean = true,
     text: String = "Kontynuuj z Google"
 ) {
-    val isDark = SjtTheme.colors.isDark
+        val isDark = SjtTheme.colors.isDark
+    val isEInk = SjtTheme.isEInk
 
-    // Official Google Identity color spec — do not alter.
-    val bgColor = if (isDark) Color(0xFF131314) else Color(0xFFFFFFFF)
-    val borderColor = if (isDark) Color(0xFF8E918F) else Color(0xFF747775)
-    val textColor = if (isDark) Color(0xFFE3E3E3) else Color(0xFF1F1F1F)
+    // Official Google Identity color spec with monochrome overrides for E-Ink mode.
+    val bgColor = if (isEInk) {
+        if (isDark) Color(0xFF000000) else Color(0xFFFFFFFF)
+    } else {
+        if (isDark) Color(0xFF131314) else Color(0xFFFFFFFF)
+    }
+    val borderColor = if (isEInk) {
+        if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
+    } else {
+        if (isDark) Color(0xFF8E918F) else Color(0xFF747775)
+    }
+    val textColor = if (isEInk) {
+        if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
+    } else {
+        if (isDark) Color(0xFFE3E3E3) else Color(0xFF1F1F1F)
+    }
 
     val skipAnimations = SjtTheme.skipAnimations
     val interactionSource = remember { MutableInteractionSource() }
@@ -152,6 +167,7 @@ fun GoogleSignInButton(
                         Image(
                             painter = painterResource(id = R.drawable.ic_google_logo_g),
                             contentDescription = null,
+                            colorFilter = if (isEInk) ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) else null,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))

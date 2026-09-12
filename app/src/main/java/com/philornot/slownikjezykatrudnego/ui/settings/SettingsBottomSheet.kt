@@ -66,6 +66,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
@@ -109,8 +112,23 @@ fun SettingsBottomSheet(
         uncheckedTrackColor = colors.bgSurface,
         uncheckedBorderColor = colors.borderDefault
     )
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
+
+    // Prevent accidental sheet dismissal when touching or scrolling inside settings content
+    val contentNestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                // Consume unconsumed vertical drag delta so flicking/dragging downwards
+                // inside settings never leaks to ModalBottomSheet to accidentally dismiss it.
+                return if (available.y != 0f) Offset(0f, available.y) else Offset.Zero
+            }
+        }
+    }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -223,11 +241,12 @@ fun SettingsBottomSheet(
         }
     ) {
         SlownikJezykaTrudnegoTheme(settings = settings) {
-            Column(
+                        Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 18.dp)
                     .padding(bottom = 24.dp)
+                    .nestedScroll(contentNestedScrollConnection)
                     .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {

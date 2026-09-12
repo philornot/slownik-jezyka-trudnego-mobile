@@ -470,16 +470,22 @@ fun HybridQuizCard(
                         )
                     }
 
-                    // Strefa 2: Dolna część - Wygodne przyciski opcji, z bezpiecznym przewijaniem na mniejszych ekranach
-                    Column(
+                    // Strefa 2: Dolna część - Wygodne przyciski opcji zakotwiczone na dole (strefa kciuka / ergonomia jednej ręki)
+                    // z bezpiecznym przewijaniem na mniejszych ekranach
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f)
-                            .verticalScroll(quizScrollState)
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .weight(1f),
+                        contentAlignment = Alignment.BottomCenter
                     ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .verticalScroll(quizScrollState)
+                                .padding(horizontal = 16.dp)
+                                .padding(bottom = 12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                         card.options.forEachIndexed { index, option ->
                             val letter = ('A' + index).toString()
 
@@ -545,6 +551,7 @@ fun HybridQuizCard(
                                 }
                             }
                         }
+                    }
                     }
                 }
             }

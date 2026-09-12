@@ -5,6 +5,8 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -94,6 +96,7 @@ fun SjtNavigationRail(
                     Image(
                         painter = painterResource(id = logoRes),
                         contentDescription = "Słownik Języka Trudnego Logo",
+                        colorFilter = if (SjtTheme.isEInk) ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) else null,
                         modifier = Modifier.size(38.dp)
                     )
 

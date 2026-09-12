@@ -79,10 +79,10 @@ class NotificationHelperTest {
     @Test
     fun testGenerateReminderTitle_returnsValidTitle() {
         val expectedTitles = setOf(
-            "Pora na lekcję!",
             "Słownik Języka Trudnego",
             "Twoja codzienna lekcja",
-            "Czas na słówka!"
+            "Czas na trudne słówka!",
+            "Lekcja na dziś"
         )
         for (i in 0 until 50) {
             val title = NotificationHelper.generateReminderTitle(context)
@@ -168,10 +168,10 @@ class NotificationHelperTest {
     @Test
     fun testGenerateStreakSaverTitle_returnsValidTitle() {
         val expectedTitles = setOf(
-            "Uratuj swoją serię!",
-            "Twoja seria jest zagrożona!",
-            "Nie trać serii!",
-            "Szybka lekcja przed końcem dnia?"
+            "Seria się kończy",
+            "Jeszcze jest czas",
+            "Przypomnienie o serii",
+            "Lekcja przed końcem dnia?"
         )
         for (i in 0 until 50) {
             val title = NotificationHelper.generateStreakSaverTitle(context)
