@@ -276,52 +276,56 @@ fun NewWordsShowcase(
                             .clip(RoundedCornerShape(12.dp))
                             .pointerHoverIcon(PointerIcon.Hand)
                     ) {
+                        val isEInk = userSettings.eInkMode || SjtTheme.isEInk
+                        val skipAnimations = SjtTheme.skipAnimations
+
+                        val blurRadius by animateDpAsState(
+                            targetValue = if (isRevealed) 0.dp else 16.dp,
+                            animationSpec = if (skipAnimations) snap() else tween(durationMillis = 300),
+                            label = "definitionBlur"
+                        )
+                        val textAlpha by animateFloatAsState(
+                            targetValue = if (isRevealed) 1f else 0.35f,
+                            animationSpec = if (skipAnimations) snap() else tween(durationMillis = 300),
+                            label = "definitionAlpha"
+                        )
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 18.dp, vertical = 14.dp),
+                                .heightIn(min = 90.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            val isEInk = userSettings.eInkMode || SjtTheme.isEInk
-                            val skipAnimations = SjtTheme.skipAnimations
-
-                            val blurRadius by animateDpAsState(
-                                targetValue = if (isRevealed) 0.dp else 16.dp,
-                                animationSpec = if (skipAnimations) snap() else tween(durationMillis = 300),
-                                label = "definitionBlur"
-                            )
-                            val textAlpha by animateFloatAsState(
-                                targetValue = if (isRevealed) 1f else 0.5f,
-                                animationSpec = if (skipAnimations) snap() else tween(durationMillis = 300),
-                                label = "definitionAlpha"
-                            )
-
-                            Text(
-                                text = currentWord.fullDefinition,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = colors.textPrimary,
-                                lineHeight = 22.sp,
+                            // Full-card definition text container with matching rounded corners and seamless blur
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .heightIn(min = 90.dp)
                                     .then(
                                         if (isEInk) {
                                             if (!isRevealed) Modifier.alpha(0f) else Modifier
+                                        } else if (blurRadius > 0.dp) {
+                                            Modifier.blur(
+                                                radius = blurRadius,
+                                                edgeTreatment = BlurredEdgeTreatment(RoundedCornerShape(12.dp))
+                                            )
                                         } else {
                                             Modifier
-                                                .alpha(textAlpha)
-                                                .then(
-                                                    if (blurRadius > 0.dp) {
-                                                        Modifier.blur(
-                                                            radius = blurRadius,
-                                                            edgeTreatment = BlurredEdgeTreatment.Unbounded
-                                                        )
-                                                    } else {
-                                                        Modifier
-                                                    }
-                                                )
                                         }
                                     )
-                            )
+                                    .padding(horizontal = 18.dp, vertical = 14.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = currentWord.fullDefinition,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = colors.textPrimary.copy(
+                                        alpha = if (isEInk && !isRevealed) 0f else textAlpha
+                                    ),
+                                    lineHeight = 22.sp,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
 
                             if (!isRevealed) {
                                 Surface(
